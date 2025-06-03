@@ -1,12 +1,8 @@
 using Blood_Donation_System.DTOs;
-using Blood_Donation_System.DTOs.AuthDTOs;
-using Blood_Donation_System.DTOs.UserDTOs;
 using Blood_Donation_System.Models;
 using Blood_Donation_System.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Blood_Donation_System.Controllers
@@ -75,83 +71,6 @@ namespace Blood_Donation_System.Controllers
             };
 
             return Ok(response);
-        }
-
-        // POST: api/Auth/logout
-        [HttpPost("logout")]
-        [Authorize]
-        public async Task<IActionResult> Logout()
-        {
-            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            var result = await _authService.LogoutAsync(token);
-            
-            if (!result)
-            {
-                return BadRequest("Đăng xuất thất bại");
-            }
-
-            return Ok("Đăng xuất thành công");
-        }
-
-        // POST: api/Auth/forgot-password
-        [HttpPost("forgot-password")]
-        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDTO forgotPasswordDto)
-        {
-            var result = await _authService.ForgotPasswordAsync(forgotPasswordDto.Email);
-            
-            if (!result)
-            {
-                return BadRequest("Email không tồn tại trong hệ thống");
-            }
-
-            return Ok("Hướng dẫn đặt lại mật khẩu đã được gửi đến email của bạn");
-        }
-
-        // POST: api/Auth/reset-password
-        [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO resetPasswordDto)
-        {
-            if (!await _authService.ValidateResetTokenAsync(resetPasswordDto.Token))
-            {
-                return BadRequest("Token không hợp lệ hoặc đã hết hạn");
-            }
-
-            var result = await _authService.ResetPasswordAsync(
-                resetPasswordDto.Token,
-                resetPasswordDto.NewPassword
-            );
-
-            if (!result)
-            {
-                return BadRequest("Đặt lại mật khẩu thất bại");
-            }
-
-            return Ok("Đặt lại mật khẩu thành công");
-        }
-
-        // POST: api/Auth/change-password
-        [HttpPost("change-password")]
-        [Authorize]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO changePasswordDto)
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid userGuid))
-            {
-                return Unauthorized("Người dùng chưa đăng nhập");
-            }
-
-            var result = await _authService.ChangePasswordAsync(
-                userGuid,
-                changePasswordDto.CurrentPassword,
-                changePasswordDto.NewPassword
-            );
-
-            if (!result)
-            {
-                return BadRequest("Mật khẩu hiện tại không đúng");
-            }
-
-            return Ok("Đổi mật khẩu thành công");
         }
     }
 

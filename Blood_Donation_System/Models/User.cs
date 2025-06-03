@@ -33,10 +33,5 @@ namespace Blood_Donation_System.Models
         
         [MaxLength(20)]
         public string Role { get; set; }
-
-        [MaxLength(500)]
-        public string ResetPasswordToken { get; set; }
-
-        public DateTime? ResetPasswordTokenExpiry { get; set; }
     }
 } 
