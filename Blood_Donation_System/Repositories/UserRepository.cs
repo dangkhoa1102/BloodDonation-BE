@@ -21,5 +21,10 @@ namespace Blood_Donation_System.Repositories
         {
             return await _dbSet.FirstOrDefaultAsync(u => u.Email == email);
         }
+
+        public async Task<User> GetUserByResetToken(string token)
+        {
+            return await _dbSet.FirstOrDefaultAsync(u => u.ResetPasswordToken == token);
+        }
     }
 } 
