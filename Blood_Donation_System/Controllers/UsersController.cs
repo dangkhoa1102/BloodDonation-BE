@@ -1,7 +1,9 @@
 using Blood_Donation_System.DTOs;
+using Blood_Donation_System.DTOs.User;
 using Blood_Donation_System.Models;
 using Blood_Donation_System.Services;
 using Microsoft.AspNetCore.Authorization;
+
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -149,45 +151,7 @@ namespace Blood_Donation_System.Controllers
 
             return CreatedAtAction(nameof(GetUser), new { id = user.UserId }, userDto);
         }
-
-        // PUT: api/Users/5
-        [HttpPut("{id}")]
-        [Authorize]
-        public async Task<IActionResult> UpdateUser(Guid id, UserUpdateDTO userUpdateDto)
-        {
-            // Kiểm tra nếu người dùng chỉ có thể cập nhật thông tin của chính mình hoặc là Admin/Staff
-            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (currentUserId != id.ToString() && 
-                !User.IsInRole(Role.Admin) && 
-                !User.IsInRole(Role.Staff))
-            {
-                return Forbid();
-            }
-
-            var user = await _userService.GetUserByIdAsync(id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            user.UserIdCard = userUpdateDto.UserIdCard ?? user.UserIdCard;
-            user.Email = userUpdateDto.Email ?? user.Email;
-            user.FullName = userUpdateDto.FullName ?? user.FullName;
-            user.Phone = userUpdateDto.Phone ?? user.Phone;
-            user.DateOfBirth = userUpdateDto.DateOfBirth ?? user.DateOfBirth;
-
-            var result = await _userService.UpdateUserAsync(user);
-
-            if (!result)
-            {
-                return BadRequest("Failed to update user");
-            }
-
-            return NoContent();
-        }
-
-        // PATCH: api/Users/5/role
+         // PATCH: api/Users/5/role
         [HttpPatch("{id}/role")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ChangeUserRole(Guid id, [FromBody] ChangeRoleDTO changeRoleDto)

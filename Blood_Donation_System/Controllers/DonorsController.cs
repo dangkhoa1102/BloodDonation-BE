@@ -1,4 +1,4 @@
-using Blood_Donation_System.DTOs;
+using Blood_Donation_System.DTOs.Donor;
 using Blood_Donation_System.Models;
 using Blood_Donation_System.Services;
 using Microsoft.AspNetCore.Authorization;
