@@ -1,4 +1,5 @@
-using Blood_Donation_System.DTOs;
+using Blood_Donation_System.DTOs.User;
+using Blood_Donation_System.DTOs.Auth;
 using Blood_Donation_System.Models;
 using Blood_Donation_System.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -72,15 +73,5 @@ namespace Blood_Donation_System.Controllers
 
             return Ok(response);
         }
-    }
-
-    public class AuthResponseDTO
-    {
-        public Guid UserId { get; set; }
-        public string Username { get; set; }
-        public string Email { get; set; }
-        public string FullName { get; set; }
-        public string Role { get; set; }
-        public string Token { get; set; }
     }
 } 

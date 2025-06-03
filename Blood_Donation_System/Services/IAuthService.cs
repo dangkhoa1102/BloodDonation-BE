@@ -1,4 +1,4 @@
-using Blood_Donation_System.DTOs;
+using Blood_Donation_System.DTOs.User;
 using Blood_Donation_System.Models;
 using System;
 using System.Threading.Tasks;
