@@ -8,5 +8,6 @@ namespace Blood_Donation_System.Repositories
     {
         Task<User> GetUserByUsername(string username);
         Task<User> GetUserByEmail(string email);
+        Task<User> GetUserByResetToken(string token);
     }
 } 

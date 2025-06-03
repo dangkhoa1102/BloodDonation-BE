@@ -1,13 +1,10 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Blood_Donation_System.Models
+namespace Blood_Donation_System.DTOs.UserDTOs
 {
-    public class User
+    public class UserCreateDTO
     {
-        [Key]
-        public Guid UserId { get; set; }
-        
         [Required]
         [MaxLength(100)]
         public string Username { get; set; }
@@ -19,6 +16,7 @@ namespace Blood_Donation_System.Models
         [MaxLength(20)]
         public string UserIdCard { get; set; }
         
+        [EmailAddress]
         [MaxLength(255)]
         public string Email { get; set; }
         
@@ -30,13 +28,5 @@ namespace Blood_Donation_System.Models
         public string Phone { get; set; }
         
         public DateTime? DateOfBirth { get; set; }
-        
-        [MaxLength(20)]
-        public string Role { get; set; }
-
-        [MaxLength(500)]
-        public string ResetPasswordToken { get; set; }
-
-        public DateTime? ResetPasswordTokenExpiry { get; set; }
     }
 } 
