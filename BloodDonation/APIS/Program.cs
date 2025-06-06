@@ -6,6 +6,8 @@ using Models;
 using Services;
 using Microsoft.OpenApi.Models;
 using APIS.Middleware;
+using Repositories.Interfaces;
+using Repositories.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,6 +72,8 @@ builder.Services.AddDbContext<BloodDonationSupportContext>(options =>
 
 // Register services
 builder.Services.AddScoped<IAuthService, AuthService>();
+// Add other repositories and services as needed
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 var app = builder.Build();
 
