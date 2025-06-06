@@ -55,7 +55,7 @@ namespace Blood_Donation_System.Migrations
 
                     b.HasIndex("AuthorId");
 
-                    b.ToTable("Blogs");
+                    b.ToTable("Blog");
                 });
 
             modelBuilder.Entity("Blood_Donation_System.Models.BloodComponent", b =>

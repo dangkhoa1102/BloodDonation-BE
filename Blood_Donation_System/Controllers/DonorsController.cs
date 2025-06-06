@@ -25,7 +25,7 @@ namespace Blood_Donation_System.Controllers
 
         // GET: api/Donors
         [HttpGet]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<DonorDTO>>> GetDonors()
         {
             var donors = await _donorService.GetAllDonorsAsync();

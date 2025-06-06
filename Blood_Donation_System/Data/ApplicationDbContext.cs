@@ -21,7 +21,7 @@ namespace Blood_Donation_System.Data
         public DbSet<BloodDonation> BloodDonations { get; set; }
         public DbSet<BloodUnit> BloodUnits { get; set; }
         public DbSet<DonationHistory> DonationHistories { get; set; }
-        public DbSet<Blog> Blogs { get; set; }
+        public DbSet<Blog> Blog { get; set; }
         public DbSet<Document> Documents { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Report> Reports { get; set; }
