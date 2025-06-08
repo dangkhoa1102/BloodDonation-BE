@@ -11,6 +11,8 @@ using Repositories.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddScoped<IBlogRepository, BlogRepository>();
+builder.Services.AddScoped<IBlogService, BlogService>();
 // Add services to the container.
 builder.Services.AddControllers();
 
