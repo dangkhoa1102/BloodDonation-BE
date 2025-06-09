@@ -42,6 +42,48 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "APIS.Controllers.BloodRequestController",
+    "Method": "GetRequestById",
+    "RelativePath": "api/BloodRequest/{requestId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "requestId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.BloodRequestController",
+    "Method": "GetPendingRequests",
+    "RelativePath": "api/BloodRequest/pending",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.BloodRequestController",
+    "Method": "RegisterBloodRequest",
+    "RelativePath": "api/BloodRequest/register",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Models.DTOs.BloodRequestRegistrationDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "APIS.Controllers.UserController",
     "Method": "AdminOnlyEndpoint",
     "RelativePath": "api/User/admin-only",

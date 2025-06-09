@@ -69,12 +69,13 @@ namespace APIS.Controllers
         {
             try
             {
-                var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-                if (string.IsNullOrEmpty(token))
+                var authHeader = Request.Headers["Authorization"].ToString();
+                if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
                 {
-                    return BadRequest(new { message = "No token provided" });
+                    return BadRequest(new { message = "Invalid token format" });
                 }
 
+                var token = authHeader.Substring("Bearer ".Length).Trim();
                 var (success, message) = await _authService.LogoutAsync(token);
 
                 if (!success)

@@ -79,6 +79,72 @@
         }
       }
     },
+    "/api/BloodRequest/register": {
+      "post": {
+        "tags": [
+          "BloodRequest"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BloodRequestRegistrationDTO"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BloodRequestRegistrationDTO"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BloodRequestRegistrationDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/BloodRequest/{requestId}": {
+      "get": {
+        "tags": [
+          "BloodRequest"
+        ],
+        "parameters": [
+          {
+            "name": "requestId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/BloodRequest/pending": {
+      "get": {
+        "tags": [
+          "BloodRequest"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/User/public": {
       "get": {
         "tags": [
@@ -142,6 +208,37 @@
   },
   "components": {
     "schemas": {
+      "BloodRequestRegistrationDTO": {
+        "required": [
+          "bloodTypeRequired",
+          "patientUserId",
+          "quantityNeeded"
+        ],
+        "type": "object",
+        "properties": {
+          "patientUserId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bloodTypeRequired": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantityNeeded": {
+            "maximum": 5000,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "description": {
+            "maxLength": 500,
+            "minLength": 0,
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "LoginDTO": {
         "required": [
           "email",
