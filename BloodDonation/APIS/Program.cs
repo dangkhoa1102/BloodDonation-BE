@@ -9,12 +9,15 @@ using APIS.Middleware;
 using Repositories.Interfaces;
 using Repositories.Implementations;
 using System.Text.Json;
-using Microsoft.AspNetCore.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.SuppressModelStateInvalidFilter = true; // Tắt validation mặc định
+    });
 
 // Configure JWT Authentication
 builder.Services.AddAuthentication(options =>
@@ -25,7 +28,7 @@ builder.Services.AddAuthentication(options =>
 }).AddJwtBearer(options =>
 {
     options.SaveToken = true;
-    options.RequireHttpsMetadata = false; // Set to true in production
+    options.RequireHttpsMetadata = false;
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -36,9 +39,9 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key is not configured")))
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? 
+                throw new InvalidOperationException("JWT Key is not configured"))),
     };
-
     options.Events = new JwtBearerEvents
     {
         OnAuthenticationFailed = context =>
@@ -48,45 +51,30 @@ builder.Services.AddAuthentication(options =>
                 context.Response.Headers.Add("Token-Expired", "true");
             }
             return Task.CompletedTask;
-        },
-        OnChallenge = context =>
-        {
-            context.HandleResponse();
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            context.Response.ContentType = "application/json";
-            
-            var result = JsonSerializer.Serialize(new { message = "You are not authorized" });
-            return context.Response.WriteAsync(result);
         }
     };
 });
 
-// Configure Swagger/OpenAPI with JWT support
+// Configure Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Blood Donation API", Version = "v1" });
-    
-    // Add JWT Authentication
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Description = "JWT Authorization. Enter your token only",
         Name = "Authorization",
         In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT"
     });
-
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
             new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
             },
             Array.Empty<string>()
         }
@@ -97,22 +85,14 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDbContext<BloodDonationSupportContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Register services
+// Register Services
 builder.Services.AddScoped<IAuthService, AuthService>();
-// Add other repositories and services as needed
+builder.Services.AddScoped<IBloodRequestService, BloodRequestService>();
+
+// Register Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IBloodRequestRepository, BloodRequestRepository>();
 builder.Services.AddScoped<IBloodRecipientRepository, BloodRecipientRepository>();
-builder.Services.AddScoped<IBloodRequestService, BloodRequestService>();
-
-// Thêm policy cho CORS
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", builder =>
-        builder.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader());
-});
 
 var app = builder.Build();
 
@@ -123,18 +103,17 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Đảm bảo đúng thứ tự middleware
 app.UseHttpsRedirection();
 
-// CORS phải đứng trước Authentication và Authorization
-app.UseCors("AllowAll");
+app.UseCors(x => x
+    .AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader());
 
-app.UseSwagger();
-app.UseSwaggerUI();
-
-// Authentication và Authorization
+// Đúng thứ tự middleware
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseTokenValidation();
 
 app.MapControllers();
 

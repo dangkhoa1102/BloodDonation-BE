@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A8000880-9CDA-420C-BC48-45E4CC2DBDF4}|APIS\\APIS.csproj|d:\\swp391\\blood.donation\\blooddonation-be\\blooddonation\\apis\\middleware\\tokenvalidationmiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A8000880-9CDA-420C-BC48-45E4CC2DBDF4}|APIS\\APIS.csproj|solutionrelative:apis\\middleware\\tokenvalidationmiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{EA8282B8-3C99-4B15-BD1B-91B4B4D12F74}|Models\\Models.csproj|d:\\swp391\\blood.donation\\blooddonation-be\\blooddonation\\models\\dtos\\logindto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EA8282B8-3C99-4B15-BD1B-91B4B4D12F74}|Models\\Models.csproj|solutionrelative:models\\dtos\\logindto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A8000880-9CDA-420C-BC48-45E4CC2DBDF4}|APIS\\APIS.csproj|d:\\swp391\\blood.donation\\blooddonation-be\\blooddonation\\apis\\controllers\\bloodrequestcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A8000880-9CDA-420C-BC48-45E4CC2DBDF4}|APIS\\APIS.csproj|solutionrelative:apis\\controllers\\bloodrequestcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A8000880-9CDA-420C-BC48-45E4CC2DBDF4}|APIS\\APIS.csproj|d:\\swp391\\blood.donation\\blooddonation-be\\blooddonation\\apis\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A8000880-9CDA-420C-BC48-45E4CC2DBDF4}|APIS\\APIS.csproj|solutionrelative:apis\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A8000880-9CDA-420C-BC48-45E4CC2DBDF4}|APIS\\APIS.csproj|d:\\swp391\\blood.donation\\blooddonation-be\\blooddonation\\apis\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -17,22 +17,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{A8000880-9CDA-420C-BC48-45E4CC2DBDF4}|APIS\\APIS.csproj|d:\\swp391\\blood.donation\\blooddonation-be\\blooddonation\\apis\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{A8000880-9CDA-420C-BC48-45E4CC2DBDF4}|APIS\\APIS.csproj|solutionrelative:apis\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9567A99F-5FF9-4F8B-ABDE-9DA92017DC8F}|Services\\Services.csproj|d:\\swp391\\blood.donation\\blooddonation-be\\blooddonation\\services\\bloodrequestservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9567A99F-5FF9-4F8B-ABDE-9DA92017DC8F}|Services\\Services.csproj|solutionrelative:services\\bloodrequestservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9567A99F-5FF9-4F8B-ABDE-9DA92017DC8F}|Services\\Services.csproj|d:\\swp391\\blood.donation\\blooddonation-be\\blooddonation\\services\\ibloodrequestservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9567A99F-5FF9-4F8B-ABDE-9DA92017DC8F}|Services\\Services.csproj|solutionrelative:services\\ibloodrequestservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{EA8282B8-3C99-4B15-BD1B-91B4B4D12F74}|Models\\Models.csproj|d:\\swp391\\blood.donation\\blooddonation-be\\blooddonation\\models\\dtos\\bloodrequestregistrationdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{EA8282B8-3C99-4B15-BD1B-91B4B4D12F74}|Models\\Models.csproj|solutionrelative:models\\dtos\\bloodrequestregistrationdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{EA8282B8-3C99-4B15-BD1B-91B4B4D12F74}|Models\\Models.csproj|d:\\swp391\\blood.donation\\blooddonation-be\\blooddonation\\models\\bloodrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{EA8282B8-3C99-4B15-BD1B-91B4B4D12F74}|Models\\Models.csproj|solutionrelative:models\\bloodrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -42,37 +26,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\APIS\\appsettings.json",
-              "RelativeDocumentMoniker": "APIS\\appsettings.json",
-              "ToolTip": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\APIS\\appsettings.json",
-              "RelativeToolTip": "APIS\\appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAcAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-06-09T14:19:38.035Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "TokenValidationMiddleware.cs",
-              "DocumentMoniker": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\APIS\\Middleware\\TokenValidationMiddleware.cs",
-              "RelativeDocumentMoniker": "APIS\\Middleware\\TokenValidationMiddleware.cs",
-              "ToolTip": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\APIS\\Middleware\\TokenValidationMiddleware.cs",
-              "RelativeToolTip": "APIS\\Middleware\\TokenValidationMiddleware.cs",
-              "ViewState": "AgIAAAEAAAAAAAAAAAAiwAwAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-09T14:19:17.507Z",
-              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -82,74 +40,48 @@
               "RelativeDocumentMoniker": "APIS\\Program.cs",
               "ToolTip": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\APIS\\Program.cs",
               "RelativeToolTip": "APIS\\Program.cs",
-              "ViewState": "AgIAAHkAAAAAAAAAAAAvwBcAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADYAAAAGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-09T14:14:53.296Z",
+              "WhenOpened": "2025-06-09T15:23:32.841Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "BloodRequestController.cs",
-              "DocumentMoniker": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\APIS\\Controllers\\BloodRequestController.cs",
-              "RelativeDocumentMoniker": "APIS\\Controllers\\BloodRequestController.cs",
-              "ToolTip": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\APIS\\Controllers\\BloodRequestController.cs",
-              "RelativeToolTip": "APIS\\Controllers\\BloodRequestController.cs",
-              "ViewState": "AgIAABUAAAAAAAAAAAAAAFoAAAABAAAAAAAAAA==",
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\APIS\\Controllers\\AuthController.cs",
+              "RelativeDocumentMoniker": "APIS\\Controllers\\AuthController.cs",
+              "ToolTip": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\APIS\\Controllers\\AuthController.cs",
+              "RelativeToolTip": "APIS\\Controllers\\AuthController.cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAAgwCQAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-09T14:02:16.686Z",
+              "WhenOpened": "2025-06-09T15:23:12.815Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "IBloodRequestService.cs",
-              "DocumentMoniker": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\Services\\IBloodRequestService.cs",
-              "RelativeDocumentMoniker": "Services\\IBloodRequestService.cs",
-              "ToolTip": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\Services\\IBloodRequestService.cs",
-              "RelativeToolTip": "Services\\IBloodRequestService.cs",
+              "DocumentIndex": 0,
+              "Title": "LoginDTO.cs",
+              "DocumentMoniker": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\Models\\DTOs\\LoginDTO.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\LoginDTO.cs",
+              "ToolTip": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\Models\\DTOs\\LoginDTO.cs",
+              "RelativeToolTip": "Models\\DTOs\\LoginDTO.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-09T14:01:53.993Z",
+              "WhenOpened": "2025-06-09T15:22:42.101Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "BloodRequestService.cs",
-              "DocumentMoniker": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\Services\\BloodRequestService.cs",
-              "RelativeDocumentMoniker": "Services\\BloodRequestService.cs",
-              "ToolTip": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\Services\\BloodRequestService.cs",
-              "RelativeToolTip": "Services\\BloodRequestService.cs",
-              "ViewState": "AgIAAEsAAAAAAAAAAAAowAYAAAA3AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-09T13:59:48.925Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "BloodRequestRegistrationDTO.cs",
-              "DocumentMoniker": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\Models\\DTOs\\BloodRequestRegistrationDTO.cs",
-              "RelativeDocumentMoniker": "Models\\DTOs\\BloodRequestRegistrationDTO.cs",
-              "ToolTip": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\Models\\DTOs\\BloodRequestRegistrationDTO.cs",
-              "RelativeToolTip": "Models\\DTOs\\BloodRequestRegistrationDTO.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAhAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-09T13:57:08.362Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "BloodRequest.cs",
-              "DocumentMoniker": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\Models\\BloodRequest.cs",
-              "RelativeDocumentMoniker": "Models\\BloodRequest.cs",
-              "ToolTip": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\Models\\BloodRequest.cs",
-              "RelativeToolTip": "Models\\BloodRequest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-09T13:51:12.621Z",
+              "DocumentIndex": 3,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\APIS\\appsettings.json",
+              "RelativeDocumentMoniker": "APIS\\appsettings.json",
+              "ToolTip": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\APIS\\appsettings.json",
+              "RelativeToolTip": "APIS\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAADAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-06-09T15:08:51.736Z",
               "EditorCaption": ""
             }
           ]

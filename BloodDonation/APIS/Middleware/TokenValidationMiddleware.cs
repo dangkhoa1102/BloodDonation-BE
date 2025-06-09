@@ -19,8 +19,6 @@ namespace APIS.Middleware
         {
             try
             {
-                _logger.LogInformation("Request Path: {Path}", context.Request.Path);
-
                 // Skip validation for these paths
                 if (context.Request.Path.StartsWithSegments("/swagger") ||
                     context.Request.Path.StartsWithSegments("/api/Auth/login") ||
@@ -30,17 +28,16 @@ namespace APIS.Middleware
                     return;
                 }
 
-                var authHeader = context.Request.Headers["Authorization"].ToString();
-                _logger.LogInformation("Auth Header: {Header}", authHeader);
-
-                if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
+                var token = context.Request.Headers["Authorization"].ToString();
+                
+                // Nếu token đã có "Bearer" thì giữ nguyên, nếu không thì thêm vào
+                if (!string.IsNullOrEmpty(token) && !token.StartsWith("Bearer "))
                 {
-                    context.Response.StatusCode = 401;
-                    await context.Response.WriteAsJsonAsync(new { message = "Invalid Authorization header format" });
-                    return;
+                    token = $"Bearer {token}";
+                    // Update lại header với token mới
+                    context.Request.Headers["Authorization"] = token;
                 }
 
-                var token = authHeader.Substring("Bearer ".Length).Trim();
                 if (string.IsNullOrEmpty(token))
                 {
                     context.Response.StatusCode = 401;
@@ -48,17 +45,19 @@ namespace APIS.Middleware
                     return;
                 }
 
-                if (AuthService.IsTokenBlacklisted(token))
+                var actualToken = token.Replace("Bearer ", "").Trim();
+                if (AuthService.IsTokenBlacklisted(actualToken))
                 {
                     context.Response.StatusCode = 401;
                     await context.Response.WriteAsJsonAsync(new { message = "Token has been revoked" });
                     return;
                 }
+
                 await _next(context);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in TokenValidationMiddleware");
+                _logger.LogError(ex, "Error in token validation");
                 context.Response.StatusCode = 500;
                 await context.Response.WriteAsJsonAsync(new { message = "Internal server error" });
             }

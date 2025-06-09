@@ -241,19 +241,20 @@
       },
       "LoginDTO": {
         "required": [
-          "email",
           "password"
         ],
         "type": "object",
         "properties": {
           "email": {
-            "minLength": 1,
             "type": "string",
-            "format": "email"
+            "format": "email",
+            "default": "example@gmail.com",
+            "nullable": true
           },
           "password": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "default": "********"
           }
         },
         "additionalProperties": false
@@ -311,10 +312,10 @@
     },
     "securitySchemes": {
       "Bearer": {
-        "type": "apiKey",
-        "description": "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
-        "name": "Authorization",
-        "in": "header"
+        "type": "http",
+        "description": "JWT Authorization. Enter your token only",
+        "scheme": "Bearer",
+        "bearerFormat": "JWT"
       }
     }
   },
