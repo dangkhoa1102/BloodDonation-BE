@@ -11,7 +11,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.Linq;
-            
+using Models.Enums;
+
 namespace Services
 {
     public interface IAuthService
@@ -91,7 +92,7 @@ namespace Services
                     Phone = registerDto.Phone,
                     UserIdCard = registerDto.UserIdCard,
                     DateOfBirth = registerDto.DateOfBirth,
-                    Role = "User"
+                    Role = UserRoles.Customer
                 };
 
                 _context.Users.Add(user);
