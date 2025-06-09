@@ -313,9 +313,8 @@
     "securitySchemes": {
       "Bearer": {
         "type": "http",
-        "description": "JWT Authorization. Enter your token only",
-        "scheme": "Bearer",
-        "bearerFormat": "JWT"
+        "description": "JWT Authorization header using the Bearer scheme.\r\n\r\n Enter your token in the text input below.",
+        "scheme": "Bearer"
       }
     }
   },

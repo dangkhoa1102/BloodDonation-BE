@@ -40,7 +40,7 @@
               "RelativeDocumentMoniker": "APIS\\Program.cs",
               "ToolTip": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\APIS\\Program.cs",
               "RelativeToolTip": "APIS\\Program.cs",
-              "ViewState": "AgIAACcAAAAAAAAAAAAAAEAAAABBAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAIwAAAAKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-06-09T15:23:32.841Z",
               "EditorCaption": ""
@@ -55,8 +55,7 @@
               "RelativeToolTip": "APIS\\Controllers\\AuthController.cs",
               "ViewState": "AgIAABMAAAAAAAAAAAAgwCQAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-09T15:23:12.815Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-06-09T15:23:12.815Z"
             },
             {
               "$type": "Document",
@@ -68,8 +67,7 @@
               "RelativeToolTip": "Models\\DTOs\\LoginDTO.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAA5AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-09T15:22:42.101Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-06-09T15:22:42.101Z"
             },
             {
               "$type": "Document",
@@ -81,8 +79,7 @@
               "RelativeToolTip": "APIS\\appsettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAADAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-06-09T15:08:51.736Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-06-09T15:08:51.736Z"
             }
           ]
         }
