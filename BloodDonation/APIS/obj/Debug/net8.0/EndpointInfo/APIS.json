@@ -79,6 +79,131 @@
         }
       }
     },
+    "/api/Blog": {
+      "get": {
+        "tags": [
+          "Blog"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Blog"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlogCreateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlogCreateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlogCreateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Blog/{id}": {
+      "get": {
+        "tags": [
+          "Blog"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Blog"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlogUpdateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlogUpdateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlogUpdateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Blog"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/BloodRequest/register": {
       "post": {
         "tags": [
@@ -145,6 +270,176 @@
         }
       }
     },
+<<<<<<< HEAD
+    "/api/BloodRequest/register": {
+      "post": {
+        "tags": [
+          "BloodRequest"
+=======
+    "/api/Blog": {
+      "get": {
+        "tags": [
+          "Blog"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Blog"
+>>>>>>> origin/develop
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+<<<<<<< HEAD
+                "$ref": "#/components/schemas/BloodRequestRegistrationDTO"
+=======
+                "$ref": "#/components/schemas/BlogCreateDto"
+>>>>>>> origin/develop
+              }
+            },
+            "text/json": {
+              "schema": {
+<<<<<<< HEAD
+                "$ref": "#/components/schemas/BloodRequestRegistrationDTO"
+=======
+                "$ref": "#/components/schemas/BlogCreateDto"
+>>>>>>> origin/develop
+              }
+            },
+            "application/*+json": {
+              "schema": {
+<<<<<<< HEAD
+                "$ref": "#/components/schemas/BloodRequestRegistrationDTO"
+=======
+                "$ref": "#/components/schemas/BlogCreateDto"
+>>>>>>> origin/develop
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+<<<<<<< HEAD
+    "/api/BloodRequest/{requestId}": {
+      "get": {
+        "tags": [
+          "BloodRequest"
+        ],
+        "parameters": [
+          {
+            "name": "requestId",
+=======
+    "/api/Blog/{id}": {
+      "get": {
+        "tags": [
+          "Blog"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Blog"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlogUpdateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlogUpdateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlogUpdateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Blog"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+>>>>>>> origin/develop
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+<<<<<<< HEAD
+    "/api/BloodRequest/pending": {
+      "get": {
+        "tags": [
+          "BloodRequest"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+=======
+>>>>>>> origin/develop
     "/api/User/public": {
       "get": {
         "tags": [
@@ -208,6 +503,7 @@
   },
   "components": {
     "schemas": {
+<<<<<<< HEAD
       "BloodRequestRegistrationDTO": {
         "required": [
           "bloodTypeRequired",
@@ -235,6 +531,59 @@
             "minLength": 0,
             "type": "string",
             "nullable": true
+=======
+      "BlogCreateDto": {
+        "required": [
+          "category",
+          "content",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "authorId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "title": {
+            "maxLength": 500,
+            "minLength": 1,
+            "type": "string"
+          },
+          "content": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "category": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "BlogUpdateDto": {
+        "required": [
+          "category",
+          "content",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "maxLength": 500,
+            "minLength": 1,
+            "type": "string"
+          },
+          "content": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "category": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+>>>>>>> origin/develop
           }
         },
         "additionalProperties": false
@@ -312,6 +661,100 @@
     },
     "securitySchemes": {
       "Bearer": {
+        "type": "http",
+        "description": "JWT Authorization header using the Bearer scheme.\r\n\r\n Enter your token in the text input below.",
+        "scheme": "Bearer"
+      "BlogCreateDto": {
+        "required": [
+          "category",
+          "content",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "authorId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "title": {
+            "maxLength": 500,
+            "minLength": 1,
+            "type": "string"
+          },
+          "content": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "category": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "BlogUpdateDto": {
+        "required": [
+          "category",
+          "content",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "maxLength": 500,
+            "minLength": 1,
+            "type": "string"
+          },
+          "content": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "category": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "BloodRequestRegistrationDTO": {
+        "required": [
+          "bloodTypeRequired",
+          "patientUserId",
+          "quantityNeeded"
+        ],
+        "type": "object",
+        "properties": {
+          "patientUserId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bloodTypeRequired": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantityNeeded": {
+            "maximum": 5000,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "description": {
+            "maxLength": 500,
+            "minLength": 0,
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+            "format": "email",
+            "default": "example@gmail.com",
+            "nullable": true
+            "type": "string",
+            "default": "********"
         "type": "http",
         "description": "JWT Authorization header using the Bearer scheme.\r\n\r\n Enter your token in the text input below.",
         "scheme": "Bearer"

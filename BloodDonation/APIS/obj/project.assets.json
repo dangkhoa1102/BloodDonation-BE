@@ -4561,23 +4561,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\dangk\\.nuget\\packages\\": {},
+    "C:\\Users\\admin\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\APIS\\APIS.csproj",
+      "projectUniqueName": "D:\\Ki5\\SWP391\\ProjectTeam\\be-new\\BloodDonation\\APIS\\APIS.csproj",
       "projectName": "APIS",
-      "projectPath": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\APIS\\APIS.csproj",
-      "packagesPath": "C:\\Users\\dangk\\.nuget\\packages\\",
-      "outputPath": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\APIS\\obj\\",
+      "projectPath": "D:\\Ki5\\SWP391\\ProjectTeam\\be-new\\BloodDonation\\APIS\\APIS.csproj",
+      "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
+      "outputPath": "D:\\Ki5\\SWP391\\ProjectTeam\\be-new\\BloodDonation\\APIS\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\dangk\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -4592,11 +4592,11 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\Models\\Models.csproj": {
-              "projectPath": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\Models\\Models.csproj"
+            "D:\\Ki5\\SWP391\\ProjectTeam\\be-new\\BloodDonation\\Models\\Models.csproj": {
+              "projectPath": "D:\\Ki5\\SWP391\\ProjectTeam\\be-new\\BloodDonation\\Models\\Models.csproj"
             },
-            "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\Services\\Services.csproj": {
-              "projectPath": "D:\\SWP391\\Blood.Donation\\BloodDonation-BE\\BloodDonation\\Services\\Services.csproj"
+            "D:\\Ki5\\SWP391\\ProjectTeam\\be-new\\BloodDonation\\Services\\Services.csproj": {
+              "projectPath": "D:\\Ki5\\SWP391\\ProjectTeam\\be-new\\BloodDonation\\Services\\Services.csproj"
             }
           }
         }
@@ -4611,7 +4611,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.300"
+      "SdkAnalysisLevel": "9.0.200"
     },
     "frameworks": {
       "net8.0": {
@@ -4665,7 +4665,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
