@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Models;
 using Models.DTOs;
+using Models.Enums;
 using Repositories.Interfaces;
 using Services;
 
@@ -84,13 +85,98 @@ public class BloodRequestService : IBloodRequestService
         }
     }
 
+    
+
+    public async Task<IEnumerable<BloodRequest>> GetAllRequestsAsync()
+    {
+        try
+        {
+            var requests = await _requestRepository.GetAllAsync();
+            // Sort by date descending to show newest first
+            return requests.OrderByDescending(r => r.RequestDate);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving blood requests");
+            return Enumerable.Empty<BloodRequest>();
+        }
+    }
     public async Task<BloodRequest> GetRequestByIdAsync(Guid requestId)
     {
         return await _requestRepository.GetByIdWithDetailsAsync(requestId);
     }
 
-    public async Task<IEnumerable<BloodRequest>> GetPendingRequestsAsync()
+    public async Task<IEnumerable<BloodRequest>> GetRequestsByStatusAsync(BloodRequestStatus status)
     {
-        return await _requestRepository.GetByStatusAsync("Pending");
+        try
+        {
+            var statusString = status.ToString();
+            var requests = await _requestRepository.GetByStatusAsync(statusString);
+            return requests.OrderByDescending(r => r.RequestDate);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving blood requests by status: {Status}", status);
+            return Enumerable.Empty<BloodRequest>();
+        }
+    }
+
+    public async Task<IEnumerable<BloodRequest>> GetRequestsByRecipientNameAsync(string recipientName)
+    {
+        try
+        {
+            var requests = await _requestRepository.GetAllAsync();
+            var filteredRequests = requests
+                .Join(_recipientRepository.GetAllAsync().Result,
+                    request => request.RecipientId,
+                    recipient => recipient.RecipientId,
+                    (request, recipient) => new { Request = request, Recipient = recipient })
+                .Join(_userRepository.GetAllAsync().Result,
+                    joined => joined.Recipient.UserId,
+                    user => user.UserId,
+                    (joined, user) => new { joined.Request, joined.Recipient, User = user })
+                .Where(joined => joined.User.FullName.ToLower().Contains(recipientName.ToLower()))
+                .Select(joined => joined.Request)
+                .ToList(); // Changed from ToListAsync() to ToList()
+
+            return filteredRequests.OrderByDescending(r => r.RequestDate);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving blood requests by recipient name: {RecipientName}", recipientName);
+            return Enumerable.Empty<BloodRequest>();
+        }
+    }
+    public async Task<IEnumerable<BloodRequest>> GetRequestsByRecipientUserIdAsync(Guid userId)
+    {
+        try
+        {
+            // Kiểm tra xem user có tồn tại và có phải là Customer không
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null || user.Role != "Customer")
+            {
+                return Enumerable.Empty<BloodRequest>();
+            }
+
+            // Lấy BloodRecipient của user
+            var recipient = await _recipientRepository.GetByUserIdAsync(userId);
+            if (recipient == null)
+            {
+                return Enumerable.Empty<BloodRequest>();
+            }
+
+            // Lấy các request của recipient và sắp xếp theo ngày mới nhất
+            var requests = await _requestRepository.GetAllAsync();
+            var recipientRequests = requests
+                .Where(r => r.RecipientId == recipient.RecipientId)
+                .OrderByDescending(r => r.RequestDate);
+
+            return recipientRequests;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving blood requests for recipient user: {UserId}", userId);
+            return Enumerable.Empty<BloodRequest>();
+        }
     }
 }
