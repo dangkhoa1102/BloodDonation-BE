@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Models;
+using Models.DTOs;
 using Repositories.Interfaces;
-using Services.Interfaces;
 
 namespace Services.Implementations
 {
@@ -69,6 +69,66 @@ namespace Services.Implementations
             {
                 _logger.LogError(ex, "Error searching users by name term: {SearchTerm}", searchTerm);
                 throw;
+            }
+        }
+        public async Task<(bool success, string message)> UpdateUserAsync(Guid userId, UserUpdateDTO updateDto)
+        {
+            try
+            {
+                var user = await _userRepository.GetByIdAsync(userId);
+                if (user == null)
+                {
+                    return (false, "User not found");
+                }
+
+                if (!string.IsNullOrWhiteSpace(updateDto.Email) && updateDto.Email != user.Email)
+                {
+                    var emailExists = await _userRepository.IsEmailExistsAsync(updateDto.Email);
+                    if (emailExists)
+                    {
+                        return (false, "Email already exists");
+                    }
+                }
+
+
+                if (!string.IsNullOrWhiteSpace(updateDto.Username) && updateDto.Username != user.Username)
+                {
+                    var usernameExists = await _userRepository.IsUsernameExistsAsync(updateDto.Username);
+                    if (usernameExists)
+                    {
+                        return (false, "Username already exists");
+                    }
+                }
+                if (!string.IsNullOrWhiteSpace(updateDto.Username))
+                    user.Username = updateDto.Username;
+
+                if (!string.IsNullOrWhiteSpace(updateDto.Email))
+                    user.Email = updateDto.Email;
+
+                if (!string.IsNullOrWhiteSpace(updateDto.FullName))
+                    user.FullName = updateDto.FullName;
+
+                if (!string.IsNullOrWhiteSpace(updateDto.Phone))
+                    user.Phone = updateDto.Phone;
+
+                if (!string.IsNullOrWhiteSpace(updateDto.UserIdCard))
+                    user.UserIdCard = updateDto.UserIdCard;
+
+                if (updateDto.DateOfBirth.HasValue)
+                    user.DateOfBirth = updateDto.DateOfBirth;
+
+                if (!string.IsNullOrWhiteSpace(updateDto.Password))
+                    user.Password = updateDto.Password;
+
+                _userRepository.UpdateAsync(user);
+                await _userRepository.SaveChangesAsync();
+
+                return (true, "User updated successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating user {UserId}", userId);
+                return (false, "An error occurred while updating the user");
             }
         }
     }

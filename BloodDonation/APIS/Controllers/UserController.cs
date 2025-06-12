@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Models.DTOs;
 using Models.Enums;
-using Services.Interfaces;
 
 namespace APIS.Controllers
 {
@@ -148,6 +148,25 @@ namespace APIS.Controllers
             {
                 _logger.LogError(ex, "Error searching users with term: {SearchTerm}", searchTerm);
                 return StatusCode(500, new { message = "An error occurred while searching users" });
+            }
+        }
+        [HttpPut("Update-User/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UserUpdateDTO updateDto)
+        {
+            try
+            {
+                var (success, message) = await _userService.UpdateUserAsync(id, updateDto);
+
+                if (!success)
+                    return BadRequest(new { message });
+
+                return Ok(new { message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating user {UserId}", id);
+                return StatusCode(500, new { message = "An error occurred while updating the user" });
             }
         }
     }
