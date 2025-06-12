@@ -1,49 +1,40 @@
-[Route("api/[controller]")]
-[ApiController]
-public class UserController : ControllerBase
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Services.Interfaces;
+
+namespace APIS.Controllers
 {
-    private readonly IUserRepository _userRepository;
-    private readonly ILogger<UserController> _logger;
-
-    public UserController(IUserRepository userRepository, ILogger<UserController> logger)
+    [ApiController]
+    [Route("api/[controller]")]
+    [Authorize(Roles = "Admin,Staff")]
+    public class UserController : ControllerBase
     {
-        _userRepository = userRepository;
-        _logger = logger;
-    }
+        private readonly IUserService _userService;
+        private readonly ILogger<UserController> _logger;
 
-    [Authorize]
-    [HttpGet("profile")]
-    public async Task<IActionResult> GetProfile()
-    {
-        try
+        public UserController(IUserService userService, ILogger<UserController> logger)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-            {
-                return BadRequest(new { message = "User ID not found in token" });
-            }
-
-            var user = await _userRepository.GetByIdAsync(Guid.Parse(userId));
-            if (user == null)
-            {
-                return NotFound(new { message = "User not found" });
-            }
-
-            return Ok(new
-            {
-                user.UserId,
-                user.Username,
-                user.Email,
-                user.FullName,
-                user.Phone,
-                user.DateOfBirth,
-                user.Role
-            });
+            _userService = userService;
+            _logger = logger;
         }
-        catch (Exception ex)
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllUsers()
         {
-            _logger.LogError(ex, "Error getting user profile");
-            return StatusCode(500, new { message = "An error occurred while retrieving the profile" });
+            try
+            {
+                var users = await _userService.GetAllUsersAsync();
+                if (!users.Any())
+                {
+                    return NoContent();
+                }
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while retrieving users");
+                return StatusCode(500, "An error occurred while retrieving users");
+            }
         }
     }
 }

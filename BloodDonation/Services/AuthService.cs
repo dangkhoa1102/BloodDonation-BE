@@ -91,7 +91,7 @@ namespace Services
                     Phone = registerDto.Phone,
                     UserIdCard = registerDto.UserIdCard,
                     DateOfBirth = registerDto.DateOfBirth,
-                    Role = UserRoles.Customer
+                    Role = UserRoles.Customer.ToString()
                 };
 
                 _context.Users.Add(user);
