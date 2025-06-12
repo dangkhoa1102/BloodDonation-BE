@@ -7,6 +7,8 @@ using Models;
 using Repositories.Implementations;
 using Repositories.Interfaces;
 using Services;
+using Services.Implementations;
+using Services.Interfaces;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -15,6 +17,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddScoped<IBlogService, BlogService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+
 // Add services to the container.
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
