@@ -1,0 +1,17 @@
+﻿using Models;
+using Models.DTOs;
+using Models.Enums;
+
+namespace Services
+{
+    public interface IBloodRequestService
+    {
+        Task<(bool success, string message, Guid? requestId)> RegisterBloodRequestAsync(
+            BloodRequestRegistrationDTO request, Guid staffId);
+        Task<BloodRequest> GetRequestByIdAsync(Guid requestId);
+        Task<IEnumerable<BloodRequest>> GetAllRequestsAsync();
+        Task<IEnumerable<BloodRequest>> GetRequestsByStatusAsync(BloodRequestStatus status);
+        Task<IEnumerable<BloodRequest>> GetRequestsByRecipientNameAsync(string recipientName);
+        Task<IEnumerable<BloodRequest>> GetRequestsByRecipientUserIdAsync(Guid userId);
+    }
+}

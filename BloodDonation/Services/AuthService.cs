@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
@@ -11,7 +11,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.Linq;
-            
+using Models.Enums;
+
 namespace Services
 {
     public interface IAuthService
@@ -50,7 +51,8 @@ namespace Services
                     return (false, "Invalid email or password", null);
                 }
 
-                if (!VerifyPassword(loginDto.Password, user.Password))
+                // So sánh mật khẩu trực tiếp, không hash
+                if (loginDto.Password != user.Password)
                 {
                     return (false, "Invalid email or password", null);
                 }
@@ -79,19 +81,17 @@ namespace Services
                     return (false, "Username already exists");
                 }
 
-                var hashedPassword = HashPassword(registerDto.Password);
-
                 var user = new User
                 {
                     UserId = Guid.NewGuid(),
                     Email = registerDto.Email,
                     Username = registerDto.Username,
-                    Password = hashedPassword,
+                    Password = registerDto.Password, // Lưu mật khẩu trực tiếp, không hash
                     FullName = registerDto.FullName,
                     Phone = registerDto.Phone,
                     UserIdCard = registerDto.UserIdCard,
                     DateOfBirth = registerDto.DateOfBirth,
-                    Role = "User"
+                    Role = UserRoles.Customer.ToString()
                 };
 
                 _context.Users.Add(user);
@@ -120,7 +120,7 @@ namespace Services
                     return (false, "Token is already invalidated");
                 }
 
-                // Th�m token v�o blacklist
+                // Thêm token vào blacklist
                 BlacklistToken(token);
 
                 return (true, "Logged out successfully");
@@ -168,20 +168,5 @@ namespace Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
-        private string HashPassword(string password)
-        {
-            using (var sha256 = SHA256.Create())
-            {
-                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return Convert.ToBase64String(hashedBytes);
-            }
-        }
-
-        private bool VerifyPassword(string inputPassword, string hashedPassword)
-        {
-            var hashedInput = HashPassword(inputPassword);
-            return hashedInput == hashedPassword;
-        }
     }
-} 
+}
