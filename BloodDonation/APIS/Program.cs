@@ -11,6 +11,13 @@ using Repositories.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<IBloodDonationRepository, BloodDonationRepository>();
+builder.Services.AddScoped<IBloodDonationService, BloodDonationService>();
+
+builder.Services.AddScoped<IDonationHistoryRepository, DonationHistoryRepository>();
+builder.Services.AddScoped<IDonationHistoryService, DonationHistoryService>();
+
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 // Add services to the container.
