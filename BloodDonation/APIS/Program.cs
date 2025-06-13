@@ -14,7 +14,17 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+<<<<<<< HEAD
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<IBloodDonationRepository, BloodDonationRepository>();
+builder.Services.AddScoped<IBloodDonationService, BloodDonationService>();
+
+builder.Services.AddScoped<IDonationHistoryRepository, DonationHistoryRepository>();
+builder.Services.AddScoped<IDonationHistoryService, DonationHistoryService>();
+
+=======
 // Register Services
+>>>>>>> develop
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();

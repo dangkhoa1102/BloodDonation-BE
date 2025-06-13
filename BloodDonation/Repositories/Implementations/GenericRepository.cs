@@ -56,5 +56,11 @@ namespace Repositories.Implementations
         {
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task DeleteAsync(T entity)
+        {
+            _context.Set<T>().Remove(entity);
+            await _context.SaveChangesAsync();
+        }
     }
 }

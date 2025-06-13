@@ -16,5 +16,6 @@ namespace Repositories.Interfaces
         void Update(T entity);
         void Remove(T entity);
         Task<bool> SaveChangesAsync();
+        Task DeleteAsync(T entity);
     }
 }
