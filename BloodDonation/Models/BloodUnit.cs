@@ -19,6 +19,8 @@ public partial class BloodUnit
 
     public string Status { get; set; }
 
+    public int Quantity { get; set; }
+
     public virtual BloodType BloodType { get; set; }
 
     public virtual BloodComponent ComponentTypeNavigation { get; set; }

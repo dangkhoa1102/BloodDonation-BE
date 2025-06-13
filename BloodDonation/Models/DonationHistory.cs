@@ -19,5 +19,9 @@ public partial class DonationHistory
 
     public DateOnly? NextEligibleDate { get; set; }
 
+    public Guid? CertificateId { get; set; }
+
+    public virtual Certificate Certificate { get; set; }
+
     public virtual Donor Donor { get; set; }
 }

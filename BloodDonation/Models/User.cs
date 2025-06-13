@@ -29,6 +29,8 @@ public partial class User
 
     public virtual ICollection<BloodRecipient> BloodRecipients { get; set; } = new List<BloodRecipient>();
 
+    public virtual ICollection<Certificate> Certificates { get; set; } = new List<Certificate>();
+
     public virtual ICollection<Donor> Donors { get; set; } = new List<Donor>();
 
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();

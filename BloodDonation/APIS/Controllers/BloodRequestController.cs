@@ -173,7 +173,7 @@ namespace APIS.Controllers
             }
         }
         [HttpGet("Get-My-Requests")]
-        [Authorize(Roles = "Customer")]
+        [Authorize(Roles = "Member")]
         public async Task<IActionResult> GetMyRequests()
         {
             try
@@ -224,7 +224,7 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-My-Requests-By-Status/{status}")]
-        [Authorize(Roles = "Customer")]
+        [Authorize(Roles = "Member")]
         public async Task<IActionResult> GetMyRequestsByStatus([FromRoute] BloodRequestStatus status)
         {
             try
@@ -272,6 +272,31 @@ namespace APIS.Controllers
             {
                 _logger.LogError(ex, "Error retrieving blood requests by status for current user");
                 return StatusCode(500, new { message = "An error occurred while retrieving your blood requests" });
+            }
+        }
+        [HttpPut("Update-Blood-Requests/{id}")]
+        [Authorize(Roles = "Staff")]
+        public async Task<IActionResult> UpdateBloodRequest(Guid id, [FromBody] BloodRequestUpdateDTO updateDto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                var staffId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? throw new InvalidOperationException("Staff ID not found in token"));
+
+                var (success, message) = await _bloodRequestService.UpdateBloodRequestAsync(id, updateDto, staffId);
+
+                if (!success)
+                    return BadRequest(new { message });
+
+                return Ok(new { message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating blood request");
+                return StatusCode(500, new { message = "An error occurred while updating the blood request" });
             }
         }
     }
