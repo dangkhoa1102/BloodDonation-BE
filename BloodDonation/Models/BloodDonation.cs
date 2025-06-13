@@ -21,7 +21,13 @@ public partial class BloodDonation
 
     public string Notes { get; set; }
 
+    public Guid? CertificateId { get; set; }
+
     public virtual ICollection<BloodUnit> BloodUnits { get; set; } = new List<BloodUnit>();
+
+    public virtual Certificate Certificate { get; set; }
+
+    public virtual ICollection<Certificate> Certificates { get; set; } = new List<Certificate>();
 
     public virtual Donor Donor { get; set; }
 

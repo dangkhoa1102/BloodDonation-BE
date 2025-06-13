@@ -33,6 +33,8 @@ public partial class Donor
 
     public virtual BloodType BloodType { get; set; }
 
+    public virtual ICollection<Certificate> Certificates { get; set; } = new List<Certificate>();
+
     public virtual MedicalFacility ClosestFacility { get; set; }
 
     public virtual ICollection<DonationHistory> DonationHistories { get; set; } = new List<DonationHistory>();
