@@ -5,8 +5,8 @@ namespace Models.DTOs
 {
     public class BloodRequestRegistrationDTO
     {
-        [Required(ErrorMessage = "Customer ID is required")]
-        public Guid PatientUserId { get; set; }  // Đổi tên để rõ ràng hơn
+        [Required(ErrorMessage = "Member ID is required")] 
+        public Guid PatientUserId { get; set; }
 
         [Required(ErrorMessage = "Blood type is required")]
         public Guid BloodTypeRequired { get; set; }

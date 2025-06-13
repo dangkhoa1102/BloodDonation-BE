@@ -25,29 +25,24 @@ public class BloodRequestService : IBloodRequestService
     }
 
     public async Task<(bool success, string message, Guid? requestId)> RegisterBloodRequestAsync(
-        BloodRequestRegistrationDTO request, Guid staffId) // Thay đổi kiểu dữ liệu của staffId từ string sang Guid
+        BloodRequestRegistrationDTO request, Guid staffId)
     {
         try
         {
-            // Kiểm tra customer có tồn tại và đúng role không
-            var customer = await _userRepository.GetByIdAsync(request.PatientUserId);
-            if (customer == null)
+            var member = await _userRepository.GetByIdAsync(request.PatientUserId);
+            if (member == null)
             {
-                return (false, "Customer not found", null);
+                return (false, "Member not found", null);  
             }
-            if (customer.Role != "Customer")
+            if (member.Role != "Member")  
             {
-                return (false, "Selected user is not a customer", null);
+                return (false, "Selected user is not a member", null);
             }
-
-            // Kiểm tra staff có tồn tại và đúng role không
             var staff = await _userRepository.GetByIdAsync(staffId);
             if (staff == null || staff.Role != "Staff")
             {
                 return (false, "Invalid staff member", null);
             }
-
-            // Tìm hoặc tạo BloodRecipient mới cho customer
             var recipient = await _recipientRepository.GetByUserIdAsync(request.PatientUserId);
             if (recipient == null)
             {
@@ -59,17 +54,15 @@ public class BloodRequestService : IBloodRequestService
                 await _recipientRepository.AddAsync(recipient);
                 await _recipientRepository.SaveChangesAsync();
             }
-
-            // Tạo yêu cầu máu mới
             var bloodRequest = new BloodRequest
             {
                 RequestId = Guid.NewGuid(),
                 RecipientId = recipient.RecipientId,
                 BloodTypeRequired = request.BloodTypeRequired,
                 QuantityNeeded = request.QuantityNeeded,
-                UrgencyLevel = "Normal", // Mặc định
+                UrgencyLevel = "Normal",
                 RequestDate = DateOnly.FromDateTime(DateTime.UtcNow),
-                Status = "Pending", // Mặc định
+                Status = "Pending",
                 Description = request.Description
             };
 
@@ -85,14 +78,11 @@ public class BloodRequestService : IBloodRequestService
         }
     }
 
-    
-
     public async Task<IEnumerable<BloodRequest>> GetAllRequestsAsync()
     {
         try
         {
             var requests = await _requestRepository.GetAllAsync();
-            // Sort by date descending to show newest first
             return requests.OrderByDescending(r => r.RequestDate);
         }
         catch (Exception ex)
@@ -137,7 +127,7 @@ public class BloodRequestService : IBloodRequestService
                     (joined, user) => new { joined.Request, joined.Recipient, User = user })
                 .Where(joined => joined.User.FullName.ToLower().Contains(recipientName.ToLower()))
                 .Select(joined => joined.Request)
-                .ToList(); // Changed from ToListAsync() to ToList()
+                .ToList();
 
             return filteredRequests.OrderByDescending(r => r.RequestDate);
         }
@@ -151,21 +141,17 @@ public class BloodRequestService : IBloodRequestService
     {
         try
         {
-            // Kiểm tra xem user có tồn tại và có phải là Customer không
+           
             var user = await _userRepository.GetByIdAsync(userId);
-            if (user == null || user.Role != "Customer")
+            if (user == null || user.Role != "Member") 
             {
                 return Enumerable.Empty<BloodRequest>();
             }
-
-            // Lấy BloodRecipient của user
             var recipient = await _recipientRepository.GetByUserIdAsync(userId);
             if (recipient == null)
             {
                 return Enumerable.Empty<BloodRequest>();
             }
-
-            // Lấy các request của recipient và sắp xếp theo ngày mới nhất
             var requests = await _requestRepository.GetAllAsync();
             var recipientRequests = requests
                 .Where(r => r.RecipientId == recipient.RecipientId)
@@ -177,6 +163,48 @@ public class BloodRequestService : IBloodRequestService
         {
             _logger.LogError(ex, "Error retrieving blood requests for recipient user: {UserId}", userId);
             return Enumerable.Empty<BloodRequest>();
+        }
+    }
+    public async Task<(bool success, string message)> UpdateBloodRequestAsync(
+    Guid requestId, BloodRequestUpdateDTO updateDto, Guid staffId)
+    {
+        try
+        {
+            var staff = await _userRepository.GetByIdAsync(staffId);
+            if (staff == null || staff.Role != "Staff")
+            {
+                return (false, "Invalid staff member");
+            }
+
+            var request = await _requestRepository.GetByIdWithDetailsAsync(requestId);
+            if (request == null)
+            {
+                return (false, "Blood request not found");
+            }
+            if (updateDto.BloodTypeRequired.HasValue)
+                request.BloodTypeRequired = updateDto.BloodTypeRequired;
+
+            if (updateDto.QuantityNeeded.HasValue)
+                request.QuantityNeeded = updateDto.QuantityNeeded;
+
+            if (!string.IsNullOrWhiteSpace(updateDto.UrgencyLevel))
+                request.UrgencyLevel = updateDto.UrgencyLevel;
+
+            if (!string.IsNullOrWhiteSpace(updateDto.Status))
+                request.Status = updateDto.Status;
+
+            if (!string.IsNullOrWhiteSpace(updateDto.Description))
+                request.Description = updateDto.Description;
+
+            _requestRepository.Update(request);
+            await _requestRepository.SaveChangesAsync();
+
+            return (true, "Blood request updated successfully");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating blood request");
+            return (false, "An error occurred while updating the blood request");
         }
     }
 }
