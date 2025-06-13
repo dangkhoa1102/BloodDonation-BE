@@ -44,5 +44,17 @@ namespace Repositories.Implementations
                 .Include(r => r.BloodTypeRequiredNavigation)
                 .FirstOrDefaultAsync(r => r.RequestId == requestId);
         }
+        public async Task<IEnumerable<BloodRequest>> GetByIdsAsync(List<Guid> ids)
+        {
+            return await _dbSet
+                .Include(r => r.Recipient)
+                .Include(r => r.BloodTypeRequiredNavigation)
+                .Where(r => ids.Contains(r.RequestId))
+                .ToListAsync();
+        }
+        public void Update(BloodRequest request)
+        {
+            _dbSet.Update(request);
+        }
     }
 }
