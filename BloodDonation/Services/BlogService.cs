@@ -30,9 +30,9 @@ namespace Services
                 AuthorId = blog.AuthorId,
                 Title = blog.Title,
                 Content = blog.Content,
-                PublishDate = blog.PublishDate,
+                PublishDate = blog.PublishDate.HasValue ? blog.PublishDate.Value.ToDateTime(TimeOnly.MinValue) : null, // Fix for CS0029  
                 Category = blog.Category,
-                ViewCount = blog.ViewCount
+                ViewCount = blog.ViewCount ?? 0
             });
         }
 
@@ -48,18 +48,17 @@ namespace Services
                 AuthorId = blog.AuthorId,
                 Title = blog.Title,
                 Content = blog.Content,
-                PublishDate = blog.PublishDate,
+                PublishDate = blog.PublishDate.HasValue ? blog.PublishDate.Value.ToDateTime(TimeOnly.MinValue) : null, // Fix for CS0029  
                 Category = blog.Category,
-                ViewCount = blog.ViewCount
+                ViewCount = blog.ViewCount ?? 0
             };
         }
 
         public async Task<BlogResponseDto> CreateBlogAsync(BlogCreateDto blogCreateDto)
         {
-            // Kiểm tra xem tiêu đề đã tồn tại chưa
             var titleExists = await _blogRepository.ExistsByTitleAsync(blogCreateDto.Title);
             if (titleExists)
-                return null; // Có thể throw exception hoặc return error message
+                return null;
 
             var blog = new Blog
             {
@@ -80,9 +79,9 @@ namespace Services
                 AuthorId = blog.AuthorId,
                 Title = blog.Title,
                 Content = blog.Content,
-                PublishDate = blog.PublishDate,
+                PublishDate = blog.PublishDate.HasValue ? blog.PublishDate.Value.ToDateTime(TimeOnly.MinValue) : null, // Fix for CS0029  
                 Category = blog.Category,
-                ViewCount = blog.ViewCount
+                ViewCount = blog.ViewCount ?? 0
             };
         }
 
@@ -105,9 +104,9 @@ namespace Services
                 AuthorId = blog.AuthorId,
                 Title = blog.Title,
                 Content = blog.Content,
-                PublishDate = blog.PublishDate,
+                PublishDate = blog.PublishDate.HasValue ? blog.PublishDate.Value.ToDateTime(TimeOnly.MinValue) : null, // Fix for CS0029  
                 Category = blog.Category,
-                ViewCount = blog.ViewCount
+                ViewCount = blog.ViewCount ?? 0
             };
         }
 

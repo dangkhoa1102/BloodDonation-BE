@@ -230,6 +230,127 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "APIS.Controllers.BloodRequestController",
+    "Method": "GetAllRequests",
+    "RelativePath": "api/BloodRequest/Get-All-Request",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.BloodRequestController",
+    "Method": "GetMyRequests",
+    "RelativePath": "api/BloodRequest/Get-My-Requests",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.BloodRequestController",
+    "Method": "GetMyRequestsByStatus",
+    "RelativePath": "api/BloodRequest/Get-My-Requests-By-Status/{status}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "status",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.BloodRequestController",
+    "Method": "GetRequestById",
+    "RelativePath": "api/BloodRequest/Get-Request-By-Id/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.BloodRequestController",
+    "Method": "GetRequestsByRecipientName",
+    "RelativePath": "api/BloodRequest/Get-Request-By-Recipient-Name/{recipientName}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "recipientName",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.BloodRequestController",
+    "Method": "GetRequestsByStatus",
+    "RelativePath": "api/BloodRequest/Get-Request-By-status/{status}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "status",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.BloodRequestController",
+    "Method": "RegisterBloodRequest",
+    "RelativePath": "api/BloodRequest/register",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Models.DTOs.BloodRequestRegistrationDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.BloodRequestController",
+    "Method": "UpdateBloodRequest",
+    "RelativePath": "api/BloodRequest/Update-Blood-Requests/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "updateDto",
+        "Type": "Models.DTOs.BloodRequestUpdateDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "APIS.Controllers.DonationHistoryController",
     "Method": "GetAll",
     "RelativePath": "api/DonationHistory",
@@ -288,9 +409,118 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "APIS.Controllers.DonorController",
+    "Method": "GetAll",
+    "RelativePath": "api/Donor",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[Models.DTOs.DonorDTO\u002BDonorDto, Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "APIS.Controllers.DonorController",
+    "Method": "Create",
+    "RelativePath": "api/Donor",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "Models.DTOs.DonorDTO\u002BCreateDonorDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Models.DTOs.DonorDTO\u002BDonorDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "APIS.Controllers.DonorController",
+    "Method": "GetById",
+    "RelativePath": "api/Donor/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Models.DTOs.DonorDTO\u002BDonorDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "APIS.Controllers.DonorController",
+    "Method": "Update",
+    "RelativePath": "api/Donor/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "Models.DTOs.DonorDTO\u002BUpdateDonorDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.DonorController",
+    "Method": "Delete",
+    "RelativePath": "api/Donor/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "APIS.Controllers.UserController",
-    "Method": "AdminOnlyEndpoint",
-    "RelativePath": "api/User/admin-only",
+    "Method": "GetAllUsers",
+    "RelativePath": "api/User/Get-All-User",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -299,42 +529,55 @@
   },
   {
     "ContainingType": "APIS.Controllers.UserController",
-    "Method": "GetUserClaims",
-    "RelativePath": "api/User/claims",
+    "Method": "GetUsersByRole",
+    "RelativePath": "api/User/Get-User-By-Role/{role}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "role",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   },
   {
     "ContainingType": "APIS.Controllers.UserController",
-    "Method": "GetProfile",
-    "RelativePath": "api/User/profile",
+    "Method": "SearchUsers",
+    "RelativePath": "api/User/Search-User-By-Name",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "searchTerm",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
     "ReturnTypes": []
   },
   {
     "ContainingType": "APIS.Controllers.UserController",
-    "Method": "PublicEndpoint",
-    "RelativePath": "api/User/public",
-    "HttpMethod": "GET",
+    "Method": "UpdateUser",
+    "RelativePath": "api/User/Update-User/{id}",
+    "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "APIS.Controllers.UserController",
-    "Method": "GetUserRole",
-    "RelativePath": "api/User/role",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "updateDto",
+        "Type": "Models.DTOs.UserUpdateDTO",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   }
 ]
