@@ -16,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Register Services
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
-builder.Services.AddScoped<IBlogService, BlogService>();
+/*builder.Services.AddScoped<IBlogService, BlogService>();*/
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
