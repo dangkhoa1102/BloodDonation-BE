@@ -1,6 +1,8 @@
 ﻿using APIS.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.SqlServer;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Models;
@@ -16,7 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Register Services
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
-builder.Services.AddScoped<IBlogService, BlogService>();
+/*builder.Services.AddScoped<IBlogService, BlogService>();*/
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -93,9 +95,14 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Add DbContext
+// Add the necessary using directive for SqlServerDbContextOptionsExtensions
+
+
+// Update the DbContext configuration to use the correct method
 builder.Services.AddDbContext<BloodDonationSupportContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
 
 // Configure Swagger with JWT support
 builder.Services.AddEndpointsApiExplorer();
