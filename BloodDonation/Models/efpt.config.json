@@ -43,6 +43,10 @@
          "ObjectType": 0
       },
       {
+         "Name": "[dbo].[Certificate]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[dbo].[Document]",
          "ObjectType": 0
       },

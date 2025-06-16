@@ -86,12 +86,12 @@ namespace Services
                     UserId = Guid.NewGuid(),
                     Email = registerDto.Email,
                     Username = registerDto.Username,
-                    Password = registerDto.Password, // Lưu mật khẩu trực tiếp, không hash
+                    Password = registerDto.Password, 
                     FullName = registerDto.FullName,
                     Phone = registerDto.Phone,
                     UserIdCard = registerDto.UserIdCard,
                     DateOfBirth = registerDto.DateOfBirth,
-                    Role = UserRoles.Customer
+                    Role = UserRoles.Member.ToString() 
                 };
 
                 _context.Users.Add(user);

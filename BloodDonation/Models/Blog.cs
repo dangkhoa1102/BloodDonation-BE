@@ -2,30 +2,24 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Models;
 
-public class Blog
+public partial class Blog
 {
-    [Key]
     public Guid BlogId { get; set; }
 
     public Guid? AuthorId { get; set; }
 
-    [ForeignKey("AuthorId")]
-    public User Author { get; set; }
-
-    [MaxLength(500)]
     public string Title { get; set; }
 
     public string Content { get; set; }
 
-    public DateTime? PublishDate { get; set; }
+    public DateOnly? PublishDate { get; set; }
 
-    [MaxLength(100)]
     public string Category { get; set; }
 
-    public int ViewCount { get; set; } = 0;
+    public int? ViewCount { get; set; }
+
+    public virtual User Author { get; set; }
 }

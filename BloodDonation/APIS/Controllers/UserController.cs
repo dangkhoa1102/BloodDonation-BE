@@ -1,87 +1,173 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Models;
-using System.Security.Claims;
+using Models.DTOs;
+using Models.Enums;
 
 namespace APIS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin,Staff")]
     public class UserController : ControllerBase
     {
-        private readonly BloodDonationSupportContext _context;
+        private readonly IUserService _userService;
         private readonly ILogger<UserController> _logger;
 
-        public UserController(BloodDonationSupportContext context, ILogger<UserController> logger)
+        public UserController(IUserService userService, ILogger<UserController> logger)
         {
-            _context = context;
+            _userService = userService;
             _logger = logger;
         }
 
-        [HttpGet("public")]
-        public IActionResult PublicEndpoint()
-        {
-            return Ok(new { message = "This is a public endpoint that anyone can access" });
-        }
-
-        [Authorize]
-        [HttpGet("profile")]
-        public async Task<IActionResult> GetProfile()
+        [HttpGet("Get-All-User")]
+        public async Task<IActionResult> GetAllUsers()
         {
             try
             {
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userId))
+                _logger.LogInformation("Getting all users");
+                var users = await _userService.GetAllUsersAsync();
+
+                if (!users.Any())
                 {
-                    return BadRequest(new { message = "User ID not found in token" });
+                    return NoContent();
                 }
 
-                var user = await _context.Users.FindAsync(Guid.Parse(userId));
-                if (user == null)
+                var response = new
                 {
-                    return NotFound(new { message = "User not found" });
-                }
+                    totalUsers = users.Count(),
+                    users = users.Select(u => new
+                    {
+                        u.UserId,
+                        u.Username,
+                        u.Email,
+                        u.FullName,
+                        u.Phone,
+                        u.UserIdCard,
+                        DateOfBirth = u.DateOfBirth?.ToString("yyyy-MM-dd"),
+                        u.Role
+                    })
+                };
 
-                // Don't return sensitive information
-                return Ok(new
-                {
-                    user.UserId,
-                    user.Username,
-                    user.Email,
-                    user.FullName,
-                    user.Phone,
-                    user.DateOfBirth,
-                    user.Role
-                });
+                return Ok(response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting user profile");
-                return StatusCode(500, new { message = "An error occurred while retrieving the profile" });
+                _logger.LogError(ex, "Error occurred while retrieving users");
+                return StatusCode(500, new { message = "An error occurred while retrieving users" });
+            }
+        }
+        [HttpGet("Get-User-By-Role/{role}")]
+        [Authorize(Roles = "Admin,Staff")]
+        public async Task<IActionResult> GetUsersByRole([FromRoute] string role)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(role))
+                {
+                    return BadRequest(new { message = "Role cannot be empty" });
+                }
+
+                if (!Enum.TryParse<UserRoles>(role, true, out UserRoles userRole))
+                {
+                    return BadRequest(new
+                    {
+                        message = "Invalid role",
+                        validRoles = Enum.GetNames(typeof(UserRoles))
+                    });
+                }
+
+                var users = await _userService.GetUsersByRoleAsync(userRole.ToString());
+                if (!users.Any())
+                {
+                    return NoContent();
+                }
+
+                var response = new
+                {
+                    role = userRole.ToString(),
+                    totalUsers = users.Count(),
+                    users = users.Select(u => new
+                    {
+                        u.UserId,
+                        u.Username,
+                        u.Email,
+                        u.FullName,
+                        u.Phone,
+                        u.UserIdCard,
+                        DateOfBirth = u.DateOfBirth?.ToString("yyyy-MM-dd"),
+                        u.Role
+                    })
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving users by role: {Role}", role);
+                return StatusCode(500, new { message = "An error occurred while retrieving users" });
             }
         }
 
+        [HttpGet("Search-User-By-Name")]
+        [Authorize(Roles = "Admin,Staff")]
+        public async Task<IActionResult> SearchUsers([FromQuery] string searchTerm)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    return BadRequest(new { message = "Search term cannot be empty" });
+                }
+
+                var users = await _userService.SearchUsersByNameAsync(searchTerm);
+                if (!users.Any())
+                {
+                    return NoContent();
+                }
+
+                var response = new
+                {
+                    searchTerm = searchTerm,
+                    totalResults = users.Count(),
+                    users = users.Select(u => new
+                    {
+                        u.UserId,
+                        u.Username,
+                        u.Email,
+                        u.FullName,
+                        u.Phone,
+                        u.UserIdCard,
+                        DateOfBirth = u.DateOfBirth?.ToString("yyyy-MM-dd"),
+                        u.Role
+                    })
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error searching users with term: {SearchTerm}", searchTerm);
+                return StatusCode(500, new { message = "An error occurred while searching users" });
+            }
+        }
+        [HttpPut("Update-User/{id}")]
         [Authorize(Roles = "Admin")]
-        [HttpGet("admin-only")]
-        public IActionResult AdminOnlyEndpoint()
+        public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UserUpdateDTO updateDto)
         {
-            return Ok(new { message = "This endpoint is only accessible by administrators" });
-        }
+            try
+            {
+                var (success, message) = await _userService.UpdateUserAsync(id, updateDto);
 
-        [Authorize]
-        [HttpGet("role")]
-        public IActionResult GetUserRole()
-        {
-            var role = User.FindFirst(ClaimTypes.Role)?.Value;
-            return Ok(new { role = role ?? "No role assigned" });
-        }
+                if (!success)
+                    return BadRequest(new { message });
 
-        [Authorize]
-        [HttpGet("claims")]
-        public IActionResult GetUserClaims()
-        {
-            var claims = User.Claims.Select(c => new { c.Type, c.Value });
-            return Ok(new { claims });
+                return Ok(new { message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating user {UserId}", id);
+                return StatusCode(500, new { message = "An error occurred while updating the user" });
+            }
         }
     }
-} 
+}

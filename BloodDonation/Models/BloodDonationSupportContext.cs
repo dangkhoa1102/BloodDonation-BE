@@ -31,6 +31,8 @@ public partial class BloodDonationSupportContext : DbContext
 
     public virtual DbSet<BloodUnit> BloodUnits { get; set; }
 
+    public virtual DbSet<Certificate> Certificates { get; set; }
+
     public virtual DbSet<Document> Documents { get; set; }
 
     public virtual DbSet<DonationHistory> DonationHistories { get; set; }
@@ -48,13 +50,8 @@ public partial class BloodDonationSupportContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        // Only configure if options haven't been set (allows for DI to work)
-        if (!optionsBuilder.IsConfigured)
-        {
-            throw new Exception("DbContext must be configured through dependency injection");
-        }
-    }
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Data Source=localhost;Initial Catalog=BloodDonationSupport;Integrated Security=False;User ID=sa;Password=12345;Connect Timeout=30;Encrypt=False;Trust Server Certificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -111,9 +108,12 @@ public partial class BloodDonationSupportContext : DbContext
 
             entity.ToTable("BloodDonation");
 
+            entity.HasIndex(e => e.CertificateId, "IX_BloodDonation_Certificate");
+
             entity.Property(e => e.DonationId)
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("donationID");
+            entity.Property(e => e.CertificateId).HasColumnName("certificateID");
             entity.Property(e => e.DonationDate).HasColumnName("donationDate");
             entity.Property(e => e.DonorId).HasColumnName("donorID");
             entity.Property(e => e.Notes).HasColumnName("notes");
@@ -122,6 +122,10 @@ public partial class BloodDonationSupportContext : DbContext
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
                 .HasColumnName("status");
+
+            entity.HasOne(d => d.Certificate).WithMany(p => p.BloodDonations)
+                .HasForeignKey(d => d.CertificateId)
+                .HasConstraintName("FK_BloodDonation_Certificate");
 
             entity.HasOne(d => d.Donor).WithMany(p => p.BloodDonations)
                 .HasForeignKey(d => d.DonorId)
@@ -230,6 +234,9 @@ public partial class BloodDonationSupportContext : DbContext
             entity.Property(e => e.ComponentType).HasColumnName("componentType");
             entity.Property(e => e.DonationId).HasColumnName("donationID");
             entity.Property(e => e.ExpiryDate).HasColumnName("expiryDate");
+            entity.Property(e => e.Quantity)
+                .HasDefaultValue(450)
+                .HasColumnName("quantity");
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
                 .HasColumnName("status");
@@ -245,6 +252,66 @@ public partial class BloodDonationSupportContext : DbContext
             entity.HasOne(d => d.Donation).WithMany(p => p.BloodUnits)
                 .HasForeignKey(d => d.DonationId)
                 .HasConstraintName("FK_BloodUnit_Donation");
+        });
+
+        modelBuilder.Entity<Certificate>(entity =>
+        {
+            entity.HasKey(e => e.CertificateId).HasName("PK__Certific__A15CBE8E306F0F2A");
+
+            entity.ToTable("Certificate");
+
+            entity.HasIndex(e => e.DonationId, "IX_Certificate_Donation");
+
+            entity.HasIndex(e => e.DonorId, "IX_Certificate_Donor");
+
+            entity.HasIndex(e => e.IssueDate, "IX_Certificate_IssueDate");
+
+            entity.HasIndex(e => e.CertificateNumber, "IX_Certificate_Number");
+
+            entity.HasIndex(e => e.StaffId, "IX_Certificate_Staff");
+
+            entity.HasIndex(e => e.CertificateNumber, "UQ__Certific__410CE512ECEAED6C").IsUnique();
+
+            entity.Property(e => e.CertificateId)
+                .HasDefaultValueSql("(newid())")
+                .HasColumnName("certificateID");
+            entity.Property(e => e.CertificateNumber)
+                .IsRequired()
+                .HasMaxLength(50)
+                .HasColumnName("certificateNumber");
+            entity.Property(e => e.CertificateType)
+                .HasMaxLength(50)
+                .HasDefaultValue("Blood Donation")
+                .HasColumnName("certificateType");
+            entity.Property(e => e.CreatedDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("createdDate");
+            entity.Property(e => e.DonationId).HasColumnName("donationID");
+            entity.Property(e => e.DonorId).HasColumnName("donorID");
+            entity.Property(e => e.IssueDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnName("issueDate");
+            entity.Property(e => e.LastModified)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("lastModified");
+            entity.Property(e => e.StaffId).HasColumnName("staffID");
+
+            entity.HasOne(d => d.Donation).WithMany(p => p.Certificates)
+                .HasForeignKey(d => d.DonationId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Certificate_Donation");
+
+            entity.HasOne(d => d.Donor).WithMany(p => p.Certificates)
+                .HasForeignKey(d => d.DonorId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Certificate_Donor");
+
+            entity.HasOne(d => d.Staff).WithMany(p => p.Certificates)
+                .HasForeignKey(d => d.StaffId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Certificate_Staff");
         });
 
         modelBuilder.Entity<Document>(entity =>
@@ -278,14 +345,21 @@ public partial class BloodDonationSupportContext : DbContext
 
             entity.ToTable("DonationHistory");
 
+            entity.HasIndex(e => e.CertificateId, "IX_DonationHistory_Certificate");
+
             entity.Property(e => e.HistoryId)
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("historyID");
+            entity.Property(e => e.CertificateId).HasColumnName("certificateID");
             entity.Property(e => e.DonationDate).HasColumnName("donationDate");
             entity.Property(e => e.DonorId).HasColumnName("donorID");
             entity.Property(e => e.HealthStatus).HasColumnName("healthStatus");
             entity.Property(e => e.NextEligibleDate).HasColumnName("nextEligibleDate");
             entity.Property(e => e.Quantity).HasColumnName("quantity");
+
+            entity.HasOne(d => d.Certificate).WithMany(p => p.DonationHistories)
+                .HasForeignKey(d => d.CertificateId)
+                .HasConstraintName("FK_DonationHistory_Certificate");
 
             entity.HasOne(d => d.Donor).WithMany(p => p.DonationHistories)
                 .HasForeignKey(d => d.DonorId)
@@ -398,6 +472,8 @@ public partial class BloodDonationSupportContext : DbContext
 
             entity.ToTable("Notification");
 
+            entity.HasIndex(e => e.CertificateId, "IX_Notification_Certificate");
+
             entity.HasIndex(e => e.IsRead, "IX_Notification_IsRead");
 
             entity.HasIndex(e => e.UserId, "IX_Notification_User");
@@ -405,6 +481,7 @@ public partial class BloodDonationSupportContext : DbContext
             entity.Property(e => e.NotificationId)
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("notificationID");
+            entity.Property(e => e.CertificateId).HasColumnName("certificateID");
             entity.Property(e => e.IsRead)
                 .HasDefaultValue(false)
                 .HasColumnName("isRead");
@@ -415,6 +492,10 @@ public partial class BloodDonationSupportContext : DbContext
             entity.Property(e => e.ScheduledDate).HasColumnName("scheduledDate");
             entity.Property(e => e.SendDate).HasColumnName("sendDate");
             entity.Property(e => e.UserId).HasColumnName("userID");
+
+            entity.HasOne(d => d.Certificate).WithMany(p => p.Notifications)
+                .HasForeignKey(d => d.CertificateId)
+                .HasConstraintName("FK_Notification_Certificate");
 
             entity.HasOne(d => d.User).WithMany(p => p.Notifications)
                 .HasForeignKey(d => d.UserId)

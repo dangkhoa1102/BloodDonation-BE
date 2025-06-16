@@ -10,7 +10,6 @@ namespace Models.DTOs
         public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Password is required")]
-        [DefaultValue("********")]
         public string Password { get; set; } = string.Empty;
     }
 } 

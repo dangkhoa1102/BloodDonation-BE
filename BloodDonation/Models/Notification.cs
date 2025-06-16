@@ -21,5 +21,9 @@ public partial class Notification
 
     public DateOnly? ScheduledDate { get; set; }
 
+    public Guid? CertificateId { get; set; }
+
+    public virtual Certificate Certificate { get; set; }
+
     public virtual User User { get; set; }
 }
