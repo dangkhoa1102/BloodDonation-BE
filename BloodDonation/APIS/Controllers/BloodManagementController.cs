@@ -1,0 +1,99 @@
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Services.Interfaces;
+
+namespace APIS.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    [Authorize]
+    public class BloodManagementController : ControllerBase
+    {
+        private readonly IBloodManagementService _bloodManagementService;
+        private readonly ILogger<BloodManagementController> _logger;
+
+        public BloodManagementController(
+            IBloodManagementService bloodManagementService,
+            ILogger<BloodManagementController> logger)
+        {
+            _bloodManagementService = bloodManagementService;
+            _logger = logger;
+        }
+
+        [HttpGet("Get-Blood-types")]
+        public async Task<IActionResult> GetBloodTypes()
+        {
+            try
+            {
+                var bloodTypes = await _bloodManagementService.GetAllBloodTypesAsync();
+                if (!bloodTypes.Any())
+                {
+                    return NoContent();
+                }
+                return Ok(bloodTypes);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving blood types");
+                return StatusCode(500, new { message = "An error occurred while retrieving blood types" });
+            }
+        }
+
+        [HttpGet("Get-blood-types/{id}")]
+        public async Task<IActionResult> GetBloodTypeById(Guid id)
+        {
+            try
+            {
+                var bloodType = await _bloodManagementService.GetBloodTypeByIdAsync(id);
+                if (bloodType == null)
+                {
+                    return NotFound(new { message = "Blood type not found" });
+                }
+                return Ok(bloodType);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving blood type with ID: {Id}", id);
+                return StatusCode(500, new { message = "An error occurred while retrieving the blood type" });
+            }
+        }
+
+        [HttpGet("Get-blood-components")]
+        public async Task<IActionResult> GetBloodComponents()
+        {
+            try
+            {
+                var components = await _bloodManagementService.GetAllBloodComponentsAsync();
+                if (!components.Any())
+                {
+                    return NoContent();
+                }
+                return Ok(components);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving blood components");
+                return StatusCode(500, new { message = "An error occurred while retrieving blood components" });
+            }
+        }
+
+        [HttpGet("Get-blood-components/{id}")]
+        public async Task<IActionResult> GetBloodComponentById(Guid id)
+        {
+            try
+            {
+                var component = await _bloodManagementService.GetBloodComponentByIdAsync(id);
+                if (component == null)
+                {
+                    return NotFound(new { message = "Blood component not found" });
+                }
+                return Ok(component);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving blood component with ID: {Id}", id);
+                return StatusCode(500, new { message = "An error occurred while retrieving the blood component" });
+            }
+        }
+    }
+}

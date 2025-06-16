@@ -299,5 +299,30 @@ namespace APIS.Controllers
                 return StatusCode(500, new { message = "An error occurred while updating the blood request" });
             }
         }
+        [HttpPost("reject-blood-request")]
+        [Authorize(Roles = "Staff")]
+        public async Task<IActionResult> RejectBloodRequest([FromBody] BloodRequestRejectDTO rejectDto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+              
+                var staffId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? throw new InvalidOperationException("Staff ID not found in token"));
+
+                var (success, message) = await _bloodRequestService.RejectBloodRequestAsync(rejectDto.RequestId,rejectDto, staffId);
+
+                if (!success)
+                    return BadRequest(new { message });
+
+                return Ok(new { message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error rejecting blood request {RequestId}", rejectDto.RequestId);
+                return StatusCode(500, new { message = "An error occurred while rejecting the blood request" });
+            }
+        }
     }
 }
