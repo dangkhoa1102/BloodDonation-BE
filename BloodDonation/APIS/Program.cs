@@ -10,22 +10,31 @@ using Repositories.Implementations;
 using Repositories.Interfaces;
 using Services;
 using Services.Implementations;
+using Services.Interfaces;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddDbContext<BloodDonationSupportContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
 // Register Services
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
-/*builder.Services.AddScoped<IBlogService, BlogService>();*/
+builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IBloodRequestService, BloodRequestService>();
 builder.Services.AddScoped<IBloodRequestRepository, BloodRequestRepository>();
 builder.Services.AddScoped<IBloodRecipientRepository, BloodRecipientRepository>();
-
+builder.Services.AddScoped<IBloodTypeRepository, BloodTypeRepository>();
+builder.Services.AddScoped<IBloodComponentRepository, BloodComponentRepository>();
+builder.Services.AddScoped<IBloodManagementService, BloodManagementService>();
 // Add controllers with JSON options
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -95,11 +104,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Update the DbContext configuration to use the correct method
-builder.Services.AddDbContext<BloodDonationSupportContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
+
 
 // Configure Swagger with JWT support
 builder.Services.AddEndpointsApiExplorer();

@@ -1,7 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Models;
 using Models.DTOs;
 using Models.Enums;
+using Repositories.Implementations;
 using Repositories.Interfaces;
 using Services;
 
@@ -205,6 +207,58 @@ public class BloodRequestService : IBloodRequestService
         {
             _logger.LogError(ex, "Error updating blood request");
             return (false, "An error occurred while updating the blood request");
+        }
+    }
+    public async Task<(bool success, string message)> RejectBloodRequestAsync(
+    Guid requestId,
+    BloodRequestRejectDTO rejectDto,
+    Guid staffId)
+    {
+        try
+        {
+            var request = await _requestRepository.GetByIdWithDetailsAsync(requestId);
+
+            if (request == null)
+            {
+                return (false, "Blood request not found");
+            }
+
+            // Chỉ cho phép từ chối đơn có trạng thái Pending
+            if (request.Status != BloodRequestStatus.Pending.ToString())
+            {
+                return (false, $"Can only reject requests with 'Pending' status. Current status: {request.Status}");
+            }
+
+            // Cập nhật trạng thái và thông tin từ chối
+            request.Status = BloodRequestStatus.Rejected.ToString();
+            request.Description = $"Reason: {rejectDto.RejectionReason}";
+
+            // Tạo notification cho recipient
+            var notification = new Notification
+            {
+                NotificationId = Guid.NewGuid(),
+                UserId = request.Recipient?.UserId,
+                NotificationType = "Request Rejection",
+                Message = $"Your blood request (ID: {request.RequestId}) has been rejected.\nReason: {rejectDto.RejectionReason}",
+                SendDate = DateOnly.FromDateTime(DateTime.Now),
+                IsRead = false
+            };
+
+            // Log hoạt động
+            _logger.LogInformation(
+                "Blood request {RequestId} rejected by staff {StaffId}. Reason: {Reason}",
+                requestId, staffId, rejectDto.RejectionReason);
+
+            // Lưu thay đổi
+            _requestRepository.Update(request);
+            await _requestRepository.SaveChangesAsync();
+
+            return (true, "Blood request rejected successfully");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error rejecting blood request {RequestId}", requestId);
+            return (false, "An error occurred while rejecting the blood request");
         }
     }
 }
