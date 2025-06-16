@@ -95,9 +95,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Add the necessary using directive for SqlServerDbContextOptionsExtensions
-
-
 // Update the DbContext configuration to use the correct method
 builder.Services.AddDbContext<BloodDonationSupportContext>(options =>
 {
@@ -137,7 +134,24 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// Add CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        builder => builder.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
+});
+
+
 var app = builder.Build();
+
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups";
+    await next();
+});
+app.UseCors("AllowAllOrigins");
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())

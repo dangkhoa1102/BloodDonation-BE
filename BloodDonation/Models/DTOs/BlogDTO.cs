@@ -43,9 +43,9 @@ namespace Models.DTOs
         public Guid? AuthorId { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
-        public DateTime? PublishDate { get; set; }
+        public DateOnly? PublishDate { get; set; }
         public string Category { get; set; }
-        public int ViewCount { get; set; }
+        public int? ViewCount { get; set; }
     }
 
 }
