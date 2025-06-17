@@ -36,5 +36,10 @@ namespace Repositories.Implementations
                 .Where(u => u.ComponentType == componentId)
                 .CountAsync();
         }
+        public async Task<BloodComponent> GetByNameAsync(string componentName)
+        {
+            return await _context.BloodComponents
+                .FirstOrDefaultAsync(bc => bc.ComponentName == componentName);
+        }
     }
 }

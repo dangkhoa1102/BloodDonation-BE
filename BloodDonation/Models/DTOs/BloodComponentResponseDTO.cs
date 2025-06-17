@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Models.DTOs
 {
