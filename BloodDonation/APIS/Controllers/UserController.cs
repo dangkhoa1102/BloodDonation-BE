@@ -169,5 +169,37 @@ namespace APIS.Controllers
                 return StatusCode(500, new { message = "An error occurred while updating the user" });
             }
         }
+        [HttpGet("Get-User-Detail/{id}")]
+        [Authorize(Roles = "Admin,Staff")]
+        public async Task<IActionResult> GetUserDetail(Guid id)
+        {
+            try
+            {
+                var user = await _userService.GetUserDetailAsync(id);
+                if (user == null)
+                {
+                    return NotFound(new { message = "User not found" });
+                }
+
+                var response = new
+                {
+                    userId = user.UserId,
+                    username = user.Username,
+                    email = user.Email,
+                    fullName = user.FullName,
+                    phone = user.Phone,
+                    userIdCard = user.UserIdCard,
+                    dateOfBirth = user.DateOfBirth?.ToString("yyyy-MM-dd"),
+                    role = user.Role,                   
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving user detail for ID: {UserId}", id);
+                return StatusCode(500, new { message = "An error occurred while retrieving user detail" });
+            }
+        }
     }
 }
