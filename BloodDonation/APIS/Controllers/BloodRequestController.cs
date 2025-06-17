@@ -324,5 +324,28 @@ namespace APIS.Controllers
                 return StatusCode(500, new { message = "An error occurred while rejecting the blood request" });
             }
         }
+
+        [HttpPost("approve-blood-request")]
+        [Authorize(Roles = "Staff")]
+        public async Task<IActionResult> ApproveBloodRequest(Guid requestId)
+        {
+            try
+            {
+                var staffId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? throw new InvalidOperationException("Staff ID not found in token"));
+
+                var (success, message) = await _bloodRequestService.ApproveBloodRequestAsync(requestId, staffId);
+
+                if (!success)
+                    return BadRequest(new { message });
+
+                return Ok(new { message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error approving blood request {RequestId}", requestId);
+                return StatusCode(500, new { message = "An error occurred while approving the blood request" });
+            }
+        }
     }
 }

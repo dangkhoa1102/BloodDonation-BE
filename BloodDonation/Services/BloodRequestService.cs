@@ -239,7 +239,7 @@ public class BloodRequestService : IBloodRequestService
                 NotificationId = Guid.NewGuid(),
                 UserId = request.Recipient?.UserId,
                 NotificationType = "Request Rejection",
-                Message = $"Your blood request (ID: {request.RequestId}) has been rejected.\nReason: {rejectDto.RejectionReason}",
+                Message = $"Your blood request (ID: {request.RequestId}) has been rejected.\n{rejectDto.RejectionReason}",
                 SendDate = DateOnly.FromDateTime(DateTime.Now),
                 IsRead = false
             };
@@ -259,6 +259,62 @@ public class BloodRequestService : IBloodRequestService
         {
             _logger.LogError(ex, "Error rejecting blood request {RequestId}", requestId);
             return (false, "An error occurred while rejecting the blood request");
+        }
+    }
+    public async Task<(bool success, string message)> ApproveBloodRequestAsync(
+    Guid requestId,
+    Guid staffId)
+    {
+        try
+        {
+            // Kiểm tra staff
+            var staff = await _userRepository.GetByIdAsync(staffId);
+            if (staff == null || staff.Role != "Staff")
+            {
+                return (false, "Invalid staff member");
+            }
+
+            var request = await _requestRepository.GetByIdWithDetailsAsync(requestId);
+            if (request == null)
+            {
+                return (false, "Blood request not found");
+            }
+
+            // Chỉ cho phép approve đơn có trạng thái Pending
+            if (request.Status != BloodRequestStatus.Pending.ToString())
+            {
+                return (false, $"Can only approve requests with 'Pending' status. Current status: {request.Status}");
+            }
+
+            // Cập nhật trạng thái 
+            request.Status = BloodRequestStatus.Approved.ToString();
+
+            // Tạo notification cho recipient
+            var notification = new Notification
+            {
+                NotificationId = Guid.NewGuid(),
+                UserId = request.Recipient?.UserId,
+                NotificationType = "Request Approved",
+                Message = $"Your blood request (ID: {request.RequestId}) has been approved.",
+                SendDate = DateOnly.FromDateTime(DateTime.Now),
+                IsRead = false
+            };
+
+            // Log hoạt động
+            _logger.LogInformation(
+                "Blood request {RequestId} approved by staff {StaffId}",
+                requestId, staffId);
+
+            // Lưu thay đổi
+            _requestRepository.Update(request);
+            await _requestRepository.SaveChangesAsync();
+
+            return (true, "Blood request approved successfully");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error approving blood request {RequestId}", requestId);
+            return (false, "An error occurred while approving the blood request");
         }
     }
 }

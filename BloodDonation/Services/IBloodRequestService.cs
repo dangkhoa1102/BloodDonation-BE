@@ -14,9 +14,7 @@ namespace Services
         Task<IEnumerable<BloodRequest>> GetRequestsByRecipientNameAsync(string recipientName);
         Task<IEnumerable<BloodRequest>> GetRequestsByRecipientUserIdAsync(Guid userId);
         Task<(bool success, string message)> UpdateBloodRequestAsync(Guid requestId, BloodRequestUpdateDTO updateDto, Guid staffId);
-        Task<(bool success, string message)> RejectBloodRequestAsync(
-            Guid requestId,
-            BloodRequestRejectDTO rejectDto,
-            Guid staffId);
+        Task<(bool success, string message)> RejectBloodRequestAsync(Guid requestId,BloodRequestRejectDTO rejectDto,Guid staffId);
+        Task<(bool success, string message)> ApproveBloodRequestAsync(Guid requestId, Guid staffId);
     }
 }
