@@ -189,12 +189,6 @@ public class BloodRequestService : IBloodRequestService
             if (updateDto.QuantityNeeded.HasValue)
                 request.QuantityNeeded = updateDto.QuantityNeeded;
 
-            if (!string.IsNullOrWhiteSpace(updateDto.UrgencyLevel))
-                request.UrgencyLevel = updateDto.UrgencyLevel;
-
-            if (!string.IsNullOrWhiteSpace(updateDto.Status))
-                request.Status = updateDto.Status;
-
             if (!string.IsNullOrWhiteSpace(updateDto.Description))
                 request.Description = updateDto.Description;
 
