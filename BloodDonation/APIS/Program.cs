@@ -35,6 +35,8 @@ builder.Services.AddScoped<IBloodRecipientRepository, BloodRecipientRepository>(
 builder.Services.AddScoped<IBloodTypeRepository, BloodTypeRepository>();
 builder.Services.AddScoped<IBloodComponentRepository, BloodComponentRepository>();
 builder.Services.AddScoped<IBloodManagementService, BloodManagementService>();
+builder.Services.AddScoped<IBloodUnitRepository, BloodUnitRepository>();
+builder.Services.AddScoped<IBloodUnitService, BloodUnitService>();
 // Add controllers with JSON options
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
