@@ -131,5 +131,21 @@ namespace Services.Implementations
                 return (false, "An error occurred while updating the user");
             }
         }
+        public async Task<User> GetUserDetailAsync(Guid id)
+        {
+            try
+            {
+                var user = await _userRepository.GetByIdAsync(id);
+                if (user == null)
+                    return null;
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving user details for ID: {UserId}", id);
+                throw;
+            }
+        }
     }
 }
