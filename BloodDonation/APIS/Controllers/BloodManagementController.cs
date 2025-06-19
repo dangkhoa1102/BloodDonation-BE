@@ -95,5 +95,67 @@ namespace APIS.Controllers
                 return StatusCode(500, new { message = "An error occurred while retrieving the blood component" });
             }
         }
+        [Route("api/[controller]")]
+        [ApiController]
+        public class BloodCompatibilityController : ControllerBase
+        {
+            private readonly IBloodManagementService _bloodManagementService;
+            private readonly ILogger<BloodCompatibilityController> _logger;
+
+            public BloodCompatibilityController(
+                IBloodManagementService bloodManagementService,
+                ILogger<BloodCompatibilityController> logger)
+            {
+                _bloodManagementService = bloodManagementService;
+                _logger = logger;
+            }         
+        }
+        [HttpGet("Get-blood-type-Compatibility/{bloodType}")]
+        public async Task<IActionResult> GetBloodTypeCompatibility(string bloodType)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(bloodType))
+                {
+                    return BadRequest(new { message = "Blood type is required" });
+                }
+
+                var compatibility = await _bloodManagementService.GetBloodTypeCompatibilityAsync(bloodType);
+                return Ok(compatibility);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting blood type compatibility for {BloodType}", bloodType);
+                return StatusCode(500, new { message = "An error occurred while retrieving blood type compatibility" });
+            }
+        }
+
+        [HttpGet("Get-component-Compatibility/{componentName}")]
+        public async Task<IActionResult> GetComponentCompatibility(string componentName)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(componentName))
+                {
+                    return BadRequest(new { message = "Component name is required" });
+                }
+
+                var compatibility = await _bloodManagementService.GetComponentCompatibilityAsync(componentName);
+                return Ok(compatibility);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting component compatibility for {ComponentName}", componentName);
+                return StatusCode(500, new { message = "An error occurred while retrieving component compatibility" });
+            }
+        }
     }
 }

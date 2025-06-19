@@ -8,5 +8,7 @@ namespace Services.Interfaces
         Task<IEnumerable<BloodComponentResponseDTO>> GetAllBloodComponentsAsync();
         Task<BloodTypeResponseDTO> GetBloodTypeByIdAsync(Guid id);
         Task<BloodComponentResponseDTO> GetBloodComponentByIdAsync(Guid id);
+        Task<BloodCompatibilityDTO> GetBloodTypeCompatibilityAsync(string bloodType);
+        Task<IEnumerable<ComponentCompatibilityDTO>> GetComponentCompatibilityAsync(string componentName);
     }
 }
