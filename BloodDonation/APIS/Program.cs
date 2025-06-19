@@ -23,14 +23,28 @@ builder.Services.AddDbContext<BloodDonationSupportContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-// Register Services
+builder.Services.AddScoped<IDonorRepository, DonorRepository>();
+builder.Services.AddScoped<IDonorService, DonorService>();
+
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+builder.Services.AddScoped<IBloodDonationRepository, BloodDonationRepository>();
+builder.Services.AddScoped<IBloodDonationService, BloodDonationService>();
+
+builder.Services.AddScoped<IDonationHistoryRepository, DonationHistoryRepository>();
+builder.Services.AddScoped<IDonationHistoryService, DonationHistoryService>();
+
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddScoped<IBlogService, BlogService>();
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+
 builder.Services.AddScoped<IAuthService, AuthService>();
+
 builder.Services.AddScoped<IBloodRequestService, BloodRequestService>();
 builder.Services.AddScoped<IBloodRequestRepository, BloodRequestRepository>();
+
 builder.Services.AddScoped<IBloodRecipientRepository, BloodRecipientRepository>();
 builder.Services.AddScoped<IBloodTypeRepository, BloodTypeRepository>();
 builder.Services.AddScoped<IBloodComponentRepository, BloodComponentRepository>();

@@ -32,8 +32,7 @@ namespace APIS.Controllers
 
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(new { message = "Email and password are required" });
-                    return BadRequest(new { message = "Email and password are required" });
+                    return BadRequest(new { message = "Email and password are required" });                    
                 }
 
                 _logger.LogInformation("Attempting login for email: {Email}", loginDto.Email);

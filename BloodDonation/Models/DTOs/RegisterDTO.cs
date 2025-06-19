@@ -28,6 +28,6 @@ namespace Models.DTOs
         [Required]
         public string UserIdCard { get; set; }
 
-        public DateOnly? DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; }
     }
 } 

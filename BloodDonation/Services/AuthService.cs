@@ -86,12 +86,12 @@ namespace Services
                     UserId = Guid.NewGuid(),
                     Email = registerDto.Email,
                     Username = registerDto.Username,
-                    Password = registerDto.Password, 
+                    Password = registerDto.Password,
                     FullName = registerDto.FullName,
                     Phone = registerDto.Phone,
                     UserIdCard = registerDto.UserIdCard,
-                    DateOfBirth = registerDto.DateOfBirth,
-                    Role = UserRoles.Member.ToString() 
+                    DateOfBirth = registerDto.DateOfBirth.HasValue ? DateOnly.FromDateTime(registerDto.DateOfBirth.Value) : null,
+                    Role = UserRoles.Member.ToString()
                 };
 
                 _context.Users.Add(user);
