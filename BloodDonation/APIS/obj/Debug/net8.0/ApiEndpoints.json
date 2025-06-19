@@ -230,6 +230,106 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "APIS.Controllers.BloodManagementController",
+    "Method": "GetBloodComponents",
+    "RelativePath": "api/BloodManagement/Get-blood-components",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.BloodManagementController",
+    "Method": "GetBloodComponentById",
+    "RelativePath": "api/BloodManagement/Get-blood-components/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.BloodManagementController",
+    "Method": "GetBloodTypeCompatibility",
+    "RelativePath": "api/BloodManagement/Get-blood-type-Compatibility/{bloodType}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "bloodType",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.BloodManagementController",
+    "Method": "GetBloodTypes",
+    "RelativePath": "api/BloodManagement/Get-Blood-types",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.BloodManagementController",
+    "Method": "GetBloodTypeById",
+    "RelativePath": "api/BloodManagement/Get-blood-types/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.BloodManagementController",
+    "Method": "GetComponentCompatibility",
+    "RelativePath": "api/BloodManagement/Get-component-Compatibility/{componentName}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "componentName",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.BloodRequestController",
+    "Method": "ApproveBloodRequest",
+    "RelativePath": "api/BloodRequest/approve-blood-request",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "requestId",
+        "Type": "System.Guid",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "APIS.Controllers.BloodRequestController",
     "Method": "GetAllRequests",
     "RelativePath": "api/BloodRequest/Get-All-Request",
@@ -331,6 +431,22 @@
   },
   {
     "ContainingType": "APIS.Controllers.BloodRequestController",
+    "Method": "RejectBloodRequest",
+    "RelativePath": "api/BloodRequest/reject-blood-request",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "rejectDto",
+        "Type": "Models.DTOs.BloodRequestRejectDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.BloodRequestController",
     "Method": "UpdateBloodRequest",
     "RelativePath": "api/BloodRequest/Update-Blood-Requests/{id}",
     "HttpMethod": "PUT",
@@ -345,6 +461,169 @@
       {
         "Name": "updateDto",
         "Type": "Models.DTOs.BloodRequestUpdateDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.BloodUnitController",
+    "Method": "GetAllBloodUnits",
+    "RelativePath": "api/BloodUnit/Get-All-BloodUnit",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.BloodUnitController",
+    "Method": "GetByBloodType",
+    "RelativePath": "api/BloodUnit/Get-BloodUnit-by-blood-type/{bloodTypeId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "bloodTypeId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.BloodUnitController",
+    "Method": "GetByComponent",
+    "RelativePath": "api/BloodUnit/Get-BloodUnit-by-component/{componentId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "componentId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.BloodUnitController",
+    "Method": "GetBloodUnitById",
+    "RelativePath": "api/BloodUnit/Get-BloodUnit-By-id/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.BloodUnitController",
+    "Method": "GetByStatus",
+    "RelativePath": "api/BloodUnit/Get-BloodUnit-by-status/{status}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "status",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.BloodUnitController",
+    "Method": "GetExpiredUnits",
+    "RelativePath": "api/BloodUnit/Get-BloodUnit-expired",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.CertificateController",
+    "Method": "GetAll",
+    "RelativePath": "api/Certificate",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.CertificateController",
+    "Method": "Create",
+    "RelativePath": "api/Certificate",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "Models.DTOs.CreateCertificateDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.CertificateController",
+    "Method": "GetById",
+    "RelativePath": "api/Certificate/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.CertificateController",
+    "Method": "Update",
+    "RelativePath": "api/Certificate/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "Models.DTOs.UpdateCertificateDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.CertificateController",
+    "Method": "Delete",
+    "RelativePath": "api/Certificate/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
         "IsRequired": true
       }
     ],
@@ -538,6 +817,22 @@
       {
         "Name": "role",
         "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "APIS.Controllers.UserController",
+    "Method": "GetUserDetail",
+    "RelativePath": "api/User/Get-User-Detail/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
         "IsRequired": true
       }
     ],

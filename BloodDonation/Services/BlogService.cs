@@ -30,7 +30,7 @@ namespace Services
                 AuthorId = blog.AuthorId,
                 Title = blog.Title,
                 Content = blog.Content,
-                PublishDate = blog.PublishDate.HasValue ? blog.PublishDate.Value.ToDateTime(TimeOnly.MinValue) : null, // Fix for CS0029  
+                PublishDate = blog.PublishDate, // Fix for CS0029  
                 Category = blog.Category,
                 ViewCount = blog.ViewCount ?? 0
             });
@@ -48,7 +48,7 @@ namespace Services
                 AuthorId = blog.AuthorId,
                 Title = blog.Title,
                 Content = blog.Content,
-                PublishDate = blog.PublishDate.HasValue ? blog.PublishDate.Value.ToDateTime(TimeOnly.MinValue) : null, // Fix for CS0029  
+                PublishDate = blog.PublishDate,  
                 Category = blog.Category,
                 ViewCount = blog.ViewCount ?? 0
             };
@@ -79,7 +79,7 @@ namespace Services
                 AuthorId = blog.AuthorId,
                 Title = blog.Title,
                 Content = blog.Content,
-                PublishDate = blog.PublishDate.HasValue ? blog.PublishDate.Value.ToDateTime(TimeOnly.MinValue) : null, // Fix for CS0029  
+                PublishDate = blog.PublishDate, // Fix for CS0029  
                 Category = blog.Category,
                 ViewCount = blog.ViewCount ?? 0
             };
@@ -104,7 +104,7 @@ namespace Services
                 AuthorId = blog.AuthorId,
                 Title = blog.Title,
                 Content = blog.Content,
-                PublishDate = blog.PublishDate.HasValue ? blog.PublishDate.Value.ToDateTime(TimeOnly.MinValue) : null, // Fix for CS0029  
+                PublishDate = blog.PublishDate, // Fix for CS0029  
                 Category = blog.Category,
                 ViewCount = blog.ViewCount ?? 0
             };
