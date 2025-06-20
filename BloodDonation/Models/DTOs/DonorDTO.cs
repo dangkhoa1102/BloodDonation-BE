@@ -51,5 +51,16 @@ namespace Models.DTOs
             public Guid? ClosestFacilityId { get; set; }
         }
 
+        public class DonorHealthCheckDto
+        {
+            public Guid DonorId { get; set; }
+            public bool IsEligible { get; set; }
+            public string Message { get; set; }
+            public DateOnly? NextEligibleDate { get; set; }
+            public double? Weight { get; set; }
+            public double? Height { get; set; }
+        }
+
+
     }
 }
