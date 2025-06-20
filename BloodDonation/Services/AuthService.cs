@@ -90,7 +90,7 @@ namespace Services
                     FullName = registerDto.FullName,
                     Phone = registerDto.Phone,
                     UserIdCard = registerDto.UserIdCard,
-                    DateOfBirth = registerDto.DateOfBirth.HasValue ? DateOnly.FromDateTime(registerDto.DateOfBirth.Value) : null,
+                    DateOfBirth = registerDto.DateOfBirth,
                     Role = UserRoles.Member.ToString()
                 };
 
