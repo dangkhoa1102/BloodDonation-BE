@@ -28,6 +28,7 @@ namespace Models.DTOs
         [Required]
         public string UserIdCard { get; set; }
 
-        public DateTime? DateOfBirth { get; set; }
+        [DataType(DataType.Date)]
+        public DateOnly? DateOfBirth { get; set; }
     }
 } 
