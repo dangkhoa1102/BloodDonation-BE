@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Models.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class AddHealthCheckModifyDonor : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -22,7 +22,7 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__BloodCom__667AC1267A572D98", x => x.componentID);
+                    table.PrimaryKey("PK__BloodCom__667AC126F26CABC1", x => x.componentID);
                 });
 
             migrationBuilder.CreateTable(
@@ -36,7 +36,7 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__BloodTyp__C879D794DF7754C0", x => x.bloodTypeID);
+                    table.PrimaryKey("PK__BloodTyp__C879D794BE3A5040", x => x.bloodTypeID);
                 });
 
             migrationBuilder.CreateTable(
@@ -53,7 +53,7 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__Document__EFAAADE56699808C", x => x.documentID);
+                    table.PrimaryKey("PK__Document__EFAAADE5699BA8E4", x => x.documentID);
                 });
 
             migrationBuilder.CreateTable(
@@ -69,7 +69,7 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__Location__30646B0E7475C78D", x => x.locationID);
+                    table.PrimaryKey("PK__Location__30646B0E7DF4F6FC", x => x.locationID);
                 });
 
             migrationBuilder.CreateTable(
@@ -88,7 +88,7 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__users__CB9A1CDF1883DE01", x => x.userID);
+                    table.PrimaryKey("PK__users__CB9A1CDFB74F38F1", x => x.userID);
                 });
 
             migrationBuilder.CreateTable(
@@ -105,7 +105,7 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__Blog__FA0AA70D9275A0A2", x => x.blogID);
+                    table.PrimaryKey("PK__Blog__FA0AA70DF494B3C9", x => x.blogID);
                     table.ForeignKey(
                         name: "FK_Blog_Author",
                         column: x => x.authorID,
@@ -125,7 +125,7 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__BloodRec__A9B8B5421A98978D", x => x.recipientID);
+                    table.PrimaryKey("PK__BloodRec__A9B8B54217264492", x => x.recipientID);
                     table.ForeignKey(
                         name: "FK_BloodRecipient_User",
                         column: x => x.userID,
@@ -146,7 +146,7 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__Report__1C9B4ECD1C1211AF", x => x.reportID);
+                    table.PrimaryKey("PK__Report__1C9B4ECDF896B590", x => x.reportID);
                     table.ForeignKey(
                         name: "FK_Report_User",
                         column: x => x.generatedBy,
@@ -169,7 +169,7 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__BloodReq__E3C5DE518396DD28", x => x.requestID);
+                    table.PrimaryKey("PK__BloodReq__E3C5DE512BE91403", x => x.requestID);
                     table.ForeignKey(
                         name: "FK_BloodRequest_BloodType",
                         column: x => x.bloodTypeRequired,
@@ -197,7 +197,7 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__BloodDon__F7F4F433F50E75C4", x => x.donationID);
+                    table.PrimaryKey("PK__BloodDon__F7F4F433B63F6689", x => x.donationID);
                     table.ForeignKey(
                         name: "FK_BloodDonation_Request",
                         column: x => x.requestID,
@@ -215,11 +215,12 @@ namespace Models.Migrations
                     componentType = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     expiryDate = table.Column<DateOnly>(type: "date", nullable: true),
                     status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    quantity = table.Column<int>(type: "int", nullable: false, defaultValue: 450)
+                    quantity = table.Column<int>(type: "int", nullable: false, defaultValue: 450),
+                    requestID = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__BloodUni__55D792156DF7DE87", x => x.unitID);
+                    table.PrimaryKey("PK__BloodUni__55D79215DA87E384", x => x.unitID);
                     table.ForeignKey(
                         name: "FK_BloodUnit_BloodType",
                         column: x => x.bloodTypeID,
@@ -235,6 +236,11 @@ namespace Models.Migrations
                         column: x => x.donationID,
                         principalTable: "BloodDonation",
                         principalColumn: "donationID");
+                    table.ForeignKey(
+                        name: "FK_BloodUnit_Request",
+                        column: x => x.requestID,
+                        principalTable: "BloodRequest",
+                        principalColumn: "requestID");
                 });
 
             migrationBuilder.CreateTable(
@@ -253,7 +259,7 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__Certific__A15CBE8E306F0F2A", x => x.certificateID);
+                    table.PrimaryKey("PK__Certific__A15CBE8E388020DB", x => x.certificateID);
                     table.ForeignKey(
                         name: "FK_Certificate_Donation",
                         column: x => x.donationID,
@@ -281,7 +287,7 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__Notifica__4BA5CE8999822DB9", x => x.notificationID);
+                    table.PrimaryKey("PK__Notifica__4BA5CE8910416400", x => x.notificationID);
                     table.ForeignKey(
                         name: "FK_Notification_Certificate",
                         column: x => x.certificateID,
@@ -308,7 +314,7 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__Donation__19BDBDB32D843D12", x => x.historyID);
+                    table.PrimaryKey("PK__Donation__19BDBDB36E09FAAA", x => x.historyID);
                     table.ForeignKey(
                         name: "FK_DonationHistory_Certificate",
                         column: x => x.certificateID,
@@ -323,9 +329,6 @@ namespace Models.Migrations
                     donorID = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     userID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     bloodTypeID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    weight = table.Column<double>(type: "float", nullable: true),
-                    height = table.Column<double>(type: "float", nullable: true),
-                    medicalHistory = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     isAvailable = table.Column<bool>(type: "bit", nullable: true),
                     lastDonationDate = table.Column<DateOnly>(type: "date", nullable: true),
                     nextEligibleDate = table.Column<DateOnly>(type: "date", nullable: true),
@@ -334,7 +337,7 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__Donor__A595D731BCCB1D8C", x => x.donorID);
+                    table.PrimaryKey("PK__Donor__A595D73182E52831", x => x.donorID);
                     table.ForeignKey(
                         name: "FK_Donor_BloodType",
                         column: x => x.bloodTypeID,
@@ -353,6 +356,33 @@ namespace Models.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "HealthCheck",
+                columns: table => new
+                {
+                    healthCheckID = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
+                    donorID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    weight = table.Column<double>(type: "float", nullable: true),
+                    height = table.Column<double>(type: "float", nullable: true),
+                    heartRate = table.Column<int>(type: "int", nullable: true),
+                    temperature = table.Column<double>(type: "float", nullable: true),
+                    blood_pressure = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    medicalHistory = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    currentMedications = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    allergies = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    HealthCheck_Date = table.Column<DateOnly>(type: "date", nullable: false, defaultValueSql: "(getdate())"),
+                    HealthCheck_Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK__HealthCh__31AFA16E0C212F82", x => x.healthCheckID);
+                    table.ForeignKey(
+                        name: "FK_HealthCheck_Donor",
+                        column: x => x.donorID,
+                        principalTable: "Donor",
+                        principalColumn: "donorID");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "MedicalFacility",
                 columns: table => new
                 {
@@ -368,7 +398,7 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__MedicalF__AA548184FAC7F769", x => x.facilityID);
+                    table.PrimaryKey("PK__MedicalF__AA5481849741A8E3", x => x.facilityID);
                     table.ForeignKey(
                         name: "FK_MedicalFacility_Donor",
                         column: x => x.closestDonorID,
@@ -437,6 +467,11 @@ namespace Models.Migrations
                 column: "expiryDate");
 
             migrationBuilder.CreateIndex(
+                name: "IX_BloodUnit_Request",
+                table: "BloodUnit",
+                column: "requestID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_BloodUnit_Status",
                 table: "BloodUnit",
                 column: "status");
@@ -467,7 +502,7 @@ namespace Models.Migrations
                 column: "staffID");
 
             migrationBuilder.CreateIndex(
-                name: "UQ__Certific__410CE512ECEAED6C",
+                name: "UQ__Certific__410CE51220B3E296",
                 table: "Certificate",
                 column: "certificateNumber",
                 unique: true);
@@ -501,6 +536,21 @@ namespace Models.Migrations
                 name: "IX_Donor_User",
                 table: "Donor",
                 column: "userID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HealthCheck_Date",
+                table: "HealthCheck",
+                column: "HealthCheck_Date");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HealthCheck_Donor",
+                table: "HealthCheck",
+                column: "donorID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HealthCheck_Status",
+                table: "HealthCheck",
+                column: "HealthCheck_Status");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MedicalFacility_closestDonorID",
@@ -597,6 +647,9 @@ namespace Models.Migrations
 
             migrationBuilder.DropTable(
                 name: "DonationHistory");
+
+            migrationBuilder.DropTable(
+                name: "HealthCheck");
 
             migrationBuilder.DropTable(
                 name: "Notification");
