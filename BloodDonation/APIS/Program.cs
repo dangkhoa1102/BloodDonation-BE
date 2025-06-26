@@ -15,6 +15,8 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
+using System.Globalization;
+using APIS.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +24,16 @@ builder.Services.AddDbContext<BloodDonationSupportContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+
+
+
+
+// With:
+builder.Services.AddScoped<IBloodDonationRepository, BloodDonationRepository>();
+
+// Same for the service registration:
+builder.Services.AddScoped<IBloodDonationService, BloodDonationService>();
 
 builder.Services.AddScoped<IDonorRepository, DonorRepository>();
 builder.Services.AddScoped<IDonorService, DonorService>();
@@ -59,6 +71,7 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
         options.JsonSerializerOptions.WriteIndented = true;
+        options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
     });
 
 // Add Authorization Policies
@@ -154,6 +167,8 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+
+
 
 // Add CORS policy
 builder.Services.AddCors(options =>

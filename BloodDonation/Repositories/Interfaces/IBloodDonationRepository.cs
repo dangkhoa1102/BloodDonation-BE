@@ -7,6 +7,12 @@ using Models;
 
 namespace Repositories.Interfaces
 {
-    public interface IBloodDonationRepository : IGenericRepository<BloodDonation> { }
+    public interface IBloodDonationRepository : IGenericRepository<BloodDonation> 
+    {
+        Task<IEnumerable<BloodDonation>> GetAllWithDetailsAsync();
+        Task<BloodDonation> GetByIdWithDetailsAsync(Guid id);
+        Task<IEnumerable<BloodDonation>> GetByDonorIdAsync(Guid donorId);
+        Task<IEnumerable<BloodDonation>> GetByStatusAsync(string status);
+    }
 
 }

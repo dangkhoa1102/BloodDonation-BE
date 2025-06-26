@@ -12,8 +12,8 @@ using Models;
 namespace Models.Migrations
 {
     [DbContext(typeof(BloodDonationSupportContext))]
-    [Migration("20250614044640_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250626104808_modifieddonor")]
+    partial class modifieddonor
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -62,7 +62,7 @@ namespace Models.Migrations
                         .HasColumnName("viewCount");
 
                     b.HasKey("BlogId")
-                        .HasName("PK__Blog__FA0AA70D9275A0A2");
+                        .HasName("PK__Blog__FA0AA70D669396E2");
 
                     b.HasIndex(new[] { "AuthorId" }, "IX_Blog_Author");
 
@@ -92,7 +92,7 @@ namespace Models.Migrations
                         .HasColumnName("storageRequirements");
 
                     b.HasKey("ComponentId")
-                        .HasName("PK__BloodCom__667AC1267A572D98");
+                        .HasName("PK__BloodCom__667AC126621C9E40");
 
                     b.ToTable("BloodComponent", (string)null);
                 });
@@ -135,7 +135,7 @@ namespace Models.Migrations
                         .HasColumnName("status");
 
                     b.HasKey("DonationId")
-                        .HasName("PK__BloodDon__F7F4F433F50E75C4");
+                        .HasName("PK__BloodDon__F7F4F433645EE0FF");
 
                     b.HasIndex("DonorId");
 
@@ -173,7 +173,7 @@ namespace Models.Migrations
                         .HasColumnName("userID");
 
                     b.HasKey("RecipientId")
-                        .HasName("PK__BloodRec__A9B8B5421A98978D");
+                        .HasName("PK__BloodRec__A9B8B542CA122FE7");
 
                     b.HasIndex("UserId");
 
@@ -219,7 +219,7 @@ namespace Models.Migrations
                         .HasColumnName("urgencyLevel");
 
                     b.HasKey("RequestId")
-                        .HasName("PK__BloodReq__E3C5DE518396DD28");
+                        .HasName("PK__BloodReq__E3C5DE51755946BB");
 
                     b.HasIndex("RecipientId");
 
@@ -256,7 +256,7 @@ namespace Models.Migrations
                         .HasColumnName("rhFactor");
 
                     b.HasKey("BloodTypeId")
-                        .HasName("PK__BloodTyp__C879D794DF7754C0");
+                        .HasName("PK__BloodTyp__C879D79464B25B49");
 
                     b.ToTable("BloodType", (string)null);
                 });
@@ -291,13 +291,17 @@ namespace Models.Migrations
                         .HasDefaultValue(450)
                         .HasColumnName("quantity");
 
+                    b.Property<Guid?>("RequestId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("requestID");
+
                     b.Property<string>("Status")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("status");
 
                     b.HasKey("UnitId")
-                        .HasName("PK__BloodUni__55D792156DF7DE87");
+                        .HasName("PK__BloodUni__55D79215BA01BA5A");
 
                     b.HasIndex("ComponentType");
 
@@ -306,6 +310,8 @@ namespace Models.Migrations
                     b.HasIndex(new[] { "BloodTypeId" }, "IX_BloodUnit_BloodType");
 
                     b.HasIndex(new[] { "ExpiryDate" }, "IX_BloodUnit_ExpiryDate");
+
+                    b.HasIndex(new[] { "RequestId" }, "IX_BloodUnit_Request");
 
                     b.HasIndex(new[] { "Status" }, "IX_BloodUnit_Status");
 
@@ -364,7 +370,7 @@ namespace Models.Migrations
                         .HasColumnName("staffID");
 
                     b.HasKey("CertificateId")
-                        .HasName("PK__Certific__A15CBE8E306F0F2A");
+                        .HasName("PK__Certific__A15CBE8E683D5BA0");
 
                     b.HasIndex(new[] { "DonationId" }, "IX_Certificate_Donation");
 
@@ -376,7 +382,7 @@ namespace Models.Migrations
 
                     b.HasIndex(new[] { "StaffId" }, "IX_Certificate_Staff");
 
-                    b.HasIndex(new[] { "CertificateNumber" }, "UQ__Certific__410CE512ECEAED6C")
+                    b.HasIndex(new[] { "CertificateNumber" }, "UQ__Certific__410CE51207A82C52")
                         .IsUnique();
 
                     b.ToTable("Certificate", (string)null);
@@ -420,7 +426,7 @@ namespace Models.Migrations
                         .HasColumnName("uploadDate");
 
                     b.HasKey("DocumentId")
-                        .HasName("PK__Document__EFAAADE56699808C");
+                        .HasName("PK__Document__EFAAADE5A994DC1C");
 
                     b.ToTable("Document", (string)null);
                 });
@@ -458,7 +464,7 @@ namespace Models.Migrations
                         .HasColumnName("quantity");
 
                     b.HasKey("HistoryId")
-                        .HasName("PK__Donation__19BDBDB32D843D12");
+                        .HasName("PK__Donation__19BDBDB3C2244AE2");
 
                     b.HasIndex("DonorId");
 
@@ -475,6 +481,10 @@ namespace Models.Migrations
                         .HasColumnName("donorID")
                         .HasDefaultValueSql("(newid())");
 
+                    b.Property<string>("Address")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<Guid?>("BloodTypeId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("bloodTypeID");
@@ -483,9 +493,16 @@ namespace Models.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("closestFacilityID");
 
-                    b.Property<double?>("Height")
-                        .HasColumnType("float")
-                        .HasColumnName("height");
+                    b.Property<string>("CurrentMedications")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("FullName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<bool?>("IsAvailable")
                         .HasColumnType("bit")
@@ -499,24 +516,20 @@ namespace Models.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("locationID");
 
-                    b.Property<string>("MedicalHistory")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("medicalHistory");
-
                     b.Property<DateOnly?>("NextEligibleDate")
                         .HasColumnType("date")
                         .HasColumnName("nextEligibleDate");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("userID");
 
-                    b.Property<double?>("Weight")
-                        .HasColumnType("float")
-                        .HasColumnName("weight");
-
                     b.HasKey("DonorId")
-                        .HasName("PK__Donor__A595D731BCCB1D8C");
+                        .HasName("PK__Donor__A595D73150F694D9");
 
                     b.HasIndex("ClosestFacilityId");
 
@@ -527,6 +540,76 @@ namespace Models.Migrations
                     b.HasIndex(new[] { "UserId" }, "IX_Donor_User");
 
                     b.ToTable("Donor", (string)null);
+                });
+
+            modelBuilder.Entity("Models.HealthCheck", b =>
+                {
+                    b.Property<Guid>("HealthCheckId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("healthCheckID")
+                        .HasDefaultValueSql("(newid())");
+
+                    b.Property<string>("Allergies")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("allergies");
+
+                    b.Property<string>("BloodPressure")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasColumnName("blood_pressure");
+
+                    b.Property<string>("CurrentMedications")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("currentMedications");
+
+                    b.Property<Guid>("DonorId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("donorID");
+
+                    b.Property<DateOnly>("HealthCheckDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("date")
+                        .HasColumnName("HealthCheck_Date")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.Property<string>("HealthCheckStatus")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("Completed")
+                        .HasColumnName("HealthCheck_Status");
+
+                    b.Property<int?>("HeartRate")
+                        .HasColumnType("int")
+                        .HasColumnName("heartRate");
+
+                    b.Property<double?>("Height")
+                        .HasColumnType("float")
+                        .HasColumnName("height");
+
+                    b.Property<string>("MedicalHistory")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("medicalHistory");
+
+                    b.Property<double?>("Temperature")
+                        .HasColumnType("float")
+                        .HasColumnName("temperature");
+
+                    b.Property<double?>("Weight")
+                        .HasColumnType("float")
+                        .HasColumnName("weight");
+
+                    b.HasKey("HealthCheckId")
+                        .HasName("PK__HealthCh__31AFA16E57E14455");
+
+                    b.HasIndex(new[] { "HealthCheckDate" }, "IX_HealthCheck_Date");
+
+                    b.HasIndex(new[] { "DonorId" }, "IX_HealthCheck_Donor");
+
+                    b.HasIndex(new[] { "HealthCheckStatus" }, "IX_HealthCheck_Status");
+
+                    b.ToTable("HealthCheck", (string)null);
                 });
 
             modelBuilder.Entity("Models.Location", b =>
@@ -561,7 +644,7 @@ namespace Models.Migrations
                         .HasColumnName("longitude");
 
                     b.HasKey("LocationId")
-                        .HasName("PK__Location__30646B0E7475C78D");
+                        .HasName("PK__Location__30646B0EE9A2DD78");
 
                     b.ToTable("Location", (string)null);
                 });
@@ -613,7 +696,7 @@ namespace Models.Migrations
                         .HasColumnName("specialization");
 
                     b.HasKey("FacilityId")
-                        .HasName("PK__MedicalF__AA548184FAC7F769");
+                        .HasName("PK__MedicalF__AA54818459FDEADA");
 
                     b.HasIndex("ClosestDonorId");
 
@@ -660,7 +743,7 @@ namespace Models.Migrations
                         .HasColumnName("userID");
 
                     b.HasKey("NotificationId")
-                        .HasName("PK__Notifica__4BA5CE8999822DB9");
+                        .HasName("PK__Notifica__4BA5CE898AE7CC61");
 
                     b.HasIndex(new[] { "CertificateId" }, "IX_Notification_Certificate");
 
@@ -701,7 +784,7 @@ namespace Models.Migrations
                         .HasColumnName("reportType");
 
                     b.HasKey("ReportId")
-                        .HasName("PK__Report__1C9B4ECD1C1211AF");
+                        .HasName("PK__Report__1C9B4ECD2BD40B30");
 
                     b.HasIndex(new[] { "GeneratedBy" }, "IX_Report_GeneratedBy");
 
@@ -759,7 +842,7 @@ namespace Models.Migrations
                         .HasColumnName("username");
 
                     b.HasKey("UserId")
-                        .HasName("PK__users__CB9A1CDF1883DE01");
+                        .HasName("PK__users__CB9A1CDF65F7D8DE");
 
                     b.ToTable("users", (string)null);
                 });
@@ -842,11 +925,18 @@ namespace Models.Migrations
                         .HasForeignKey("DonationId")
                         .HasConstraintName("FK_BloodUnit_Donation");
 
+                    b.HasOne("Models.BloodRequest", "Request")
+                        .WithMany("BloodUnits")
+                        .HasForeignKey("RequestId")
+                        .HasConstraintName("FK_BloodUnit_Request");
+
                     b.Navigation("BloodType");
 
                     b.Navigation("ComponentTypeNavigation");
 
                     b.Navigation("Donation");
+
+                    b.Navigation("Request");
                 });
 
             modelBuilder.Entity("Models.Certificate", b =>
@@ -924,6 +1014,17 @@ namespace Models.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Models.HealthCheck", b =>
+                {
+                    b.HasOne("Models.Donor", "Donor")
+                        .WithMany("HealthChecks")
+                        .HasForeignKey("DonorId")
+                        .IsRequired()
+                        .HasConstraintName("FK_HealthCheck_Donor");
+
+                    b.Navigation("Donor");
+                });
+
             modelBuilder.Entity("Models.MedicalFacility", b =>
                 {
                     b.HasOne("Models.Donor", "ClosestDonor")
@@ -981,6 +1082,8 @@ namespace Models.Migrations
             modelBuilder.Entity("Models.BloodRequest", b =>
                 {
                     b.Navigation("BloodDonations");
+
+                    b.Navigation("BloodUnits");
                 });
 
             modelBuilder.Entity("Models.BloodType", b =>
@@ -1008,6 +1111,8 @@ namespace Models.Migrations
                     b.Navigation("Certificates");
 
                     b.Navigation("DonationHistories");
+
+                    b.Navigation("HealthChecks");
 
                     b.Navigation("MedicalFacilities");
                 });

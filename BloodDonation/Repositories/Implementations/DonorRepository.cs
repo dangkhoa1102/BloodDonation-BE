@@ -20,5 +20,14 @@ namespace Repositories.Implementations
         {
             return await _dbSet.Where(d => d.IsAvailable == true).ToListAsync();
         }
+
+        public async Task<Donor> GetByIdWithDetailsAsync(Guid id)
+        {
+            return await _dbSet
+                .Include(d => d.User)
+                .Include(d => d.BloodType)
+                .Include(d => d.Location)
+                .FirstOrDefaultAsync(d => d.DonorId == id);
+        }
     }
 }

@@ -15,7 +15,7 @@ namespace Services
         Task<DonorDto> CreateAsync(CreateDonorDto dto);
         Task<bool> UpdateAsync(Guid id, UpdateDonorDto dto);
         Task<bool> DeleteAsync(Guid id);
-        Task<DonorHealthCheckDto> HealthCheckAsync(Guid donorId);
+        //Task<DonorHealthCheckDto> HealthCheckAsync(Guid donorId);
     }
 
 }

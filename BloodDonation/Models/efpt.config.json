@@ -59,6 +59,10 @@
          "ObjectType": 0
       },
       {
+         "Name": "[dbo].[HealthCheck]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[dbo].[Location]",
          "ObjectType": 0
       },

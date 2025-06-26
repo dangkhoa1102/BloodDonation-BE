@@ -21,9 +21,13 @@ public partial class BloodUnit
 
     public int Quantity { get; set; }
 
+    public Guid? RequestId { get; set; }
+
     public virtual BloodType BloodType { get; set; }
 
     public virtual BloodComponent ComponentTypeNavigation { get; set; }
 
     public virtual BloodDonation Donation { get; set; }
+
+    public virtual BloodRequest Request { get; set; }
 }

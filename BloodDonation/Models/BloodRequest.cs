@@ -27,5 +27,7 @@ public partial class BloodRequest
 
     public virtual BloodType BloodTypeRequiredNavigation { get; set; }
 
+    public virtual ICollection<BloodUnit> BloodUnits { get; set; } = new List<BloodUnit>();
+
     public virtual BloodRecipient Recipient { get; set; }
 }
