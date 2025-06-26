@@ -61,26 +61,65 @@ namespace Services
         {
             try
             {
-                // Kiểm tra DonorId
+                Guid donorId;
+                Donor donor;
+
+                // Nếu không có DonorId, tạo mới Donor (và User nếu cần)
                 if (!dto.DonorId.HasValue)
                 {
-                    _logger.LogError("DonorId is required");
-                    throw new ArgumentException("DonorId is required");
-                }
+                    // Tạo mới User (nếu hệ thống của bạn tách User và Donor)
+                    var user = new User
+                    {
+                        FullName = dto.FullName,
+                        Phone = dto.PhoneNumber,
+                        Email = dto.Email,
+                        Password = "default_password",
+                        Username = !string.IsNullOrWhiteSpace(dto.Email) ? dto.Email : Guid.NewGuid().ToString(),              
+                        UserIdCard = "unknown",        // hoặc lấy từ dto nếu có                       
+                        Role = "Donor",
+                        // Thêm các trường khác nếu cần
+                    };
+                    await _userRepository.AddAsync(user);
+                    await _userRepository.SaveChangesAsync();
 
-                var donor = await _donorRepository.GetByIdWithDetailsAsync(dto.DonorId.Value);
-                if (donor == null)
+                    // Tìm BloodTypeId nếu có
+                    Guid? bloodTypeId = null;
+                    if (!string.IsNullOrWhiteSpace(dto.BloodType))
+                    {
+                        var bloodType = (await _bloodTypeRepository.GetAllAsync())
+                            .FirstOrDefault(bt => (bt.AboType + bt.RhFactor) == dto.BloodType);
+                        bloodTypeId = bloodType?.BloodTypeId;
+                    }
+
+                    // Tạo mới Donor
+                    donor = new Donor
+                    {
+                        UserId = user.UserId,
+                        BloodTypeId = bloodTypeId,
+                        // Nếu có Location, bạn có thể xử lý tương tự
+                        // LocationId = ...
+                    };
+                    await _donorRepository.AddAsync(donor);
+                    await _donorRepository.SaveChangesAsync();
+                    donorId = donor.DonorId;
+                }
+                else
                 {
-                    _logger.LogError("Donor not found with ID: {DonorId}", dto.DonorId);
-                    throw new ArgumentException("Donor không tồn tại");
+                    donor = await _donorRepository.GetByIdWithDetailsAsync(dto.DonorId.Value);
+                    if (donor == null)
+                    {
+                        _logger.LogError("Donor not found with ID: {DonorId}", dto.DonorId);
+                        throw new ArgumentException("Donor không tồn tại");
+                    }
+                    donorId = donor.DonorId;
                 }
 
-                // Chỉ lưu các trường có trong bảng BloodDonation
+                // Tạo mới BloodDonation
                 var donation = new BloodDonation
                 {
                     DonationId = Guid.NewGuid(),
-                    DonorId = dto.DonorId.Value,
-                    RequestId = dto.RequestId,
+                    DonorId = donorId,
+                    RequestId = dto.RequestId, // Có thể null
                     DonationDate = dto.DonationDate,
                     Quantity = dto.Quantity,
                     Status = dto.Status,
@@ -90,7 +129,7 @@ namespace Services
                 await _donationRepository.AddAsync(donation);
                 await _donationRepository.SaveChangesAsync();
 
-                // Build DTO với dữ liệu từ Donor
+                // Build DTO trả về
                 return new BloodDonationDto
                 {
                     DonationId = donation.DonationId,
@@ -101,8 +140,6 @@ namespace Services
                     Status = donation.Status ?? string.Empty,
                     Notes = donation.Notes ?? string.Empty,
                     CertificateId = donation.CertificateId,
-
-                    // Lấy thông tin từ Donor và User
                     FullName = donor.User?.FullName ?? string.Empty,
                     PhoneNumber = donor.User?.Phone ?? string.Empty,
                     Email = donor.User?.Email ?? string.Empty,
