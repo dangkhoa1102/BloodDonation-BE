@@ -59,7 +59,7 @@ namespace Models.Migrations
                         .HasColumnName("viewCount");
 
                     b.HasKey("BlogId")
-                        .HasName("PK__Blog__FA0AA70DF494B3C9");
+                        .HasName("PK__Blog__FA0AA70D669396E2");
 
                     b.HasIndex(new[] { "AuthorId" }, "IX_Blog_Author");
 
@@ -89,7 +89,7 @@ namespace Models.Migrations
                         .HasColumnName("storageRequirements");
 
                     b.HasKey("ComponentId")
-                        .HasName("PK__BloodCom__667AC126F26CABC1");
+                        .HasName("PK__BloodCom__667AC126621C9E40");
 
                     b.ToTable("BloodComponent", (string)null);
                 });
@@ -132,7 +132,7 @@ namespace Models.Migrations
                         .HasColumnName("status");
 
                     b.HasKey("DonationId")
-                        .HasName("PK__BloodDon__F7F4F433B63F6689");
+                        .HasName("PK__BloodDon__F7F4F433645EE0FF");
 
                     b.HasIndex("DonorId");
 
@@ -170,7 +170,7 @@ namespace Models.Migrations
                         .HasColumnName("userID");
 
                     b.HasKey("RecipientId")
-                        .HasName("PK__BloodRec__A9B8B54217264492");
+                        .HasName("PK__BloodRec__A9B8B542CA122FE7");
 
                     b.HasIndex("UserId");
 
@@ -216,7 +216,7 @@ namespace Models.Migrations
                         .HasColumnName("urgencyLevel");
 
                     b.HasKey("RequestId")
-                        .HasName("PK__BloodReq__E3C5DE512BE91403");
+                        .HasName("PK__BloodReq__E3C5DE51755946BB");
 
                     b.HasIndex("RecipientId");
 
@@ -253,7 +253,7 @@ namespace Models.Migrations
                         .HasColumnName("rhFactor");
 
                     b.HasKey("BloodTypeId")
-                        .HasName("PK__BloodTyp__C879D794BE3A5040");
+                        .HasName("PK__BloodTyp__C879D79464B25B49");
 
                     b.ToTable("BloodType", (string)null);
                 });
@@ -298,7 +298,7 @@ namespace Models.Migrations
                         .HasColumnName("status");
 
                     b.HasKey("UnitId")
-                        .HasName("PK__BloodUni__55D79215DA87E384");
+                        .HasName("PK__BloodUni__55D79215BA01BA5A");
 
                     b.HasIndex("ComponentType");
 
@@ -367,7 +367,7 @@ namespace Models.Migrations
                         .HasColumnName("staffID");
 
                     b.HasKey("CertificateId")
-                        .HasName("PK__Certific__A15CBE8E388020DB");
+                        .HasName("PK__Certific__A15CBE8E683D5BA0");
 
                     b.HasIndex(new[] { "DonationId" }, "IX_Certificate_Donation");
 
@@ -379,7 +379,7 @@ namespace Models.Migrations
 
                     b.HasIndex(new[] { "StaffId" }, "IX_Certificate_Staff");
 
-                    b.HasIndex(new[] { "CertificateNumber" }, "UQ__Certific__410CE51220B3E296")
+                    b.HasIndex(new[] { "CertificateNumber" }, "UQ__Certific__410CE51207A82C52")
                         .IsUnique();
 
                     b.ToTable("Certificate", (string)null);
@@ -423,7 +423,7 @@ namespace Models.Migrations
                         .HasColumnName("uploadDate");
 
                     b.HasKey("DocumentId")
-                        .HasName("PK__Document__EFAAADE5699BA8E4");
+                        .HasName("PK__Document__EFAAADE5A994DC1C");
 
                     b.ToTable("Document", (string)null);
                 });
@@ -461,7 +461,7 @@ namespace Models.Migrations
                         .HasColumnName("quantity");
 
                     b.HasKey("HistoryId")
-                        .HasName("PK__Donation__19BDBDB36E09FAAA");
+                        .HasName("PK__Donation__19BDBDB3C2244AE2");
 
                     b.HasIndex("DonorId");
 
@@ -478,6 +478,10 @@ namespace Models.Migrations
                         .HasColumnName("donorID")
                         .HasDefaultValueSql("(newid())");
 
+                    b.Property<string>("Address")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<Guid?>("BloodTypeId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("bloodTypeID");
@@ -485,6 +489,17 @@ namespace Models.Migrations
                     b.Property<Guid?>("ClosestFacilityId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("closestFacilityID");
+
+                    b.Property<string>("CurrentMedications")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("FullName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<bool?>("IsAvailable")
                         .HasColumnType("bit")
@@ -502,12 +517,16 @@ namespace Models.Migrations
                         .HasColumnType("date")
                         .HasColumnName("nextEligibleDate");
 
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("userID");
 
                     b.HasKey("DonorId")
-                        .HasName("PK__Donor__A595D73182E52831");
+                        .HasName("PK__Donor__A595D73150F694D9");
 
                     b.HasIndex("ClosestFacilityId");
 
@@ -552,8 +571,10 @@ namespace Models.Migrations
                         .HasDefaultValueSql("(getdate())");
 
                     b.Property<string>("HealthCheckStatus")
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("Completed")
                         .HasColumnName("HealthCheck_Status");
 
                     b.Property<int?>("HeartRate")
@@ -577,7 +598,7 @@ namespace Models.Migrations
                         .HasColumnName("weight");
 
                     b.HasKey("HealthCheckId")
-                        .HasName("PK__HealthCh__31AFA16E0C212F82");
+                        .HasName("PK__HealthCh__31AFA16E57E14455");
 
                     b.HasIndex(new[] { "HealthCheckDate" }, "IX_HealthCheck_Date");
 
@@ -620,7 +641,7 @@ namespace Models.Migrations
                         .HasColumnName("longitude");
 
                     b.HasKey("LocationId")
-                        .HasName("PK__Location__30646B0E7DF4F6FC");
+                        .HasName("PK__Location__30646B0EE9A2DD78");
 
                     b.ToTable("Location", (string)null);
                 });
@@ -672,7 +693,7 @@ namespace Models.Migrations
                         .HasColumnName("specialization");
 
                     b.HasKey("FacilityId")
-                        .HasName("PK__MedicalF__AA5481849741A8E3");
+                        .HasName("PK__MedicalF__AA54818459FDEADA");
 
                     b.HasIndex("ClosestDonorId");
 
@@ -719,7 +740,7 @@ namespace Models.Migrations
                         .HasColumnName("userID");
 
                     b.HasKey("NotificationId")
-                        .HasName("PK__Notifica__4BA5CE8910416400");
+                        .HasName("PK__Notifica__4BA5CE898AE7CC61");
 
                     b.HasIndex(new[] { "CertificateId" }, "IX_Notification_Certificate");
 
@@ -760,7 +781,7 @@ namespace Models.Migrations
                         .HasColumnName("reportType");
 
                     b.HasKey("ReportId")
-                        .HasName("PK__Report__1C9B4ECDF896B590");
+                        .HasName("PK__Report__1C9B4ECD2BD40B30");
 
                     b.HasIndex(new[] { "GeneratedBy" }, "IX_Report_GeneratedBy");
 
@@ -818,7 +839,7 @@ namespace Models.Migrations
                         .HasColumnName("username");
 
                     b.HasKey("UserId")
-                        .HasName("PK__users__CB9A1CDFB74F38F1");
+                        .HasName("PK__users__CB9A1CDF65F7D8DE");
 
                     b.ToTable("users", (string)null);
                 });

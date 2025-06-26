@@ -11,5 +11,6 @@ namespace Repositories.Interfaces
     {
         // Bạn có thể thêm các method đặc thù cho Donor ở đây nếu cần, ví dụ:
         Task<IEnumerable<Donor>> GetAvailableDonorsAsync();
+        Task<Donor> GetByIdWithDetailsAsync(Guid id);
     }
 }
