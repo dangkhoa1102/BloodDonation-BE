@@ -335,7 +335,7 @@ public class BloodRequestService : IBloodRequestService
                     UserId = Guid.NewGuid(),
                     Email = request.Email,
                     Username = request.Email.Split('@')[0],
-                    Password = "123456",
+                    Password = "benhnhan123",
                     FullName = request.PatientName,
                     UserIdCard = request.UserIdCard,
                     Phone = request.Phone,
