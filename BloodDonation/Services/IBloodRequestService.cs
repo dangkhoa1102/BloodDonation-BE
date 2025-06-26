@@ -16,5 +16,7 @@ namespace Services
         Task<(bool success, string message)> UpdateBloodRequestAsync(Guid requestId, BloodRequestUpdateDTO updateDto, Guid staffId);
         Task<(bool success, string message)> RejectBloodRequestAsync(Guid requestId,BloodRequestRejectDTO rejectDto,Guid staffId);
         Task<(bool success, string message)> ApproveBloodRequestAsync(Guid requestId, Guid staffId);
+        Task<(bool success, string message, Guid? requestId)> RegisterEmergencyBloodRequestAsync(
+        EmergencyBloodRequestDTO request, Guid staffId);
     }
 }
