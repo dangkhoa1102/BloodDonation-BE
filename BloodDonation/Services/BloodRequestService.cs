@@ -310,5 +310,108 @@ public class BloodRequestService : IBloodRequestService
             _logger.LogError(ex, "Error approving blood request {RequestId}", requestId);
             return (false, "An error occurred while approving the blood request");
         }
+
+    }
+    public async Task<(bool success, string message, Guid? requestId)> RegisterEmergencyBloodRequestAsync(
+    EmergencyBloodRequestDTO request, Guid staffId)
+    {
+        try
+        {
+            _logger.LogInformation("Starting emergency blood request registration. Staff ID: {StaffId}", staffId);
+
+            var staff = await _userRepository.GetByIdAsync(staffId);
+            if (staff == null || staff.Role != "Staff")
+            {
+                return (false, "Invalid staff member", null);
+            }
+
+            // Chỉ tìm user dựa trên email
+            var existingUser = await _userRepository.GetByEmailAsync(request.Email);
+
+            if (existingUser == null)
+            {
+                existingUser = new User
+                {
+                    UserId = Guid.NewGuid(),
+                    Email = request.Email,
+                    Username = request.Email.Split('@')[0],
+                    Password = "benhnhan123",
+                    FullName = request.PatientName,
+                    UserIdCard = request.UserIdCard,
+                    Phone = request.Phone,
+                    DateOfBirth = request.DateOfBirth, // Add this line to include DateOfBirth
+                    Role = UserRoles.Member.ToString()
+                };
+
+                await _userRepository.AddAsync(existingUser);
+                await _userRepository.SaveChangesAsync();
+
+                _logger.LogInformation("Created new user with ID: {UserId}", existingUser.UserId);
+            }
+            else
+            {
+                // Update existing user's information if needed
+                existingUser.FullName = request.PatientName;
+                existingUser.UserIdCard = request.UserIdCard;
+                existingUser.Phone = request.Phone;
+                if (request.DateOfBirth.HasValue)
+                {
+                    existingUser.DateOfBirth = request.DateOfBirth;
+                }
+                
+                await _userRepository.SaveChangesAsync();
+                _logger.LogInformation("Updated existing user information for ID: {UserId}", existingUser.UserId);
+            }
+
+            // Rest of the code remains the same...
+            var recipient = await _recipientRepository.GetByUserIdAsync(existingUser.UserId);
+            if (recipient == null)
+            {
+                recipient = new BloodRecipient
+                {
+                    RecipientId = Guid.NewGuid(),
+                    UserId = existingUser.UserId,
+                    ContactInfo = request.Phone
+                };
+                await _recipientRepository.AddAsync(recipient);
+                await _recipientRepository.SaveChangesAsync();
+
+                _logger.LogInformation("Created new recipient with ID: {RecipientId}", recipient.RecipientId);
+            }
+
+            var bloodRequest = new BloodRequest
+            {
+                RequestId = Guid.NewGuid(),
+                RecipientId = recipient.RecipientId,
+                BloodTypeRequired = request.BloodTypeRequired,
+                QuantityNeeded = request.QuantityNeeded,
+                UrgencyLevel = "Emergency",
+                RequestDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                Status = BloodRequestStatus.Pending.ToString(),
+                Description = request.Description
+            };
+
+            await _requestRepository.AddAsync(bloodRequest);
+            await _requestRepository.SaveChangesAsync();
+
+            _logger.LogInformation("Created emergency blood request with ID: {RequestId}", bloodRequest.RequestId);
+
+            var notification = new Notification
+            {
+                NotificationId = Guid.NewGuid(),
+                UserId = existingUser.UserId,
+                NotificationType = "Emergency Blood Request",
+                Message = $"Emergency blood request has been created. Request ID: {bloodRequest.RequestId}",
+                SendDate = DateOnly.FromDateTime(DateTime.Now),
+                IsRead = false
+            };
+
+            return (true, "Emergency blood request created successfully", bloodRequest.RequestId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating emergency blood request");
+            return (false, $"An error occurred: {ex.Message}", null);
+        }
     }
 }

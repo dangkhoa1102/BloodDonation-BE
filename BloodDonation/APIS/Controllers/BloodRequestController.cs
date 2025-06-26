@@ -347,5 +347,61 @@ namespace APIS.Controllers
                 return StatusCode(500, new { message = "An error occurred while approving the blood request" });
             }
         }
+        [HttpPost("register-emergency")]
+        [Authorize(Roles = "Staff")]
+        public async Task<IActionResult> RegisterEmergencyRequest([FromBody] EmergencyBloodRequestDTO request)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    var errors = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage)
+                        .ToList();
+
+                    _logger.LogWarning("Validation failed: {Errors}", string.Join(", ", errors));
+                    return BadRequest(new { message = "Validation failed", errors });
+                }
+
+                var staffId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? throw new InvalidOperationException("Staff ID not found in token"));
+
+                var (success, message, requestId) = await _bloodRequestService.RegisterEmergencyBloodRequestAsync(
+                    request, staffId);
+
+                if (!success)
+                    return BadRequest(new { message });
+
+                return Ok(new
+                {
+                    success = true,
+                    message,
+                    data = new
+                    {
+                        requestId,
+                        requestDetails = new
+                        {
+                            patientName = request.PatientName,
+                            email = request.Email,
+                            userIdCard = request.UserIdCard,
+                            bloodType = request.BloodTypeRequired,
+                            quantityNeeded = request.QuantityNeeded,
+                            contactPhone = request.Phone,
+                            dateOfBirth = request.DateOfBirth?.ToString("yyyy-MM-dd"),
+                            description = request.Description,
+                            status = "Pending",
+                            urgencyLevel = "Emergency",
+                            requestDate = DateTime.UtcNow.ToString("yyyy-MM-dd")
+                        }
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing emergency blood request");
+                return StatusCode(500, new { message = "An error occurred while processing the emergency request" });
+            }
+        }
     }
 }

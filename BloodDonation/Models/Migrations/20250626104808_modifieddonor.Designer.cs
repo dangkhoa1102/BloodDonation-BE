@@ -12,8 +12,13 @@ using Models;
 namespace Models.Migrations
 {
     [DbContext(typeof(BloodDonationSupportContext))]
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.Designer.cs
     [Migration("20250626104808_modifieddonor")]
     partial class modifieddonor
+========
+    [Migration("20250625154835_AddHealthCheck-ModifyDonor")]
+    partial class AddHealthCheckModifyDonor
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -62,7 +67,11 @@ namespace Models.Migrations
                         .HasColumnName("viewCount");
 
                     b.HasKey("BlogId")
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.Designer.cs
                         .HasName("PK__Blog__FA0AA70D669396E2");
+========
+                        .HasName("PK__Blog__FA0AA70DF494B3C9");
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.Designer.cs
 
                     b.HasIndex(new[] { "AuthorId" }, "IX_Blog_Author");
 
@@ -92,7 +101,11 @@ namespace Models.Migrations
                         .HasColumnName("storageRequirements");
 
                     b.HasKey("ComponentId")
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.Designer.cs
                         .HasName("PK__BloodCom__667AC126621C9E40");
+========
+                        .HasName("PK__BloodCom__667AC126F26CABC1");
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.Designer.cs
 
                     b.ToTable("BloodComponent", (string)null);
                 });
@@ -135,7 +148,11 @@ namespace Models.Migrations
                         .HasColumnName("status");
 
                     b.HasKey("DonationId")
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.Designer.cs
                         .HasName("PK__BloodDon__F7F4F433645EE0FF");
+========
+                        .HasName("PK__BloodDon__F7F4F433B63F6689");
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.Designer.cs
 
                     b.HasIndex("DonorId");
 
@@ -173,7 +190,11 @@ namespace Models.Migrations
                         .HasColumnName("userID");
 
                     b.HasKey("RecipientId")
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.Designer.cs
                         .HasName("PK__BloodRec__A9B8B542CA122FE7");
+========
+                        .HasName("PK__BloodRec__A9B8B54217264492");
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.Designer.cs
 
                     b.HasIndex("UserId");
 
@@ -219,7 +240,11 @@ namespace Models.Migrations
                         .HasColumnName("urgencyLevel");
 
                     b.HasKey("RequestId")
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.Designer.cs
                         .HasName("PK__BloodReq__E3C5DE51755946BB");
+========
+                        .HasName("PK__BloodReq__E3C5DE512BE91403");
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.Designer.cs
 
                     b.HasIndex("RecipientId");
 
@@ -256,7 +281,11 @@ namespace Models.Migrations
                         .HasColumnName("rhFactor");
 
                     b.HasKey("BloodTypeId")
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.Designer.cs
                         .HasName("PK__BloodTyp__C879D79464B25B49");
+========
+                        .HasName("PK__BloodTyp__C879D794BE3A5040");
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.Designer.cs
 
                     b.ToTable("BloodType", (string)null);
                 });
@@ -301,7 +330,11 @@ namespace Models.Migrations
                         .HasColumnName("status");
 
                     b.HasKey("UnitId")
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.Designer.cs
                         .HasName("PK__BloodUni__55D79215BA01BA5A");
+========
+                        .HasName("PK__BloodUni__55D79215DA87E384");
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.Designer.cs
 
                     b.HasIndex("ComponentType");
 
@@ -370,7 +403,11 @@ namespace Models.Migrations
                         .HasColumnName("staffID");
 
                     b.HasKey("CertificateId")
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.Designer.cs
                         .HasName("PK__Certific__A15CBE8E683D5BA0");
+========
+                        .HasName("PK__Certific__A15CBE8E388020DB");
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.Designer.cs
 
                     b.HasIndex(new[] { "DonationId" }, "IX_Certificate_Donation");
 
@@ -382,7 +419,11 @@ namespace Models.Migrations
 
                     b.HasIndex(new[] { "StaffId" }, "IX_Certificate_Staff");
 
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.Designer.cs
                     b.HasIndex(new[] { "CertificateNumber" }, "UQ__Certific__410CE51207A82C52")
+========
+                    b.HasIndex(new[] { "CertificateNumber" }, "UQ__Certific__410CE51220B3E296")
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.Designer.cs
                         .IsUnique();
 
                     b.ToTable("Certificate", (string)null);
@@ -426,7 +467,11 @@ namespace Models.Migrations
                         .HasColumnName("uploadDate");
 
                     b.HasKey("DocumentId")
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.Designer.cs
                         .HasName("PK__Document__EFAAADE5A994DC1C");
+========
+                        .HasName("PK__Document__EFAAADE5699BA8E4");
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.Designer.cs
 
                     b.ToTable("Document", (string)null);
                 });
@@ -464,7 +509,11 @@ namespace Models.Migrations
                         .HasColumnName("quantity");
 
                     b.HasKey("HistoryId")
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.Designer.cs
                         .HasName("PK__Donation__19BDBDB3C2244AE2");
+========
+                        .HasName("PK__Donation__19BDBDB36E09FAAA");
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.Designer.cs
 
                     b.HasIndex("DonorId");
 
@@ -493,6 +542,7 @@ namespace Models.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("closestFacilityID");
 
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.Designer.cs
                     b.Property<string>("CurrentMedications")
                         .HasColumnType("nvarchar(max)");
 
@@ -504,6 +554,8 @@ namespace Models.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+========
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.Designer.cs
                     b.Property<bool?>("IsAvailable")
                         .HasColumnType("bit")
                         .HasColumnName("isAvailable");
@@ -529,7 +581,11 @@ namespace Models.Migrations
                         .HasColumnName("userID");
 
                     b.HasKey("DonorId")
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.Designer.cs
                         .HasName("PK__Donor__A595D73150F694D9");
+========
+                        .HasName("PK__Donor__A595D73182E52831");
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.Designer.cs
 
                     b.HasIndex("ClosestFacilityId");
 
@@ -574,10 +630,15 @@ namespace Models.Migrations
                         .HasDefaultValueSql("(getdate())");
 
                     b.Property<string>("HealthCheckStatus")
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.Designer.cs
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
                         .HasDefaultValue("Completed")
+========
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.Designer.cs
                         .HasColumnName("HealthCheck_Status");
 
                     b.Property<int?>("HeartRate")
@@ -601,7 +662,11 @@ namespace Models.Migrations
                         .HasColumnName("weight");
 
                     b.HasKey("HealthCheckId")
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.Designer.cs
                         .HasName("PK__HealthCh__31AFA16E57E14455");
+========
+                        .HasName("PK__HealthCh__31AFA16E0C212F82");
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.Designer.cs
 
                     b.HasIndex(new[] { "HealthCheckDate" }, "IX_HealthCheck_Date");
 
@@ -644,7 +709,11 @@ namespace Models.Migrations
                         .HasColumnName("longitude");
 
                     b.HasKey("LocationId")
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.Designer.cs
                         .HasName("PK__Location__30646B0EE9A2DD78");
+========
+                        .HasName("PK__Location__30646B0E7DF4F6FC");
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.Designer.cs
 
                     b.ToTable("Location", (string)null);
                 });
@@ -696,7 +765,11 @@ namespace Models.Migrations
                         .HasColumnName("specialization");
 
                     b.HasKey("FacilityId")
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.Designer.cs
                         .HasName("PK__MedicalF__AA54818459FDEADA");
+========
+                        .HasName("PK__MedicalF__AA5481849741A8E3");
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.Designer.cs
 
                     b.HasIndex("ClosestDonorId");
 
@@ -743,7 +816,11 @@ namespace Models.Migrations
                         .HasColumnName("userID");
 
                     b.HasKey("NotificationId")
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.Designer.cs
                         .HasName("PK__Notifica__4BA5CE898AE7CC61");
+========
+                        .HasName("PK__Notifica__4BA5CE8910416400");
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.Designer.cs
 
                     b.HasIndex(new[] { "CertificateId" }, "IX_Notification_Certificate");
 
@@ -784,7 +861,11 @@ namespace Models.Migrations
                         .HasColumnName("reportType");
 
                     b.HasKey("ReportId")
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.Designer.cs
                         .HasName("PK__Report__1C9B4ECD2BD40B30");
+========
+                        .HasName("PK__Report__1C9B4ECDF896B590");
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.Designer.cs
 
                     b.HasIndex(new[] { "GeneratedBy" }, "IX_Report_GeneratedBy");
 
@@ -842,7 +923,11 @@ namespace Models.Migrations
                         .HasColumnName("username");
 
                     b.HasKey("UserId")
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.Designer.cs
                         .HasName("PK__users__CB9A1CDF65F7D8DE");
+========
+                        .HasName("PK__users__CB9A1CDFB74F38F1");
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.Designer.cs
 
                     b.ToTable("users", (string)null);
                 });

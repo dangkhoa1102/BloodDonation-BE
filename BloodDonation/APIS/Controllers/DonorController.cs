@@ -60,12 +60,5 @@ namespace APIS.Controllers
             return NoContent();
         }
 
-        //[HttpGet("{donorId}/healthcheck")]
-        //public async Task<IActionResult> HealthCheck(Guid donorId)
-        //{
-        //    var result = await _donorService.HealthCheckAsync(donorId);
-        //    return Ok(result);
-        //}
-
     }
 }

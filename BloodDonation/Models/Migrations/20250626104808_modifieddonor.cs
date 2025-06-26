@@ -6,7 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Models.Migrations
 {
     /// <inheritdoc />
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.cs
     public partial class modifieddonor : Migration
+========
+    public partial class AddHealthCheckModifyDonor : Migration
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.cs
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -22,7 +26,11 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.cs
                     table.PrimaryKey("PK__BloodCom__667AC126621C9E40", x => x.componentID);
+========
+                    table.PrimaryKey("PK__BloodCom__667AC126F26CABC1", x => x.componentID);
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.cs
                 });
 
             migrationBuilder.CreateTable(
@@ -36,7 +44,11 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.cs
                     table.PrimaryKey("PK__BloodTyp__C879D79464B25B49", x => x.bloodTypeID);
+========
+                    table.PrimaryKey("PK__BloodTyp__C879D794BE3A5040", x => x.bloodTypeID);
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.cs
                 });
 
             migrationBuilder.CreateTable(
@@ -53,7 +65,11 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.cs
                     table.PrimaryKey("PK__Document__EFAAADE5A994DC1C", x => x.documentID);
+========
+                    table.PrimaryKey("PK__Document__EFAAADE5699BA8E4", x => x.documentID);
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.cs
                 });
 
             migrationBuilder.CreateTable(
@@ -69,7 +85,11 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.cs
                     table.PrimaryKey("PK__Location__30646B0EE9A2DD78", x => x.locationID);
+========
+                    table.PrimaryKey("PK__Location__30646B0E7DF4F6FC", x => x.locationID);
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.cs
                 });
 
             migrationBuilder.CreateTable(
@@ -88,7 +108,11 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.cs
                     table.PrimaryKey("PK__users__CB9A1CDF65F7D8DE", x => x.userID);
+========
+                    table.PrimaryKey("PK__users__CB9A1CDFB74F38F1", x => x.userID);
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.cs
                 });
 
             migrationBuilder.CreateTable(
@@ -105,7 +129,11 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.cs
                     table.PrimaryKey("PK__Blog__FA0AA70D669396E2", x => x.blogID);
+========
+                    table.PrimaryKey("PK__Blog__FA0AA70DF494B3C9", x => x.blogID);
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.cs
                     table.ForeignKey(
                         name: "FK_Blog_Author",
                         column: x => x.authorID,
@@ -125,7 +153,11 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.cs
                     table.PrimaryKey("PK__BloodRec__A9B8B542CA122FE7", x => x.recipientID);
+========
+                    table.PrimaryKey("PK__BloodRec__A9B8B54217264492", x => x.recipientID);
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.cs
                     table.ForeignKey(
                         name: "FK_BloodRecipient_User",
                         column: x => x.userID,
@@ -146,7 +178,11 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.cs
                     table.PrimaryKey("PK__Report__1C9B4ECD2BD40B30", x => x.reportID);
+========
+                    table.PrimaryKey("PK__Report__1C9B4ECDF896B590", x => x.reportID);
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.cs
                     table.ForeignKey(
                         name: "FK_Report_User",
                         column: x => x.generatedBy,
@@ -169,7 +205,11 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.cs
                     table.PrimaryKey("PK__BloodReq__E3C5DE51755946BB", x => x.requestID);
+========
+                    table.PrimaryKey("PK__BloodReq__E3C5DE512BE91403", x => x.requestID);
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.cs
                     table.ForeignKey(
                         name: "FK_BloodRequest_BloodType",
                         column: x => x.bloodTypeRequired,
@@ -197,7 +237,11 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.cs
                     table.PrimaryKey("PK__BloodDon__F7F4F433645EE0FF", x => x.donationID);
+========
+                    table.PrimaryKey("PK__BloodDon__F7F4F433B63F6689", x => x.donationID);
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.cs
                     table.ForeignKey(
                         name: "FK_BloodDonation_Request",
                         column: x => x.requestID,
@@ -220,7 +264,11 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.cs
                     table.PrimaryKey("PK__BloodUni__55D79215BA01BA5A", x => x.unitID);
+========
+                    table.PrimaryKey("PK__BloodUni__55D79215DA87E384", x => x.unitID);
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.cs
                     table.ForeignKey(
                         name: "FK_BloodUnit_BloodType",
                         column: x => x.bloodTypeID,
@@ -259,7 +307,11 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.cs
                     table.PrimaryKey("PK__Certific__A15CBE8E683D5BA0", x => x.certificateID);
+========
+                    table.PrimaryKey("PK__Certific__A15CBE8E388020DB", x => x.certificateID);
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.cs
                     table.ForeignKey(
                         name: "FK_Certificate_Donation",
                         column: x => x.donationID,
@@ -287,7 +339,11 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.cs
                     table.PrimaryKey("PK__Notifica__4BA5CE898AE7CC61", x => x.notificationID);
+========
+                    table.PrimaryKey("PK__Notifica__4BA5CE8910416400", x => x.notificationID);
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.cs
                     table.ForeignKey(
                         name: "FK_Notification_Certificate",
                         column: x => x.certificateID,
@@ -314,7 +370,11 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.cs
                     table.PrimaryKey("PK__Donation__19BDBDB3C2244AE2", x => x.historyID);
+========
+                    table.PrimaryKey("PK__Donation__19BDBDB36E09FAAA", x => x.historyID);
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.cs
                     table.ForeignKey(
                         name: "FK_DonationHistory_Certificate",
                         column: x => x.certificateID,
@@ -342,7 +402,11 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.cs
                     table.PrimaryKey("PK__Donor__A595D73150F694D9", x => x.donorID);
+========
+                    table.PrimaryKey("PK__Donor__A595D73182E52831", x => x.donorID);
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.cs
                     table.ForeignKey(
                         name: "FK_Donor_BloodType",
                         column: x => x.bloodTypeID,
@@ -375,11 +439,19 @@ namespace Models.Migrations
                     currentMedications = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     allergies = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     HealthCheck_Date = table.Column<DateOnly>(type: "date", nullable: false, defaultValueSql: "(getdate())"),
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.cs
                     HealthCheck_Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true, defaultValue: "Completed")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK__HealthCh__31AFA16E57E14455", x => x.healthCheckID);
+========
+                    HealthCheck_Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK__HealthCh__31AFA16E0C212F82", x => x.healthCheckID);
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.cs
                     table.ForeignKey(
                         name: "FK_HealthCheck_Donor",
                         column: x => x.donorID,
@@ -403,7 +475,11 @@ namespace Models.Migrations
                 },
                 constraints: table =>
                 {
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.cs
                     table.PrimaryKey("PK__MedicalF__AA54818459FDEADA", x => x.facilityID);
+========
+                    table.PrimaryKey("PK__MedicalF__AA5481849741A8E3", x => x.facilityID);
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.cs
                     table.ForeignKey(
                         name: "FK_MedicalFacility_Donor",
                         column: x => x.closestDonorID,
@@ -507,7 +583,11 @@ namespace Models.Migrations
                 column: "staffID");
 
             migrationBuilder.CreateIndex(
+<<<<<<<< HEAD:BloodDonation/Models/Migrations/20250626104808_modifieddonor.cs
                 name: "UQ__Certific__410CE51207A82C52",
+========
+                name: "UQ__Certific__410CE51220B3E296",
+>>>>>>>> develop:BloodDonation/Models/Migrations/20250625154835_AddHealthCheck-ModifyDonor.cs
                 table: "Certificate",
                 column: "certificateNumber",
                 unique: true);
