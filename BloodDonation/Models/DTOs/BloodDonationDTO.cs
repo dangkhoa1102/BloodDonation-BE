@@ -22,6 +22,7 @@ namespace Models.DTOs
         public string PhoneNumber { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
+        public DateOnly? DateOfBirth { get; set; }
 
         // Thông tin y tế
         public string BloodType { get; set; } = string.Empty;
@@ -44,9 +45,6 @@ namespace Models.DTOs
         public string Notes { get; set; } = string.Empty;
         public string CurrentMedications { get; set; } = string.Empty;
         // Thêm các trường thông tin cá nhân
-        public string FullName { get; set; } = string.Empty;
-        public string PhoneNumber { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
         public string BloodType { get; set; } = string.Empty;
 

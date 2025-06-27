@@ -46,36 +46,16 @@ namespace APIS.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<BloodDonationDto>> Create(CreateBloodDonationDto dto)
+        public async Task<ActionResult<BloodDonationDto>> Create([FromBody] CreateBloodDonationDto dto)
         {
-            try
-            {
-                var created = await _service.CreateAsync(dto);
-                return CreatedAtAction(nameof(GetById), new { id = created.DonationId }, created);
-            }
-            catch (DbUpdateException dbEx)
-            {
-                _logger.LogError(dbEx, "Database error when creating donation: {Message}", dbEx.InnerException?.Message);
-                return StatusCode(500, new
-                {
-                    message = "Database error when creating donation",
-                    detail = dbEx.InnerException?.Message
-                });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Lỗi khi tạo mới hiến máu: {Message}", ex.Message);
-                return StatusCode(500, new
-                {
-                    message = ex.Message,
-                    innerMessage = ex.InnerException?.Message,
-                    stack = ex.StackTrace
-                });
-            }
+            var userIdClaim = User.FindFirst("UserId") ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return Unauthorized("User not logged in");
+
+            Guid userId = Guid.Parse(userIdClaim.Value);
+
+            var created = await _service.CreateAsync(dto, userId);
+            return CreatedAtAction(nameof(GetById), new { id = created.DonationId }, created);
         }
 
         [HttpPost("sync")]
