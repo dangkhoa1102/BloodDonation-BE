@@ -28,6 +28,9 @@ builder.Services.AddDbContext<BloodDonationSupportContext>(options =>
 
 
 
+builder.Services.AddScoped<IHealthCheckRepository, HealthCheckRepository>();
+builder.Services.AddScoped<IHealthCheckService, HealthCheckService>();
+
 
 // With:
 builder.Services.AddScoped<IBloodDonationRepository, BloodDonationRepository>();
