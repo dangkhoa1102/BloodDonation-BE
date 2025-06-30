@@ -75,9 +75,7 @@ public partial class BloodDonationSupportContext : DbContext
             entity.Property(e => e.Title)
                 .HasMaxLength(500)
                 .HasColumnName("title");
-            entity.Property(e => e.ViewCount)
-                .HasDefaultValue(0)
-                .HasColumnName("viewCount");
+            
 
             entity.HasOne(d => d.Author).WithMany(p => p.Blogs)
                 .HasForeignKey(d => d.AuthorId)

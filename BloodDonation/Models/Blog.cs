@@ -18,7 +18,5 @@ public partial class Blog
 
     public string Category { get; set; }
 
-    public int? ViewCount { get; set; }
-
     public virtual User Author { get; set; }
 }
