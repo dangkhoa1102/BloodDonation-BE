@@ -32,7 +32,7 @@ namespace Services
                 Content = blog.Content,
                 PublishDate = blog.PublishDate, // Fix for CS0029  
                 Category = blog.Category,
-                ViewCount = blog.ViewCount ?? 0
+                
             });
         }
 
@@ -50,7 +50,7 @@ namespace Services
                 Content = blog.Content,
                 PublishDate = blog.PublishDate,  
                 Category = blog.Category,
-                ViewCount = blog.ViewCount ?? 0
+                
             };
         }
 
@@ -67,7 +67,8 @@ namespace Services
                 Title = blogCreateDto.Title,
                 Content = blogCreateDto.Content,
                 Category = blogCreateDto.Category,
-                ViewCount = 0
+                PublishDate = blogCreateDto.PublishDate
+
             };
 
             await _blogRepository.AddAsync(blog);
@@ -81,7 +82,7 @@ namespace Services
                 Content = blog.Content,
                 PublishDate = blog.PublishDate, // Fix for CS0029  
                 Category = blog.Category,
-                ViewCount = blog.ViewCount ?? 0
+                
             };
         }
 
@@ -94,6 +95,7 @@ namespace Services
             blog.Title = blogUpdateDto.Title;
             blog.Content = blogUpdateDto.Content;
             blog.Category = blogUpdateDto.Category;
+            blog.PublishDate = blogUpdateDto.PublishDate;
 
             _blogRepository.Update(blog);
             await _blogRepository.SaveChangesAsync();
@@ -106,7 +108,7 @@ namespace Services
                 Content = blog.Content,
                 PublishDate = blog.PublishDate, // Fix for CS0029  
                 Category = blog.Category,
-                ViewCount = blog.ViewCount ?? 0
+                
             };
         }
 
