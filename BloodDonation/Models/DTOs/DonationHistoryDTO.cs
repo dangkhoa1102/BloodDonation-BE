@@ -16,16 +16,16 @@ namespace Models.DTOs
         public DateOnly DonationDate { get; set; }
 
         [Required]
-        [Range(100, 1000)] // Ví dụ: số ml máu hợp lệ
+        [Range(100, 1000, ErrorMessage = "Quantity must be between 100 and 1000 ml.")]
         public int Quantity { get; set; }
 
         [Required]
         [MaxLength(100)]
-        public string HealthStatus { get; set; }
+        public string HealthStatus { get; set; } = string.Empty;
 
         [Required]
         public DateOnly NextEligibleDate { get; set; }
-        
+        public Guid? CertificateId { get; set; }
     }
 
     public class DonationHistoryUpdateDto
@@ -34,27 +34,30 @@ namespace Models.DTOs
         public DateOnly DonationDate { get; set; }
 
         [Required]
-        [Range(100, 1000)]
+        [Range(100, 1000, ErrorMessage = "Quantity must be between 100 and 1000 ml.")]
         public int Quantity { get; set; }
 
         [Required]
         [MaxLength(100)]
-        public string HealthStatus { get; set; }
+        public string HealthStatus { get; set; } = string.Empty;
 
         [Required]
         public DateOnly NextEligibleDate { get; set; }
+        public Guid? CertificateId { get; set; }
     }
 
+    // DTO trả về khi lấy thông tin lịch sử hiến máu
     public class DonationHistoryResponseDto
     {
         public Guid HistoryId { get; set; }
         public Guid DonorId { get; set; }
         public DateOnly DonationDate { get; set; }
         public int Quantity { get; set; }
-        public string HealthStatus { get; set; }
+        public string HealthStatus { get; set; } = string.Empty;
         public DateOnly NextEligibleDate { get; set; }
+        public Guid? CertificateId { get; set; }
 
-        // Nếu muốn hiển thị thêm thông tin người hiến
+        // Thông tin mở rộng về người hiến máu (nếu cần)
         public string? DonorName { get; set; }
         public string? DonorBloodType { get; set; }
     }

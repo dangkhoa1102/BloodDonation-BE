@@ -9,7 +9,7 @@ namespace Repositories.Interfaces
 {
     public interface IDonationHistoryRepository : IGenericRepository<DonationHistory>
     {
-        // Thêm phương thức đặc thù nếu cần, ví dụ:
-        Task<IEnumerable<DonationHistory>> GetByDonorIdAsync(Guid donorId);
+        Task<IEnumerable<DonationHistory>> GetAllWithDonorAsync();
+        Task<DonationHistory> GetByIdWithDonorAsync(Guid id);
     }
 }

@@ -28,6 +28,7 @@ builder.Services.AddDbContext<BloodDonationSupportContext>(options =>
 
 
 
+
 builder.Services.AddScoped<IHealthCheckRepository, HealthCheckRepository>();
 builder.Services.AddScoped<IHealthCheckService, HealthCheckService>();
 
@@ -235,6 +236,7 @@ app.Use(async (context, next) =>
     }
 });
 
+
 // Configure middleware pipeline with correct order
 app.UseHttpsRedirection();
 
@@ -242,6 +244,8 @@ app.UseCors(x => x
     .AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader());
+
+//app.UseCors("AllowAllOrigins");
 
 app.UseAuthentication();
 app.UseAuthorization();

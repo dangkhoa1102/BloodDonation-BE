@@ -6,41 +6,86 @@ using System.Threading.Tasks;
 using Models;
 using Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Models.DTOs;
 
 namespace Services
 {
     public class DonationHistoryService : IDonationHistoryService
     {
-        private readonly IDonationHistoryRepository _repository;
+        private readonly IDonationHistoryRepository _repo;
 
-        public DonationHistoryService(IDonationHistoryRepository repository)
+        public DonationHistoryService(IDonationHistoryRepository repo)
         {
-            _repository = repository;
+            _repo = repo;
         }
 
-        public async Task<IEnumerable<DonationHistory>> GetAllAsync()
+        public async Task<IEnumerable<DonationHistoryResponseDto>> GetAllAsync()
         {
-            return await _repository.GetAllAsync();
+            var histories = await _repo.GetAllWithDonorAsync();
+            return histories.Select(MapToResponseDto);
         }
 
-        public async Task<DonationHistory?> GetByIdAsync(Guid id)
+        public async Task<DonationHistoryResponseDto> GetByIdAsync(Guid id)
         {
-            return await _repository.GetByIdAsync(id);
+            var history = await _repo.GetByIdWithDonorAsync(id);
+            return history == null ? null : MapToResponseDto(history);
         }
 
-        public async Task<DonationHistory> AddAsync(DonationHistory history)
+        public async Task<DonationHistoryResponseDto> CreateAsync(DonationHistoryCreateDto dto)
         {
-            await _repository.AddAsync(history);
-            return history;
+            var entity = new DonationHistory
+            {
+                HistoryId = Guid.NewGuid(),
+                DonorId = dto.DonorId,
+                DonationDate = dto.DonationDate,
+                Quantity = dto.Quantity,
+                HealthStatus = dto.HealthStatus,
+                NextEligibleDate = dto.NextEligibleDate,
+                CertificateId = dto.CertificateId
+            };
+            await _repo.AddAsync(entity);
+            await _repo.SaveChangesAsync();
+            return MapToResponseDto(entity);
+        }
+
+        public async Task<DonationHistoryResponseDto> UpdateAsync(Guid id, DonationHistoryUpdateDto dto)
+        {
+            var entity = await _repo.GetByIdAsync(id);
+            if (entity == null) return null;
+
+            entity.DonationDate = dto.DonationDate;
+            entity.Quantity = dto.Quantity;
+            entity.HealthStatus = dto.HealthStatus;
+            entity.NextEligibleDate = dto.NextEligibleDate;
+            entity.CertificateId = dto.CertificateId;
+
+            _repo.Update(entity);
+            await _repo.SaveChangesAsync();
+            return MapToResponseDto(entity);
         }
 
         public async Task<bool> DeleteAsync(Guid id)
         {
-            var existing = await _repository.GetByIdAsync(id);
-            if (existing == null) return false;
+            var entity = await _repo.GetByIdAsync(id);
+            if (entity == null) return false;
+            _repo.Remove(entity);
+            return await _repo.SaveChangesAsync();
+        }
 
-            await _repository.DeleteAsync(existing);
-            return true;
+        private DonationHistoryResponseDto MapToResponseDto(DonationHistory history)
+        {
+            return new DonationHistoryResponseDto
+            {
+                HistoryId = history.HistoryId,
+                DonorId = history.DonorId ?? Guid.Empty,
+                DonationDate = history.DonationDate ?? default,
+                Quantity = history.Quantity ?? 0,
+                HealthStatus = history.HealthStatus ?? string.Empty,
+                NextEligibleDate = history.NextEligibleDate ?? default,
+                CertificateId = history.CertificateId,
+                DonorName = history.Donor?.FullName,
+                DonorBloodType = history.Donor?.BloodType?.ToString()
+            };
         }
     }
 }
