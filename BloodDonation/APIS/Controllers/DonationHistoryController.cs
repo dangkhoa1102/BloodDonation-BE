@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.DTOs;
 using Services;
@@ -9,46 +10,66 @@ namespace APIS.Controllers
     [Route("api/[controller]")]
     public class DonationHistoryController : ControllerBase
     {
-        private readonly IDonationHistoryService _service;
+        private readonly IDonationHistoryService _donationHistoryService;
 
-        public DonationHistoryController(IDonationHistoryService service)
+        public DonationHistoryController(IDonationHistoryService donationHistoryService)
         {
-            _service = service;
+            _donationHistoryService = donationHistoryService;
         }
 
+        // GET: api/donationhistory
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAll()
         {
-            var data = await _service.GetAllAsync();
-            return Ok(data);
+            var histories = await _donationHistoryService.GetAllAsync();
+            return Ok(histories);
         }
 
+        // GET: api/donationhistory/{id}
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var result = await _service.GetByIdAsync(id);
-            if (result == null) return NotFound();
-            return Ok(result);
+            var history = await _donationHistoryService.GetByIdAsync(id);
+            if (history == null)
+                return NotFound();
+            return Ok(history);
         }
 
+        // POST: api/donationhistory
         [HttpPost]
-        public async Task<IActionResult> Create(DonationHistory model)
+        public async Task<IActionResult> Create([FromBody] DonationHistoryCreateDto dto)
         {
-            var result = await _service.AddAsync(model);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _donationHistoryService.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = result.HistoryId }, result);
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> Create([FromBody] DonationHistoryCreateDto dto)
-        //{
-        //    // Xử lý tạo mới
-        //}
+        // PUT: api/donationhistory/{id}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, [FromBody] DonationHistoryUpdateDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
+            var result = await _donationHistoryService.UpdateAsync(id, dto);
+            if (result == null)
+                return NotFound();
+
+            return Ok(result);
+        }
+
+        // DELETE: api/donationhistory/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var deleted = await _service.DeleteAsync(id);
-            if (!deleted) return NotFound();
+            var success = await _donationHistoryService.DeleteAsync(id);
+            if (!success)
+                return NotFound();
+
             return NoContent();
         }
     }

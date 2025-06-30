@@ -11,18 +11,17 @@ namespace Repositories.Implementations
 {
     public class DonationHistoryRepository : GenericRepository<DonationHistory>, IDonationHistoryRepository
     {
-        private readonly BloodDonationSupportContext _context;
+        public DonationHistoryRepository(BloodDonationSupportContext context) : base(context) { }
 
-        public DonationHistoryRepository(BloodDonationSupportContext context) : base(context)
+        public async Task<IEnumerable<DonationHistory>> GetAllWithDonorAsync()
         {
-            _context = context;
+            return await _dbSet.Include(d => d.Donor).ToListAsync();
         }
 
-        public async Task<IEnumerable<DonationHistory>> GetByDonorIdAsync(Guid donorId)
+        public async Task<DonationHistory> GetByIdWithDonorAsync(Guid id)
         {
-            return await _context.Set<DonationHistory>()
-                .Where(d => d.DonorId == donorId)
-                .ToListAsync();
+            return await _dbSet.Include(d => d.Donor)
+                               .FirstOrDefaultAsync(d => d.HistoryId == id);
         }
     }
 }
