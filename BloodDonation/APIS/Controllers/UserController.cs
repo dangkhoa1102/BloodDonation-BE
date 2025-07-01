@@ -7,7 +7,7 @@ namespace APIS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin,Staff")]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -109,7 +109,7 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Search-User-By-Name")]
-        [Authorize(Roles = "Admin,Staff")]
+        [Authorize]
         public async Task<IActionResult> SearchUsers([FromQuery] string searchTerm)
         {
             try
@@ -151,7 +151,7 @@ namespace APIS.Controllers
             }
         }
         [HttpPut("Update-User/{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UserUpdateDTO updateDto)
         {
             try
@@ -170,7 +170,7 @@ namespace APIS.Controllers
             }
         }
         [HttpGet("Get-User-Detail/{id}")]
-        [Authorize(Roles = "Admin,Staff")]
+        [Authorize]
         public async Task<IActionResult> GetUserDetail(Guid id)
         {
             try
