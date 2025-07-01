@@ -228,5 +228,54 @@ namespace APIS.Controllers
                 return StatusCode(500, new { message = "An error occurred while retrieving user information" });
             }
         }
+
+        [HttpGet("search-by-fullname/{fullName}")]
+        [Authorize]
+        public async Task<IActionResult> GetUsersByFullName(string fullName)
+        {
+            try
+            {
+                // Kiểm tra role
+                if (!User.IsInRole("Admin") && !User.IsInRole("Staff"))
+                {
+                    return Unauthorized(new { message = "Unauthorized access" });
+                }
+
+                if (string.IsNullOrWhiteSpace(fullName))
+                {
+                    return BadRequest(new { message = "Full name cannot be empty" });
+                }
+
+                var users = await _userService.GetUsersByFullNameAsync(fullName);
+                if (!users.Any())
+                {
+                    return NoContent();
+                }
+
+                var response = new
+                {
+                    searchTerm = fullName,
+                    totalResults = users.Count(),
+                    users = users.Select(u => new
+                    {
+                        u.UserId,
+                        u.Username,
+                        u.Email,
+                        u.FullName,
+                        u.Phone,
+                        u.UserIdCard,
+                        DateOfBirth = u.DateOfBirth?.ToString("yyyy-MM-dd"),
+                        u.Role
+                    })
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error searching users by full name: {FullName}", fullName);
+                return StatusCode(500, new { message = "An error occurred while searching users" });
+            }
+        }
     }
 }

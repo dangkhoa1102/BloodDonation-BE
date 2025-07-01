@@ -172,5 +172,31 @@ namespace Services.Implementations
                 throw;
             }
         }
+        public async Task<IEnumerable<User>> GetUsersByFullNameAsync(string fullName)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(fullName))
+                    return Enumerable.Empty<User>();
+
+                var users = await _userRepository.GetUsersByFullNameAsync(fullName);
+                return users.Select(u => new User
+                {
+                    UserId = u.UserId,
+                    Username = u.Username,
+                    Email = u.Email,
+                    FullName = u.FullName,
+                    Phone = u.Phone,
+                    UserIdCard = u.UserIdCard,
+                    DateOfBirth = u.DateOfBirth,
+                    Role = u.Role
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving users by full name: {FullName}", fullName);
+                throw;
+            }
+        }
     }
 }

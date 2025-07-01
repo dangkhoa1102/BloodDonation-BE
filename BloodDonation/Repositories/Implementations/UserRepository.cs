@@ -39,5 +39,13 @@ namespace Repositories.Implementations
         {
             return await _dbSet.Where(u => u.Role == role).ToListAsync();
         }
+
+        public async Task<IEnumerable<User>> GetUsersByFullNameAsync(string fullName)
+        {
+            return await _dbSet
+                .Where(u => u.FullName.ToLower().Contains(fullName.ToLower()))
+                .OrderBy(u => u.FullName)
+                .ToListAsync();
+        }
     }
 }
