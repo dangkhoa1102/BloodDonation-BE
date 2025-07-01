@@ -8,4 +8,5 @@ public interface IUserService
     Task<IEnumerable<User>> SearchUsersByNameAsync(string name);
     Task<(bool success, string message)> UpdateUserAsync(Guid userId, UserUpdateDTO updateDto);
     Task<User> GetUserDetailAsync(Guid id);
+    Task<User> GetCurrentUserAsync(Guid userId);
 }
