@@ -1,7 +1,8 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.DTOs;
 using Models.Enums;
+using System.Security.Claims;
 
 namespace APIS.Controllers
 {
@@ -199,6 +200,32 @@ namespace APIS.Controllers
             {
                 _logger.LogError(ex, "Error retrieving user detail for ID: {UserId}", id);
                 return StatusCode(500, new { message = "An error occurred while retrieving user detail" });
+            }
+        }
+        [HttpGet("current")]
+        [Authorize] // Requires authentication
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out Guid userId))
+                {
+                    return Unauthorized(new { message = "Invalid user identification" });
+                }
+
+                var user = await _userService.GetCurrentUserAsync(userId);
+                if (user == null)
+                {
+                    return NotFound(new { message = "User not found" });
+                }
+
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving current user");
+                return StatusCode(500, new { message = "An error occurred while retrieving user information" });
             }
         }
     }

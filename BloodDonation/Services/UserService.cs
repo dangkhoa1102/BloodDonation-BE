@@ -147,5 +147,30 @@ namespace Services.Implementations
                 throw;
             }
         }
+        public async Task<User> GetCurrentUserAsync(Guid userId)
+        {
+            try
+            {
+                var user = await _userRepository.GetByIdAsync(userId);
+                if (user == null)
+                    return null;
+                return new User
+                {
+                    UserId = user.UserId,
+                    Username = user.Username,
+                    Email = user.Email,
+                    FullName = user.FullName,
+                    Phone = user.Phone,
+                    UserIdCard = user.UserIdCard,
+                    DateOfBirth = user.DateOfBirth,
+                    Role = user.Role
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving current user with ID: {UserId}", userId);
+                throw;
+            }
+        }
     }
 }
