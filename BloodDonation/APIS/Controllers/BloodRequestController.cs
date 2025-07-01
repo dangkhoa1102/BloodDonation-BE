@@ -65,7 +65,7 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-All-Request")]
-        [Authorize(Roles = "Staff")]
+        [Authorize]
         public async Task<IActionResult> GetAllRequests()
         {
             try
@@ -86,7 +86,7 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-Request-By-Id/{id}")]
-        [Authorize(Roles = "Staff")]
+        [Authorize]
         public async Task<IActionResult> GetRequestById(Guid id)
         {
             try
@@ -107,7 +107,7 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-Request-By-status/{status}")]
-        [Authorize(Roles = "Staff")]
+        [Authorize]
         public async Task<IActionResult> GetRequestsByStatus([FromRoute] BloodRequestStatus status)
         {
             try
@@ -133,7 +133,7 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-Request-By-Recipient-Name/{recipientName}")]
-        [Authorize(Roles = "Staff")]
+        [Authorize]
         public async Task<IActionResult> GetRequestsByRecipientName([FromRoute] string recipientName)
         {
             try
@@ -173,7 +173,7 @@ namespace APIS.Controllers
             }
         }
         [HttpGet("Get-My-Requests")]
-        [Authorize(Roles = "Member")]
+        [Authorize]
         public async Task<IActionResult> GetMyRequests()
         {
             try
@@ -224,7 +224,7 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-My-Requests-By-Status/{status}")]
-        [Authorize(Roles = "Member")]
+        [Authorize]
         public async Task<IActionResult> GetMyRequestsByStatus([FromRoute] BloodRequestStatus status)
         {
             try
@@ -275,7 +275,7 @@ namespace APIS.Controllers
             }
         }
         [HttpPut("Update-Blood-Requests/{id}")]
-        [Authorize(Roles = "Staff")]
+        [Authorize]
         public async Task<IActionResult> UpdateBloodRequest(Guid id, [FromBody] BloodRequestUpdateDTO updateDto)
         {
             try
@@ -300,7 +300,7 @@ namespace APIS.Controllers
             }
         }
         [HttpPost("reject-blood-request")]
-        [Authorize(Roles = "Staff")]
+        [Authorize]
         public async Task<IActionResult> RejectBloodRequest([FromBody] BloodRequestRejectDTO rejectDto)
         {
             try
@@ -326,7 +326,7 @@ namespace APIS.Controllers
         }
 
         [HttpPost("approve-blood-request")]
-        [Authorize(Roles = "Staff")]
+        [Authorize]
         public async Task<IActionResult> ApproveBloodRequest(Guid requestId)
         {
             try
@@ -348,7 +348,7 @@ namespace APIS.Controllers
             }
         }
         [HttpPost("register-emergency")]
-        [Authorize(Roles = "Staff")]
+        [Authorize]
         public async Task<IActionResult> RegisterEmergencyRequest([FromBody] EmergencyBloodRequestDTO request)
         {
             try
