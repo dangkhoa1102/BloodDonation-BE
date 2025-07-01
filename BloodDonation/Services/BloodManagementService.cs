@@ -108,6 +108,7 @@ namespace Services.Implementations
                 TotalUnits = totalUnits
             };
         }
+
         public async Task<BloodCompatibilityDTO> GetBloodTypeCompatibilityAsync(string bloodType)
         {
             try
@@ -158,13 +159,18 @@ namespace Services.Implementations
                 var components = await _bloodComponentRepository.GetAllAsync();
                 foreach (var component in components)
                 {
-                    var componentCompatibility = new ComponentCompatibilityDTO
+                    // Parse componentName to enum
+                    if (Enum.TryParse<BloodComponentEnum>(component.ComponentName, true, out var componentType))
                     {
-                        ComponentName = component.ComponentName,
-                        CompatibilityRules = component.CompatibilityRules,
-                        CompatibleBloodTypes = GetCompatibleBloodTypesForComponent(bloodType, component.ComponentName)
-                    };
-                    compatibility.ComponentCompatibility.Add(componentCompatibility);
+                        var componentCompatibility = new ComponentCompatibilityDTO
+                        {
+                            ComponentName = component.ComponentName,
+                            ComponentType = componentType,
+                            CompatibilityRules = component.CompatibilityRules,
+                            CompatibleBloodTypes = GetCompatibleBloodTypesForComponent(bloodType, componentType)
+                        };
+                        compatibility.ComponentCompatibility.Add(componentCompatibility);
+                    }
                 }
 
                 return compatibility;
@@ -176,13 +182,52 @@ namespace Services.Implementations
             }
         }
 
-        public async Task<IEnumerable<ComponentCompatibilityDTO>> GetComponentCompatibilityAsync(string componentName)
+        private string FormatComponentName(BloodComponentEnum componentType)
+        {
+            // Format 1: Original enum name (e.g. "RedBloodCells")
+            var original = componentType.ToString();
+            
+            // Format 2: Display name with spaces (e.g. "Red Blood Cells") 
+            var withSpaces = string.Concat(original.Select((x, i) => i > 0 && char.IsUpper(x) ? " " + x : x.ToString()));
+            
+            // Format 3: Vietnamese name from enum comment
+            var vietnameseName = componentType switch
+            {
+                BloodComponentEnum.WholeBlood => "Máu toàn phần",
+                BloodComponentEnum.RedBloodCells => "Hồng cầu",
+                BloodComponentEnum.Plasma => "Huyết tương",
+                BloodComponentEnum.Platelets => "Tiểu cầu", 
+                BloodComponentEnum.Cryoprecipitate => "Tủa lạnh",
+                BloodComponentEnum.WhiteBloodCells => "Bạch cầu",
+                _ => original
+            };
+
+            return original;
+        }
+
+        public async Task<IEnumerable<ComponentCompatibilityDTO>> GetComponentCompatibilityAsync(BloodComponentEnum componentType)
         {
             try
             {
+                // Try all possible name formats
+                var componentName = FormatComponentName(componentType);
                 var component = await _bloodComponentRepository.GetByNameAsync(componentName);
+
                 if (component == null)
-                    throw new ArgumentException("Invalid component name");
+                {
+                    // If not found, get all components and try to match ignoring case
+                    var allComponents = await _bloodComponentRepository.GetAllAsync();
+                    component = allComponents.FirstOrDefault(c => 
+                        string.Equals(c.ComponentName, componentName, StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(c.ComponentName.Replace(" ", ""), componentName, StringComparison.OrdinalIgnoreCase));
+                }
+
+                if (component == null)
+                {
+                    _logger.LogError("Component not found in database. ComponentType: {ComponentType}, Tried name: {ComponentName}", 
+                        componentType, componentName);
+                    throw new ArgumentException($"Component not found for type: {componentType}");
+                }
 
                 var bloodTypes = new[] { "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-" };
                 var compatibilities = new List<ComponentCompatibilityDTO>();
@@ -191,9 +236,10 @@ namespace Services.Implementations
                 {
                     var compatibility = new ComponentCompatibilityDTO
                     {
-                        ComponentName = componentName,
+                        ComponentName = component.ComponentName,
+                        ComponentType = componentType,
                         CompatibilityRules = component.CompatibilityRules,
-                        CompatibleBloodTypes = GetCompatibleBloodTypesForComponent(bloodType, componentName)
+                        CompatibleBloodTypes = GetCompatibleBloodTypesForComponent(bloodType, componentType)
                     };
                     compatibilities.Add(compatibility);
                 }
@@ -202,19 +248,18 @@ namespace Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting component compatibility for {ComponentName}", componentName);
+                _logger.LogError(ex, "Error getting component compatibility for {ComponentType}", componentType);
                 throw;
             }
         }
 
-        private List<string> GetCompatibleBloodTypesForComponent(string bloodType, string componentName)
+        private List<string> GetCompatibleBloodTypesForComponent(string bloodType, BloodComponentEnum componentType)
         {
-            // Xác định tính tương thích dựa trên loại thành phần
-            switch (componentName.ToLower())
+            switch (componentType)
             {
-                case "redbloodcells":
-                    // Tuân theo quy tắc tương tự như truyền máu toàn phần
-                    return bloodType switch
+                case BloodComponentEnum.WholeBlood:
+                case BloodComponentEnum.RedBloodCells:
+                    return bloodType.ToUpper() switch
                     {
                         "A+" => new List<string> { "A+", "A-", "O+", "O-" },
                         "A-" => new List<string> { "A-", "O-" },
@@ -227,9 +272,8 @@ namespace Services.Implementations
                         _ => new List<string>()
                     };
 
-                case "plasma":
-                    // Quy tắc ngược với truyền máu toàn phần
-                    return bloodType switch
+                case BloodComponentEnum.Plasma:
+                    return bloodType.ToUpper() switch
                     {
                         "A+" => new List<string> { "A+", "AB+" },
                         "A-" => new List<string> { "A+", "A-", "AB+", "AB-" },
@@ -242,11 +286,14 @@ namespace Services.Implementations
                         _ => new List<string>()
                     };
 
-                case "platelets":
-                    // Tiểu cầu thường tương thích với hầu hết các nhóm máu
+                case BloodComponentEnum.Platelets:
+                case BloodComponentEnum.Cryoprecipitate:
+                case BloodComponentEnum.WhiteBloodCells:
+                    // Các thành phần này thường tương thích với hầu hết các nhóm máu
                     return new List<string> { "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-" };
 
                 default:
+                    _logger.LogWarning("Unhandled component type: {ComponentType}", componentType);
                     return new List<string>();
             }
         }

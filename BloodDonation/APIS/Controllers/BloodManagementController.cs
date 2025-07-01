@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Models.Enums;
 using Services.Interfaces;
 
 namespace APIS.Controllers
@@ -134,18 +135,32 @@ namespace APIS.Controllers
             }
         }
 
-        [HttpGet("Get-component-Compatibility/{componentName}")]
-        public async Task<IActionResult> GetComponentCompatibility(string componentName)
+        [HttpGet("Get-component-Compatibility/{componentType}")]
+        public async Task<IActionResult> GetComponentCompatibility(string componentType)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(componentName))
+                if (string.IsNullOrWhiteSpace(componentType))
                 {
-                    return BadRequest(new { message = "Component name is required" });
+                    return BadRequest(new { message = "Component type is required" });
                 }
 
-                var compatibility = await _bloodManagementService.GetComponentCompatibilityAsync(componentName);
-                return Ok(compatibility);
+                // Parse string to enum
+                if (!Enum.TryParse<BloodComponentEnum>(componentType, true, out var componentEnum))
+                {
+                    return BadRequest(new
+                    {
+                        message = "Invalid component type",
+                        validTypes = Enum.GetNames(typeof(BloodComponentEnum))
+                    });
+                }
+
+                var compatibility = await _bloodManagementService.GetComponentCompatibilityAsync(componentEnum);
+                return Ok(new
+                {
+                    componentType = componentEnum.ToString(),
+                    compatibilities = compatibility
+                });
             }
             catch (ArgumentException ex)
             {
@@ -153,7 +168,7 @@ namespace APIS.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting component compatibility for {ComponentName}", componentName);
+                _logger.LogError(ex, "Error getting component compatibility for {ComponentType}", componentType);
                 return StatusCode(500, new { message = "An error occurred while retrieving component compatibility" });
             }
         }
