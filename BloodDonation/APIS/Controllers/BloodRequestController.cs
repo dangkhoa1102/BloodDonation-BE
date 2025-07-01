@@ -4,8 +4,6 @@ using Models;
 using Models.DTOs;
 using Models.Enums;
 using Services;
-using Services.Implementations;
-using Services.Interfaces;
 using System.Security.Claims;
 
 namespace APIS.Controllers
@@ -349,31 +347,60 @@ namespace APIS.Controllers
                 return StatusCode(500, new { message = "An error occurred while approving the blood request" });
             }
         }
-        [HttpGet("Get-component-Compatibility/{componentType}")]
-        public async Task<IActionResult> GetComponentCompatibility(string componentType)
+        [HttpPost("register-emergency")]
+        [Authorize]
+        public async Task<IActionResult> RegisterEmergencyRequest([FromBody] EmergencyBloodRequestDTO request)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(componentType))
+                if (!ModelState.IsValid)
                 {
-                    return BadRequest(new { message = "Component type is required" });
+                    var errors = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage)
+                        .ToList();
+
+                    _logger.LogWarning("Validation failed: {Errors}", string.Join(", ", errors));
+                    return BadRequest(new { message = "Validation failed", errors });
                 }
 
-                var compatibility = await _bloodManagementService.GetComponentCompatibilityAsync(componentType);
+                var staffId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? throw new InvalidOperationException("Staff ID not found in token"));
+
+                var (success, message, requestId) = await _bloodRequestService.RegisterEmergencyBloodRequestAsync(
+                    request, staffId);
+
+                if (!success)
+                    return BadRequest(new { message });
+
                 return Ok(new
                 {
-                    componentType,
-                    compatibilities = compatibility
+                    success = true,
+                    message,
+                    data = new
+                    {
+                        requestId,
+                        requestDetails = new
+                        {
+                            patientName = request.PatientName,
+                            email = request.Email,
+                            userIdCard = request.UserIdCard,
+                            bloodType = request.BloodTypeRequired,
+                            quantityNeeded = request.QuantityNeeded,
+                            contactPhone = request.Phone,
+                            dateOfBirth = request.DateOfBirth?.ToString("yyyy-MM-dd"),
+                            description = request.Description,
+                            status = "Pending",
+                            urgencyLevel = "Emergency",
+                            requestDate = DateTime.UtcNow.ToString("yyyy-MM-dd")
+                        }
+                    }
                 });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting component compatibility for {ComponentType}", componentType);
-                return StatusCode(500, new { message = "An error occurred while retrieving component compatibility" });
+                _logger.LogError(ex, "Error processing emergency blood request");
+                return StatusCode(500, new { message = "An error occurred while processing the emergency request" });
             }
         }
     }
