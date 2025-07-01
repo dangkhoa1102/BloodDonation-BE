@@ -8,5 +8,6 @@ namespace Repositories.Interfaces
         Task<BloodComponent> GetByIdAsync(Guid id);
         Task<int> GetAvailableUnitsCountAsync(Guid componentId);
         Task<int> GetTotalUnitsCountAsync(Guid componentId);
+        Task<BloodComponent> GetByNameAsync(string componentName);
     }
 }

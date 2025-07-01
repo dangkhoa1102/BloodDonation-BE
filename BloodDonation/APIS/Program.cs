@@ -15,6 +15,8 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
+using System.Globalization;
+using APIS.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,18 +25,48 @@ builder.Services.AddDbContext<BloodDonationSupportContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-// Register Services
+
+
+
+
+builder.Services.AddScoped<IHealthCheckRepository, HealthCheckRepository>();
+builder.Services.AddScoped<IHealthCheckService, HealthCheckService>();
+
+
+// With:
+builder.Services.AddScoped<IBloodDonationRepository, BloodDonationRepository>();
+
+// Same for the service registration:
+builder.Services.AddScoped<IBloodDonationService, BloodDonationService>();
+
+builder.Services.AddScoped<IDonorRepository, DonorRepository>();
+builder.Services.AddScoped<IDonorService, DonorService>();
+
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+builder.Services.AddScoped<IBloodDonationRepository, BloodDonationRepository>();
+builder.Services.AddScoped<IBloodDonationService, BloodDonationService>();
+
+builder.Services.AddScoped<IDonationHistoryRepository, DonationHistoryRepository>();
+builder.Services.AddScoped<IDonationHistoryService, DonationHistoryService>();
+
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddScoped<IBlogService, BlogService>();
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+
 builder.Services.AddScoped<IAuthService, AuthService>();
+
 builder.Services.AddScoped<IBloodRequestService, BloodRequestService>();
 builder.Services.AddScoped<IBloodRequestRepository, BloodRequestRepository>();
+
 builder.Services.AddScoped<IBloodRecipientRepository, BloodRecipientRepository>();
 builder.Services.AddScoped<IBloodTypeRepository, BloodTypeRepository>();
 builder.Services.AddScoped<IBloodComponentRepository, BloodComponentRepository>();
 builder.Services.AddScoped<IBloodManagementService, BloodManagementService>();
+builder.Services.AddScoped<IBloodUnitRepository, BloodUnitRepository>();
+builder.Services.AddScoped<IBloodUnitService, BloodUnitService>();
 // Add controllers with JSON options
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -43,6 +75,7 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
         options.JsonSerializerOptions.WriteIndented = true;
+        options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
     });
 
 // Add Authorization Policies
@@ -139,6 +172,8 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+
+
 // Add CORS policy
 builder.Services.AddCors(options =>
 {
@@ -201,6 +236,7 @@ app.Use(async (context, next) =>
     }
 });
 
+
 // Configure middleware pipeline with correct order
 app.UseHttpsRedirection();
 
@@ -208,6 +244,8 @@ app.UseCors(x => x
     .AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader());
+
+//app.UseCors("AllowAllOrigins");
 
 app.UseAuthentication();
 app.UseAuthorization();

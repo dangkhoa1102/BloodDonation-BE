@@ -30,9 +30,9 @@ namespace Services
                 AuthorId = blog.AuthorId,
                 Title = blog.Title,
                 Content = blog.Content,
-                PublishDate = blog.PublishDate,
+                PublishDate = blog.PublishDate, // Fix for CS0029  
                 Category = blog.Category,
-                ViewCount = blog.ViewCount
+                
             });
         }
 
@@ -48,18 +48,17 @@ namespace Services
                 AuthorId = blog.AuthorId,
                 Title = blog.Title,
                 Content = blog.Content,
-                PublishDate = blog.PublishDate,
+                PublishDate = blog.PublishDate,  
                 Category = blog.Category,
-                ViewCount = blog.ViewCount
+                
             };
         }
 
         public async Task<BlogResponseDto> CreateBlogAsync(BlogCreateDto blogCreateDto)
         {
-            // Kiểm tra xem tiêu đề đã tồn tại chưa
             var titleExists = await _blogRepository.ExistsByTitleAsync(blogCreateDto.Title);
             if (titleExists)
-                return null; // Có thể throw exception hoặc return error message
+                return null;
 
             var blog = new Blog
             {
@@ -68,7 +67,8 @@ namespace Services
                 Title = blogCreateDto.Title,
                 Content = blogCreateDto.Content,
                 Category = blogCreateDto.Category,
-                ViewCount = 0
+                PublishDate = blogCreateDto.PublishDate
+
             };
 
             await _blogRepository.AddAsync(blog);
@@ -80,9 +80,9 @@ namespace Services
                 AuthorId = blog.AuthorId,
                 Title = blog.Title,
                 Content = blog.Content,
-                PublishDate = blog.PublishDate,
+                PublishDate = blog.PublishDate, // Fix for CS0029  
                 Category = blog.Category,
-                ViewCount = blog.ViewCount
+                
             };
         }
 
@@ -95,6 +95,7 @@ namespace Services
             blog.Title = blogUpdateDto.Title;
             blog.Content = blogUpdateDto.Content;
             blog.Category = blogUpdateDto.Category;
+            blog.PublishDate = blogUpdateDto.PublishDate;
 
             _blogRepository.Update(blog);
             await _blogRepository.SaveChangesAsync();
@@ -105,9 +106,9 @@ namespace Services
                 AuthorId = blog.AuthorId,
                 Title = blog.Title,
                 Content = blog.Content,
-                PublishDate = blog.PublishDate,
+                PublishDate = blog.PublishDate, // Fix for CS0029  
                 Category = blog.Category,
-                ViewCount = blog.ViewCount
+                
             };
         }
 

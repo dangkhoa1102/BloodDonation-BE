@@ -39,6 +39,8 @@ public partial class BloodDonationSupportContext : DbContext
 
     public virtual DbSet<Donor> Donors { get; set; }
 
+    public virtual DbSet<HealthCheck> HealthChecks { get; set; }
+
     public virtual DbSet<Location> Locations { get; set; }
 
     public virtual DbSet<MedicalFacility> MedicalFacilities { get; set; }
@@ -49,15 +51,13 @@ public partial class BloodDonationSupportContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=localhost;Initial Catalog=BloodDonationSupport;Integrated Security=False;User ID=sa;Password=12345;Connect Timeout=30;Encrypt=False;Trust Server Certificate=True;");
+    
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Blog>(entity =>
         {
-            entity.HasKey(e => e.BlogId).HasName("PK__Blog__FA0AA70D9275A0A2");
+            entity.HasKey(e => e.BlogId).HasName("PK__Blog__FA0AA70D669396E2");
 
             entity.ToTable("Blog");
 
@@ -75,9 +75,7 @@ public partial class BloodDonationSupportContext : DbContext
             entity.Property(e => e.Title)
                 .HasMaxLength(500)
                 .HasColumnName("title");
-            entity.Property(e => e.ViewCount)
-                .HasDefaultValue(0)
-                .HasColumnName("viewCount");
+            
 
             entity.HasOne(d => d.Author).WithMany(p => p.Blogs)
                 .HasForeignKey(d => d.AuthorId)
@@ -86,7 +84,7 @@ public partial class BloodDonationSupportContext : DbContext
 
         modelBuilder.Entity<BloodComponent>(entity =>
         {
-            entity.HasKey(e => e.ComponentId).HasName("PK__BloodCom__667AC1267A572D98");
+            entity.HasKey(e => e.ComponentId).HasName("PK__BloodCom__667AC126621C9E40");
 
             entity.ToTable("BloodComponent");
 
@@ -104,7 +102,7 @@ public partial class BloodDonationSupportContext : DbContext
 
         modelBuilder.Entity<BloodDonation>(entity =>
         {
-            entity.HasKey(e => e.DonationId).HasName("PK__BloodDon__F7F4F433F50E75C4");
+            entity.HasKey(e => e.DonationId).HasName("PK__BloodDon__F7F4F433645EE0FF");
 
             entity.ToTable("BloodDonation");
 
@@ -138,7 +136,7 @@ public partial class BloodDonationSupportContext : DbContext
 
         modelBuilder.Entity<BloodRecipient>(entity =>
         {
-            entity.HasKey(e => e.RecipientId).HasName("PK__BloodRec__A9B8B5421A98978D");
+            entity.HasKey(e => e.RecipientId).HasName("PK__BloodRec__A9B8B542CA122FE7");
 
             entity.ToTable("BloodRecipient");
 
@@ -161,7 +159,7 @@ public partial class BloodDonationSupportContext : DbContext
 
         modelBuilder.Entity<BloodRequest>(entity =>
         {
-            entity.HasKey(e => e.RequestId).HasName("PK__BloodReq__E3C5DE518396DD28");
+            entity.HasKey(e => e.RequestId).HasName("PK__BloodReq__E3C5DE51755946BB");
 
             entity.ToTable("BloodRequest");
 
@@ -195,7 +193,7 @@ public partial class BloodDonationSupportContext : DbContext
 
         modelBuilder.Entity<BloodType>(entity =>
         {
-            entity.HasKey(e => e.BloodTypeId).HasName("PK__BloodTyp__C879D794DF7754C0");
+            entity.HasKey(e => e.BloodTypeId).HasName("PK__BloodTyp__C879D79464B25B49");
 
             entity.ToTable("BloodType");
 
@@ -217,13 +215,15 @@ public partial class BloodDonationSupportContext : DbContext
 
         modelBuilder.Entity<BloodUnit>(entity =>
         {
-            entity.HasKey(e => e.UnitId).HasName("PK__BloodUni__55D792156DF7DE87");
+            entity.HasKey(e => e.UnitId).HasName("PK__BloodUni__55D79215BA01BA5A");
 
             entity.ToTable("BloodUnit");
 
             entity.HasIndex(e => e.BloodTypeId, "IX_BloodUnit_BloodType");
 
             entity.HasIndex(e => e.ExpiryDate, "IX_BloodUnit_ExpiryDate");
+
+            entity.HasIndex(e => e.RequestId, "IX_BloodUnit_Request");
 
             entity.HasIndex(e => e.Status, "IX_BloodUnit_Status");
 
@@ -237,6 +237,7 @@ public partial class BloodDonationSupportContext : DbContext
             entity.Property(e => e.Quantity)
                 .HasDefaultValue(450)
                 .HasColumnName("quantity");
+            entity.Property(e => e.RequestId).HasColumnName("requestID");
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
                 .HasColumnName("status");
@@ -252,11 +253,15 @@ public partial class BloodDonationSupportContext : DbContext
             entity.HasOne(d => d.Donation).WithMany(p => p.BloodUnits)
                 .HasForeignKey(d => d.DonationId)
                 .HasConstraintName("FK_BloodUnit_Donation");
+
+            entity.HasOne(d => d.Request).WithMany(p => p.BloodUnits)
+                .HasForeignKey(d => d.RequestId)
+                .HasConstraintName("FK_BloodUnit_Request");
         });
 
         modelBuilder.Entity<Certificate>(entity =>
         {
-            entity.HasKey(e => e.CertificateId).HasName("PK__Certific__A15CBE8E306F0F2A");
+            entity.HasKey(e => e.CertificateId).HasName("PK__Certific__A15CBE8E683D5BA0");
 
             entity.ToTable("Certificate");
 
@@ -270,7 +275,7 @@ public partial class BloodDonationSupportContext : DbContext
 
             entity.HasIndex(e => e.StaffId, "IX_Certificate_Staff");
 
-            entity.HasIndex(e => e.CertificateNumber, "UQ__Certific__410CE512ECEAED6C").IsUnique();
+            entity.HasIndex(e => e.CertificateNumber, "UQ__Certific__410CE51207A82C52").IsUnique();
 
             entity.Property(e => e.CertificateId)
                 .HasDefaultValueSql("(newid())")
@@ -316,7 +321,7 @@ public partial class BloodDonationSupportContext : DbContext
 
         modelBuilder.Entity<Document>(entity =>
         {
-            entity.HasKey(e => e.DocumentId).HasName("PK__Document__EFAAADE56699808C");
+            entity.HasKey(e => e.DocumentId).HasName("PK__Document__EFAAADE5A994DC1C");
 
             entity.ToTable("Document");
 
@@ -341,7 +346,7 @@ public partial class BloodDonationSupportContext : DbContext
 
         modelBuilder.Entity<DonationHistory>(entity =>
         {
-            entity.HasKey(e => e.HistoryId).HasName("PK__Donation__19BDBDB32D843D12");
+            entity.HasKey(e => e.HistoryId).HasName("PK__Donation__19BDBDB3C2244AE2");
 
             entity.ToTable("DonationHistory");
 
@@ -368,7 +373,7 @@ public partial class BloodDonationSupportContext : DbContext
 
         modelBuilder.Entity<Donor>(entity =>
         {
-            entity.HasKey(e => e.DonorId).HasName("PK__Donor__A595D731BCCB1D8C");
+            entity.HasKey(e => e.DonorId).HasName("PK__Donor__A595D73150F694D9");
 
             entity.ToTable("Donor");
 
@@ -381,16 +386,17 @@ public partial class BloodDonationSupportContext : DbContext
             entity.Property(e => e.DonorId)
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("donorID");
+            entity.Property(e => e.Address).HasMaxLength(200);
             entity.Property(e => e.BloodTypeId).HasColumnName("bloodTypeID");
             entity.Property(e => e.ClosestFacilityId).HasColumnName("closestFacilityID");
-            entity.Property(e => e.Height).HasColumnName("height");
+            entity.Property(e => e.Email).HasMaxLength(100);
+            entity.Property(e => e.FullName).HasMaxLength(100);
             entity.Property(e => e.IsAvailable).HasColumnName("isAvailable");
             entity.Property(e => e.LastDonationDate).HasColumnName("lastDonationDate");
             entity.Property(e => e.LocationId).HasColumnName("locationID");
-            entity.Property(e => e.MedicalHistory).HasColumnName("medicalHistory");
             entity.Property(e => e.NextEligibleDate).HasColumnName("nextEligibleDate");
+            entity.Property(e => e.PhoneNumber).HasMaxLength(20);
             entity.Property(e => e.UserId).HasColumnName("userID");
-            entity.Property(e => e.Weight).HasColumnName("weight");
 
             entity.HasOne(d => d.BloodType).WithMany(p => p.Donors)
                 .HasForeignKey(d => d.BloodTypeId)
@@ -409,9 +415,49 @@ public partial class BloodDonationSupportContext : DbContext
                 .HasConstraintName("FK_Donor_User");
         });
 
+        modelBuilder.Entity<HealthCheck>(entity =>
+        {
+            entity.HasKey(e => e.HealthCheckId).HasName("PK__HealthCh__31AFA16E57E14455");
+
+            entity.ToTable("HealthCheck");
+
+            entity.HasIndex(e => e.HealthCheckDate, "IX_HealthCheck_Date");
+
+            entity.HasIndex(e => e.DonorId, "IX_HealthCheck_Donor");
+
+            entity.HasIndex(e => e.HealthCheckStatus, "IX_HealthCheck_Status");
+
+            entity.Property(e => e.HealthCheckId)
+                .HasDefaultValueSql("(newid())")
+                .HasColumnName("healthCheckID");
+            entity.Property(e => e.Allergies).HasColumnName("allergies");
+            entity.Property(e => e.BloodPressure)
+                .HasMaxLength(20)
+                .HasColumnName("blood_pressure");
+            entity.Property(e => e.CurrentMedications).HasColumnName("currentMedications");
+            entity.Property(e => e.DonorId).HasColumnName("donorID");
+            entity.Property(e => e.HealthCheckDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnName("HealthCheck_Date");
+            entity.Property(e => e.HealthCheckStatus)
+                .HasMaxLength(50)
+                .HasDefaultValue("Completed")
+                .HasColumnName("HealthCheck_Status");
+            entity.Property(e => e.HeartRate).HasColumnName("heartRate");
+            entity.Property(e => e.Height).HasColumnName("height");
+            entity.Property(e => e.MedicalHistory).HasColumnName("medicalHistory");
+            entity.Property(e => e.Temperature).HasColumnName("temperature");
+            entity.Property(e => e.Weight).HasColumnName("weight");
+
+            entity.HasOne(d => d.Donor).WithMany(p => p.HealthChecks)
+                .HasForeignKey(d => d.DonorId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_HealthCheck_Donor");
+        });
+
         modelBuilder.Entity<Location>(entity =>
         {
-            entity.HasKey(e => e.LocationId).HasName("PK__Location__30646B0E7475C78D");
+            entity.HasKey(e => e.LocationId).HasName("PK__Location__30646B0EE9A2DD78");
 
             entity.ToTable("Location");
 
@@ -433,7 +479,7 @@ public partial class BloodDonationSupportContext : DbContext
 
         modelBuilder.Entity<MedicalFacility>(entity =>
         {
-            entity.HasKey(e => e.FacilityId).HasName("PK__MedicalF__AA548184FAC7F769");
+            entity.HasKey(e => e.FacilityId).HasName("PK__MedicalF__AA54818459FDEADA");
 
             entity.ToTable("MedicalFacility");
 
@@ -468,7 +514,7 @@ public partial class BloodDonationSupportContext : DbContext
 
         modelBuilder.Entity<Notification>(entity =>
         {
-            entity.HasKey(e => e.NotificationId).HasName("PK__Notifica__4BA5CE8999822DB9");
+            entity.HasKey(e => e.NotificationId).HasName("PK__Notifica__4BA5CE898AE7CC61");
 
             entity.ToTable("Notification");
 
@@ -504,7 +550,7 @@ public partial class BloodDonationSupportContext : DbContext
 
         modelBuilder.Entity<Report>(entity =>
         {
-            entity.HasKey(e => e.ReportId).HasName("PK__Report__1C9B4ECD1C1211AF");
+            entity.HasKey(e => e.ReportId).HasName("PK__Report__1C9B4ECD2BD40B30");
 
             entity.ToTable("Report");
 
@@ -528,7 +574,7 @@ public partial class BloodDonationSupportContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__users__CB9A1CDF1883DE01");
+            entity.HasKey(e => e.UserId).HasName("PK__users__CB9A1CDF65F7D8DE");
 
             entity.ToTable("users");
 
