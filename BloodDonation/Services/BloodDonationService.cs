@@ -84,7 +84,7 @@ namespace Services
                     PhoneNumber = user.Phone,
                     // Email không cần vì đã có trong User
                     BloodTypeId = bloodTypeId,
-                    Address = dto.Address,
+                    Address = dto.Address ?? string.Empty,
                     Email = user.Email,
                     CurrentMedications = dto.CurrentMedications
                     // Nếu có Address, bạn có thể lưu vào Location hoặc trường riêng
@@ -150,12 +150,9 @@ namespace Services
                 throw new ArgumentException("User không tồn tại cho donor này");
             }
 
-            // Lấy thông tin địa chỉ từ Location nếu có
-            string address = "";
-            if (donor.Location != null)
-            {
-                address = $"{donor.Location.Address}, {donor.Location.District}, {donor.Location.City}";
-            }
+            // Lấy thông tin địa chỉ trực tiếp từ Donor
+            string address = donor.Address ?? string.Empty;
+
 
             // Lấy thông tin nhóm máu
             string bloodType = "";
@@ -218,9 +215,8 @@ namespace Services
                 FullName = user.FullName ?? string.Empty,
                 PhoneNumber = user.Phone ?? string.Empty,
                 Email = user.Email ?? string.Empty,
-                Address = donor.Location != null
-            ? $"{donor.Location.Address}, {donor.Location.District}, {donor.Location.City}"
-            : string.Empty,
+                Address = donor.Address ?? string.Empty,
+
                 BloodType = donor.BloodType != null
             ? $"{donor.BloodType.AboType}{donor.BloodType.RhFactor}"
             : string.Empty,
@@ -295,9 +291,8 @@ namespace Services
                 FullName = donation.Donor?.User?.FullName ?? string.Empty,
                 PhoneNumber = donation.Donor?.User?.Phone ?? string.Empty,
                 Email = donation.Donor?.User?.Email ?? string.Empty,
-                Address = donation.Donor?.Location != null
-                    ? $"{donation.Donor.Location.Address}, {donation.Donor.Location.District}, {donation.Donor.Location.City}"
-                    : string.Empty,
+                Address = donation.Donor?.Address ?? string.Empty,
+
                 BloodType = donation.Donor?.BloodType != null
                     ? $"{donation.Donor.BloodType.AboType}{donation.Donor.BloodType.RhFactor}"
                     : string.Empty,
