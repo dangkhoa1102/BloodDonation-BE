@@ -274,6 +274,27 @@ namespace Services
             return await _donationRepository.SaveChangesAsync();
         }
 
+        public async Task<bool> ApproveDonationAsync(Guid donationId, DateOnly? approveDate)
+        {
+            var donation = await _donationRepository.GetByIdAsync(donationId);
+            if (donation == null) return false;
+            donation.Status = "Approved";
+            donation.Notes = $"Approved on {approveDate?.ToString() ?? DateTime.Now.ToShortDateString()}";
+            await _donationRepository.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> RejectDonationAsync(Guid donationId, string reason, DateOnly? rejectionDate)
+        {
+            var donation = await _donationRepository.GetByIdAsync(donationId);
+            if (donation == null) return false;
+            donation.Status = "Rejected";
+            donation.Notes = $"Rejected: {reason} on {rejectionDate?.ToString() ?? DateTime.Now.ToShortDateString()}";
+            await _donationRepository.SaveChangesAsync();
+            return true;
+        }
+
+
         private BloodDonationDto MapToDto(BloodDonation donation)
         {
             return new BloodDonationDto
