@@ -17,6 +17,10 @@ namespace Services
         Task<bool> UpdateAsync(Guid id, UpdateBloodDonationDto dto);
         Task<bool> DeleteAsync(Guid id);
         Task<bool> UpdateStatusAsync(Guid id, string status);
+
+        Task<bool> ApproveDonationAsync(Guid donationId, DateOnly? approveDate);
+        Task<bool> RejectDonationAsync(Guid donationId, string reason, DateOnly? rejectionDate);
+
     }
 
 
