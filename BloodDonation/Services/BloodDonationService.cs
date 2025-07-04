@@ -321,6 +321,7 @@ namespace Services
                 CurrentMedications = string.Empty, // Không có trong BloodDonation
                 DonorName = donation.Donor?.User?.FullName ?? string.Empty,
                 RequestDescription = donation.Request?.Description ?? string.Empty,
+                UserIdCard = donation.Donor?.User?.UserIdCard ?? string.Empty,
 
             };
         }
