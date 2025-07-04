@@ -8,7 +8,7 @@ namespace Models.DTOs
 {
     public class HealthCheckDTO
     {
-        public Guid DonorId { get; set; }
+        public string UserIdCard { get; set; } = string.Empty;
         public double? Weight { get; set; }
         public double? Height { get; set; }
         public int? HeartRate { get; set; }
