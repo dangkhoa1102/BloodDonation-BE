@@ -6,15 +6,18 @@ using System.Threading.Tasks;
 using Models.DTOs;
 using Models;
 using Repositories.Interfaces;
+using System.Drawing;
 
 namespace Services
 {
     public class HealthCheckService : IHealthCheckService
     {
         private readonly IHealthCheckRepository _repo;
-        public HealthCheckService(IHealthCheckRepository repo)
+        private readonly IDonorRepository _donorRepo;
+        public HealthCheckService(IHealthCheckRepository repo, IDonorRepository donorRepo)
         {
             _repo = repo;
+            _donorRepo = donorRepo;
         }
 
         public async Task<IEnumerable<HealthCheck>> GetAllAsync()
@@ -25,10 +28,14 @@ namespace Services
 
         public async Task<HealthCheck> AddAsync(HealthCheckDTO dto)
         {
+            var donor = await _donorRepo.GetByUserIdCardAsync(dto.UserIdCard);
+            if (donor == null)
+                throw new ArgumentException("Không tìm thấy donor với userIdCard này");
+
             var entity = new HealthCheck
             {
                 HealthCheckId = Guid.NewGuid(),
-                DonorId = dto.DonorId,
+                DonorId = donor.DonorId,
                 Weight = dto.Weight,
                 Height = dto.Height,
                 HeartRate = dto.HeartRate,

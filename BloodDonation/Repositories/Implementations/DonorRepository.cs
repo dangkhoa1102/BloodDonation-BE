@@ -29,5 +29,12 @@ namespace Repositories.Implementations
                 .Include(d => d.Location)
                 .FirstOrDefaultAsync(d => d.DonorId == id);
         }
+
+        public async Task<Donor> GetByUserIdCardAsync(string userIdCard)
+        {
+            return await _dbSet
+                .Include(d => d.User)
+                .FirstOrDefaultAsync(d => d.User != null && d.User.UserIdCard == userIdCard);
+        }
     }
 }
