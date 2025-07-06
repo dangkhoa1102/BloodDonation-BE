@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.DTOs;
@@ -39,6 +40,7 @@ namespace APIS.Controllers
 
         // POST: api/donationhistory
         [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> Create([FromBody] DonationHistoryCreateDto dto)
         {
             if (!ModelState.IsValid)
@@ -50,6 +52,7 @@ namespace APIS.Controllers
 
         // PUT: api/donationhistory/{id}
         [HttpPut("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> Update(Guid id, [FromBody] DonationHistoryUpdateDto dto)
         {
             if (!ModelState.IsValid)
@@ -64,6 +67,7 @@ namespace APIS.Controllers
 
         // DELETE: api/donationhistory/{id}
         [HttpDelete("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var success = await _donationHistoryService.DeleteAsync(id);

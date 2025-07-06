@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services;
 using static Models.DTOs.DonorDTO;
@@ -34,6 +36,7 @@ namespace APIS.Controllers
         }
 
         [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<DonorDto>> Create([FromBody] CreateDonorDto dto)
         {
             var created = await _donorService.CreateAsync(dto);
@@ -41,6 +44,7 @@ namespace APIS.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateDonorDto dto)
         {
             var success = await _donorService.UpdateAsync(id, dto);
@@ -51,6 +55,7 @@ namespace APIS.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var success = await _donorService.DeleteAsync(id);

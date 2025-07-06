@@ -2,6 +2,7 @@
 using Models.DTOs;
 using Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace APIS.Controllers
 {
@@ -49,6 +50,7 @@ namespace APIS.Controllers
 
         // PUT: api/blog/{id}
         [HttpPut("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> UpdateBlog(Guid id, [FromBody] BlogUpdateDto blogUpdateDto)
         {
             if (!ModelState.IsValid)
@@ -63,6 +65,7 @@ namespace APIS.Controllers
 
         // DELETE: api/blog/{id}
         [HttpDelete("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> DeleteBlog(Guid id)
         {
             var result = await _blogService.DeleteBlogAsync(id);
