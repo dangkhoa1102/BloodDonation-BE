@@ -10,4 +10,5 @@ public interface IUserService
     Task<User> GetUserDetailAsync(Guid id);
     Task<User> GetCurrentUserAsync(Guid userId);
     Task<IEnumerable<User>> GetUsersByFullNameAsync(string fullName);
+    Task<User> GetByUserIdCardAsync(string userIdCard);
 }

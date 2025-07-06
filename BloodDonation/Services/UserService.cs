@@ -198,5 +198,20 @@ namespace Services.Implementations
                 throw;
             }
         }
+        public async Task<User> GetByUserIdCardAsync(string userIdCard)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(userIdCard))
+                    return null;
+
+                return await _userRepository.GetByUserIdCardAsync(userIdCard);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving user by UserIdCard: {UserIdCard}", userIdCard);
+                throw;
+            }
+        }
     }
 }
