@@ -1,4 +1,5 @@
 ﻿using Models.DTOs;
+using Models.Enums;
 
 namespace Services.Interfaces
 {
@@ -9,6 +10,6 @@ namespace Services.Interfaces
         Task<BloodTypeResponseDTO> GetBloodTypeByIdAsync(Guid id);
         Task<BloodComponentResponseDTO> GetBloodComponentByIdAsync(Guid id);
         Task<BloodCompatibilityDTO> GetBloodTypeCompatibilityAsync(string bloodType);
-        Task<IEnumerable<ComponentCompatibilityDTO>> GetComponentCompatibilityAsync(string componentName);
+        Task<IEnumerable<ComponentCompatibilityDTO>> GetComponentCompatibilityAsync(BloodComponentEnum componentType);
     }
 }

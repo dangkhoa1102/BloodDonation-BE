@@ -1,14 +1,17 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+
 using Microsoft.AspNetCore.Mvc;
 using Models.DTOs;
 using Models.Enums;
+using System.Security.Claims;
 
 namespace APIS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,Staff")]
+
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -112,6 +115,7 @@ namespace APIS.Controllers
 
         [HttpGet("Search-User-By-Name")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,Staff")]
+
         public async Task<IActionResult> SearchUsers([FromQuery] string searchTerm)
         {
             try
@@ -154,6 +158,7 @@ namespace APIS.Controllers
         }
         [HttpPut("Update-User/{id}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+
         public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UserUpdateDTO updateDto)
         {
             try
@@ -173,6 +178,7 @@ namespace APIS.Controllers
         }
         [HttpGet("Get-User-Detail/{id}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,Staff")]
+
         public async Task<IActionResult> GetUserDetail(Guid id)
         {
             try
@@ -201,6 +207,81 @@ namespace APIS.Controllers
             {
                 _logger.LogError(ex, "Error retrieving user detail for ID: {UserId}", id);
                 return StatusCode(500, new { message = "An error occurred while retrieving user detail" });
+            }
+        }
+        [HttpGet("current")]
+        [Authorize] // Requires authentication
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out Guid userId))
+                {
+                    return Unauthorized(new { message = "Invalid user identification" });
+                }
+
+                var user = await _userService.GetCurrentUserAsync(userId);
+                if (user == null)
+                {
+                    return NotFound(new { message = "User not found" });
+                }
+
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving current user");
+                return StatusCode(500, new { message = "An error occurred while retrieving user information" });
+            }
+        }
+
+        [HttpGet("search-by-fullname/{fullName}")]
+        [Authorize]
+        public async Task<IActionResult> GetUsersByFullName(string fullName)
+        {
+            try
+            {
+                // Kiểm tra role
+                if (!User.IsInRole("Admin") && !User.IsInRole("Staff"))
+                {
+                    return Unauthorized(new { message = "Unauthorized access" });
+                }
+
+                if (string.IsNullOrWhiteSpace(fullName))
+                {
+                    return BadRequest(new { message = "Full name cannot be empty" });
+                }
+
+                var users = await _userService.GetUsersByFullNameAsync(fullName);
+                if (!users.Any())
+                {
+                    return NoContent();
+                }
+
+                var response = new
+                {
+                    searchTerm = fullName,
+                    totalResults = users.Count(),
+                    users = users.Select(u => new
+                    {
+                        u.UserId,
+                        u.Username,
+                        u.Email,
+                        u.FullName,
+                        u.Phone,
+                        u.UserIdCard,
+                        DateOfBirth = u.DateOfBirth?.ToString("yyyy-MM-dd"),
+                        u.Role
+                    })
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error searching users by full name: {FullName}", fullName);
+                return StatusCode(500, new { message = "An error occurred while searching users" });
             }
         }
     }
