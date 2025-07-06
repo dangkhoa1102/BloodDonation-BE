@@ -46,6 +46,11 @@ namespace Repositories.Implementations
         {
             return await _dbSet
                 .Include(d => d.Donor)
+                    .ThenInclude(donor => donor.User)
+                .Include(d => d.Donor)
+                    .ThenInclude(donor => donor.BloodType)
+                .Include(d => d.Donor)
+                    .ThenInclude(donor => donor.Location)
                 .Include(d => d.Request)
                 .Include(d => d.Certificate)
                 .Where(d => d.DonorId == donorId)
@@ -56,7 +61,13 @@ namespace Repositories.Implementations
         {
             return await _dbSet
                 .Include(d => d.Donor)
+                    .ThenInclude(donor => donor.User)
+                .Include(d => d.Donor)
+                    .ThenInclude(donor => donor.BloodType)
+                .Include(d => d.Donor)
+                    .ThenInclude(donor => donor.Location)
                 .Include(d => d.Request)
+                .Include(d => d.Certificate)
                 .Where(d => d.Status == status)
                 .ToListAsync();
         }

@@ -104,5 +104,23 @@ namespace APIS.Controllers
                 return NotFound();
             return NoContent();
         }
+
+        [HttpPost("approve-blood-donation")]
+        public async Task<IActionResult> ApproveBloodDonation([FromBody] ApproveBloodDonationDTO dto)
+        {
+            var result = await _service.ApproveDonationAsync(dto.DonationId, dto.ApproveDate);
+            if (!result)
+                return NotFound(new { message = "Donation not found" });
+            return Ok(new { message = "Blood donation approved successfully." });
+        }
+
+        [HttpPost("reject-blood-donation")]
+        public async Task<IActionResult> RejectBloodDonation([FromBody] RejectBloodDonationDTO dto)
+        {
+            var result = await _service.RejectDonationAsync(dto.DonationId, dto.RejectionReason, dto.RejectionDate);
+            if (!result)
+                return NotFound(new { message = "Donation not found" });
+            return Ok(new { message = "Blood donation rejected successfully." });
+        }
     }
 }
