@@ -203,7 +203,7 @@ namespace APIS.Controllers
             }
         }
         [HttpGet("current")]
-        [Authorize] // Requires authentication
+        [Authorize]
         public async Task<IActionResult> GetCurrentUser()
         {
             try
@@ -235,7 +235,6 @@ namespace APIS.Controllers
         {
             try
             {
-                // Kiểm tra role
                 if (!User.IsInRole("Admin") && !User.IsInRole("Staff"))
                 {
                     return Unauthorized(new { message = "Unauthorized access" });
@@ -275,6 +274,43 @@ namespace APIS.Controllers
             {
                 _logger.LogError(ex, "Error searching users by full name: {FullName}", fullName);
                 return StatusCode(500, new { message = "An error occurred while searching users" });
+            }
+        }
+        [HttpGet("get-by-idcard/{userIdCard}")]
+        [Authorize] 
+        public async Task<IActionResult> GetByUserIdCard(string userIdCard)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(userIdCard))
+                {
+                    return BadRequest(new { message = "UserIdCard cannot be empty" });
+                }
+
+                var user = await _userService.GetByUserIdCardAsync(userIdCard);
+                if (user == null)
+                {
+                    return NotFound(new { message = "User not found" });
+                }
+
+                var response = new
+                {
+                    userId = user.UserId,
+                    username = user.Username,
+                    email = user.Email,
+                    fullName = user.FullName,
+                    phone = user.Phone,
+                    userIdCard = user.UserIdCard,
+                    dateOfBirth = user.DateOfBirth?.ToString("yyyy-MM-dd"),
+                    role = user.Role
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving user by UserIdCard: {UserIdCard}", userIdCard);
+                return StatusCode(500, new { message = "An error occurred while retrieving user information" });
             }
         }
     }

@@ -47,5 +47,10 @@ namespace Repositories.Implementations
                 .OrderBy(u => u.FullName)
                 .ToListAsync();
         }
+        public async Task<User> GetByUserIdCardAsync(string userIdCard)
+        {
+            return await _dbSet
+                .FirstOrDefaultAsync(u => u.UserIdCard.Equals(userIdCard));
+        }
     }
 }

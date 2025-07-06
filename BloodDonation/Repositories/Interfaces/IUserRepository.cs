@@ -15,5 +15,6 @@ namespace Repositories.Interfaces
         Task<bool> IsUsernameExistsAsync(string username);
         Task<IEnumerable<User>> GetUsersByRoleAsync(string role);
         Task<IEnumerable<User>> GetUsersByFullNameAsync(string fullName);
+        Task<User> GetByUserIdCardAsync(string userIdCard);
     }
 }
