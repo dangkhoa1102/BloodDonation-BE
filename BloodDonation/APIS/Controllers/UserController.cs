@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+
 using Microsoft.AspNetCore.Mvc;
 using Models.DTOs;
 using Models.Enums;
@@ -8,7 +10,8 @@ namespace APIS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,Staff")]
+
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -21,6 +24,7 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-All-User")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,Staff")]
         public async Task<IActionResult> GetAllUsers()
         {
             try
@@ -58,7 +62,7 @@ namespace APIS.Controllers
             }
         }
         [HttpGet("Get-User-By-Role/{role}")]
-        [Authorize(Roles = "Admin,Staff")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,Staff")]
         public async Task<IActionResult> GetUsersByRole([FromRoute] string role)
         {
             try
@@ -110,7 +114,8 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Search-User-By-Name")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,Staff")]
+
         public async Task<IActionResult> SearchUsers([FromQuery] string searchTerm)
         {
             try
@@ -152,7 +157,8 @@ namespace APIS.Controllers
             }
         }
         [HttpPut("Update-User/{id}")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+
         public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UserUpdateDTO updateDto)
         {
             try
@@ -171,7 +177,8 @@ namespace APIS.Controllers
             }
         }
         [HttpGet("Get-User-Detail/{id}")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,Staff")]
+
         public async Task<IActionResult> GetUserDetail(Guid id)
         {
             try
