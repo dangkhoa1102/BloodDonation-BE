@@ -6,12 +6,11 @@ using System.Text;
 using Models;
 using Models.DTOs;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System.Collections.Concurrent;
 using System.Linq;
 using Models.Enums;
+using Repositories.Interfaces;
 
 namespace Services
 {
@@ -19,7 +18,10 @@ namespace Services
     {
         Task<(bool success, string message, string token)> LoginAsync(LoginDTO loginDto);
         Task<(bool success, string message)> RegisterAsync(RegisterDTO registerDto);
-        Task<(bool success, string message)> LogoutAsync(string token);  // Changed parameter from userId to token
+        Task<(bool success, string message)> LogoutAsync(string token);
+        Task<(bool success, string message, string token)> LoginWithGoogleAsync(string email, string name);
+        Task<User> GetUserByEmailAsync(string email);
+
     }
 
     public class AuthService : IAuthService
@@ -27,16 +29,47 @@ namespace Services
         private readonly BloodDonationSupportContext _context;
         private readonly IConfiguration _configuration;
         private readonly ILogger<AuthService> _logger;
+        private readonly IUserRepository _userRepository;
+        private readonly IJwtService _jwtService;
         private static readonly HashSet<string> _blacklistedTokens = new HashSet<string>();
 
         public AuthService(
             BloodDonationSupportContext context,
             IConfiguration configuration,
-            ILogger<AuthService> logger)
+            ILogger<AuthService> logger,
+            IUserRepository userRepository,
+            IJwtService jwtService)
         {
             _context = context;
             _configuration = configuration;
             _logger = logger;
+            _userRepository = userRepository;
+            _jwtService = jwtService;
+        }
+
+        public async Task<(bool success, string message, string token)> LoginWithGoogleAsync(string email, string name)
+        {
+            // 1. Tìm user theo email
+            var user = await _userRepository.GetByEmailAsync(email);
+
+            // 2. Nếu chưa có user, tạo mới
+            if (user == null)
+            {
+                user = new User
+                {
+                    UserId = Guid.NewGuid(),
+                    Email = email,
+                    FullName = name,
+                    Username = email, // hoặc sinh username từ email/name
+                    Role = UserRoles.Member.ToString()
+                };
+                await _userRepository.AddAsync(user);
+            }
+
+            // 3. Tạo JWT token cho user
+            var token = _jwtService.GenerateToken(user);
+
+            return (true, "Login with Google successful", token);
         }
 
         public async Task<(bool success, string message, string token)> LoginAsync(LoginDTO loginDto)
@@ -168,5 +201,11 @@ namespace Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            return await _userRepository.GetByEmailAsync(email);
+        }
+
     }
 }
