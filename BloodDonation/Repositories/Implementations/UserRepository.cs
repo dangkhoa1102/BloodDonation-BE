@@ -17,8 +17,13 @@ namespace Repositories.Implementations
 
         public async Task<User> GetByEmailAsync(string email)
         {
-            return await _dbSet.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+            if (string.IsNullOrWhiteSpace(email))
+                return null;
+
+            var normalizedEmail = email.Trim().ToLower();
+            return await _dbSet.FirstOrDefaultAsync(u => u.Email.Trim().ToLower() == normalizedEmail);
         }
+
 
         public async Task<User> GetByUsernameAsync(string username)
         {

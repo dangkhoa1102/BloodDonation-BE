@@ -134,10 +134,12 @@ namespace APIS.Controllers
         [HttpGet("login-google")]
         public IActionResult LoginWithGoogle()
         {
-            var redirectUrl = Url.Action("GoogleResponse", "Auth", null, Request.Scheme);
+            // Redirect về FE route trung gian, không phải /register
+            var redirectUrl = "http://localhost:5173/google-callback";
             var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
             return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }
+
 
         [HttpGet("google-response")]
         public async Task<IActionResult> GoogleResponse()
@@ -146,8 +148,7 @@ namespace APIS.Controllers
 
             if (!result.Succeeded || result.Principal == null)
             {
-                // Redirect về FE với lỗi xác thực Google
-                return Redirect("http://localhost:5173/register?error=GoogleAuthFailed");
+                return Unauthorized(new { message = "Google authentication failed" });
             }
 
             var email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
@@ -155,7 +156,7 @@ namespace APIS.Controllers
 
             if (string.IsNullOrEmpty(email))
             {
-                return Redirect("http://localhost:5173/register?error=NoEmail");
+                return BadRequest(new { message = "Cannot retrieve email from Google account" });
             }
 
             var user = await _authService.GetUserByEmailAsync(email);
@@ -163,21 +164,33 @@ namespace APIS.Controllers
             if (user == null)
             {
                 // Chưa có tài khoản, FE sẽ xử lý đăng ký
-                var registerUrl = $"http://localhost:5173/register?needRegister=true&email={Uri.EscapeDataString(email)}&name={Uri.EscapeDataString(name ?? "")}";
-                return Redirect(registerUrl);
+                return Ok(new
+                {
+                    needRegister = true,
+                    message = "Email chưa có tài khoản, vui lòng đăng ký.",
+                    email,
+                    name
+                });
             }
 
             var (success, message, token) = await _authService.LoginWithGoogleAsync(email, name);
 
             if (!success)
             {
-                return Redirect($"http://localhost:5173/register?error={Uri.EscapeDataString(message)}");
+                return BadRequest(new { message });
             }
 
-            // Đã có tài khoản, redirect về FE kèm token
-            var successUrl = $"http://localhost:5173/register?needRegister=false&email={Uri.EscapeDataString(email)}&name={Uri.EscapeDataString(name ?? "")}&token={Uri.EscapeDataString(token)}";
-            return Redirect(successUrl);
+            // Đã có tài khoản, trả về token cho FE
+            return Ok(new
+            {
+                needRegister = false,
+                message = "Google login successful",
+                email,
+                name,
+                token
+            });
         }
+
 
 
 
