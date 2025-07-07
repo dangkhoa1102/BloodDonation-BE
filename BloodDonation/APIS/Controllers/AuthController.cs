@@ -146,7 +146,8 @@ namespace APIS.Controllers
 
             if (!result.Succeeded || result.Principal == null)
             {
-                return Unauthorized(new { message = "Google authentication failed" });
+                // Redirect về FE với lỗi xác thực Google
+                return Redirect("http://localhost:5173/register?error=GoogleAuthFailed");
             }
 
             var email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
@@ -154,41 +155,30 @@ namespace APIS.Controllers
 
             if (string.IsNullOrEmpty(email))
             {
-                return BadRequest(new { message = "Cannot retrieve email from Google account" });
+                return Redirect("http://localhost:5173/register?error=NoEmail");
             }
 
-            // Kiểm tra user đã tồn tại chưa
-            var user = await _authService.GetUserByEmailAsync(email); // Bạn cần thêm hàm này vào IAuthService và AuthService
+            var user = await _authService.GetUserByEmailAsync(email);
 
             if (user == null)
             {
-                // Chưa có tài khoản, trả về thông báo cho frontend chuyển hướng sang trang đăng ký
-                return Ok(new
-                {
-                    needRegister = true,
-                    message = "Email chưa có tài khoản, vui lòng đăng ký.",
-                    email,
-                    name
-                });
+                // Chưa có tài khoản, FE sẽ xử lý đăng ký
+                var registerUrl = $"http://localhost:5173/register?needRegister=true&email={Uri.EscapeDataString(email)}&name={Uri.EscapeDataString(name ?? "")}";
+                return Redirect(registerUrl);
             }
 
-            // Đã có tài khoản, đăng nhập như bình thường
             var (success, message, token) = await _authService.LoginWithGoogleAsync(email, name);
 
             if (!success)
             {
-                return BadRequest(new { message });
+                return Redirect($"http://localhost:5173/register?error={Uri.EscapeDataString(message)}");
             }
 
-            return Ok(new
-            {
-                needRegister = false,
-                message = "Google login successful",
-                email,
-                name,
-                token
-            });
+            // Đã có tài khoản, redirect về FE kèm token
+            var successUrl = $"http://localhost:5173/register?needRegister=false&email={Uri.EscapeDataString(email)}&name={Uri.EscapeDataString(name ?? "")}&token={Uri.EscapeDataString(token)}";
+            return Redirect(successUrl);
         }
+
 
 
     }
