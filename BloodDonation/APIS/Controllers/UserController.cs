@@ -210,7 +210,7 @@ namespace APIS.Controllers
             }
         }
         [HttpGet("current")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> GetCurrentUser()
         {
             try
@@ -237,7 +237,8 @@ namespace APIS.Controllers
         }
 
         [HttpGet("search-by-fullname/{fullName}")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
         public async Task<IActionResult> GetUsersByFullName(string fullName)
         {
             try
@@ -284,7 +285,8 @@ namespace APIS.Controllers
             }
         }
         [HttpGet("get-by-idcard/{userIdCard}")]
-        [Authorize] 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
         public async Task<IActionResult> GetByUserIdCard(string userIdCard)
         {
             try
