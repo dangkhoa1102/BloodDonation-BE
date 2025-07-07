@@ -157,7 +157,7 @@ namespace APIS.Controllers
             }
         }
         [HttpPut("Update-User/{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
         public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UserUpdateDTO updateDto)
         {
@@ -177,7 +177,7 @@ namespace APIS.Controllers
             }
         }
         [HttpGet("Get-User-Detail/{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,Staff")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
         public async Task<IActionResult> GetUserDetail(Guid id)
         {
