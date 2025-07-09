@@ -9,8 +9,8 @@ namespace Services
 {
     public interface IAppointmentService
     {
-        Task<AppointmentDetailDTO> CreateAppointmentAsync(CreateAppointmentDTO dto);
-        Task<AppointmentDetailDTO> GetAppointmentByIdAsync(Guid donationId);
+        
         Task<bool> UpdateDonationDateAsync(UpdateDonationDateDTO dto);
+        Task<BloodDonationProcessDTO> GetLatestDonationProcessByDonorIdAsync(Guid donorId);
     }
 }

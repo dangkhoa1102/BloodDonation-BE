@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Models.DTOs;
 using Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Services
 {
@@ -17,44 +18,30 @@ namespace Services
             _context = context;
         }
 
-        public async Task<AppointmentDetailDTO> CreateAppointmentAsync(CreateAppointmentDTO dto)
+
+        public async Task<BloodDonationProcessDTO> GetLatestDonationProcessByDonorIdAsync(Guid donorId)
         {
-            var appointment = new BloodDonation
-            {
-                DonationId = Guid.NewGuid(),
-                DonorId = dto.DonorId,
-                DonationDate = dto.DonationDate,
-                Quantity = dto.Quantity,
-                Status = "Scheduled",
-                Notes = dto.Notes
-            };
-            _context.BloodDonations.Add(appointment);
-            await _context.SaveChangesAsync();
+            var donation = await _context.BloodDonations
+                .Where(d => d.DonorId == donorId)
+                .OrderByDescending(d => d.DonationDate)
+                .FirstOrDefaultAsync();
 
-            return new AppointmentDetailDTO
-            {
-                DonationId = appointment.DonationId,
-                DonorId = appointment.DonorId,
-                DonationDate = appointment.DonationDate,
-                Quantity = appointment.Quantity,
-                Status = appointment.Status,
-                Notes = appointment.Notes
-            };
-        }
+            if (donation == null) return null;
 
-        public async Task<AppointmentDetailDTO> GetAppointmentByIdAsync(Guid donationId)
-        {
-            var appointment = await _context.BloodDonations.FindAsync(donationId);
-            if (appointment == null) return null;
+            var healthCheck = await _context.HealthChecks
+                .Where(hc => hc.Donor.DonorId == donorId && hc.HealthCheckDate <= donation.DonationDate)
+                .OrderByDescending(hc => hc.HealthCheckDate)
+                .FirstOrDefaultAsync();
 
-            return new AppointmentDetailDTO
+            return new BloodDonationProcessDTO
             {
-                DonationId = appointment.DonationId,
-                DonorId = appointment.DonorId,
-                DonationDate = appointment.DonationDate,
-                Quantity = appointment.Quantity,
-                Status = appointment.Status,
-                Notes = appointment.Notes
+                DonationId = donation.DonationId,
+                Status = donation.Status,
+                HealthCheckDate = healthCheck?.HealthCheckDate,
+                HealthCheckStatus = healthCheck?.HealthCheckStatus,
+                CertificateId = donation.CertificateId,
+                Notes = donation.Notes,
+                DonorId = donation.DonorId
             };
         }
 

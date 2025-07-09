@@ -18,26 +18,12 @@ namespace APIS.Controllers
             _appointmentService = appointmentService;
         }
 
-        // Staff tạo lịch hẹn hiến máu
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff")]
-        [HttpPost("create")]
-        public async Task<IActionResult> CreateAppointment([FromBody] CreateAppointmentDTO dto)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
-            var result = await _appointmentService.CreateAppointmentAsync(dto);
-            return Ok(result);
-        }
-
-        // Lấy thông tin lịch hẹn theo ID
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpGet("{donationId}")]
-        public async Task<IActionResult> GetAppointment(Guid donationId)
+        [HttpGet("process/by-donor/{donorId}")]
+        public async Task<IActionResult> GetDonationProcessesByDonorId(Guid donorId)
         {
-            var result = await _appointmentService.GetAppointmentByIdAsync(donationId);
-            if (result == null)
-                return NotFound(new { message = "Appointment not found" });
+            var result = await _appointmentService.GetLatestDonationProcessByDonorIdAsync(donorId);
             return Ok(result);
         }
 
