@@ -120,5 +120,47 @@ namespace Services.Implementations
                 throw;
             }
         }
+        public async Task<(bool success, string message)> UpdateBloodUnitAsync(Guid id, UpdateBloodUnitDTO dto)
+        {
+            try
+            {
+                var bloodUnit = await _bloodUnitRepository.GetByIdAsync(id);
+                if (bloodUnit == null)
+                    return (false, "Blood unit not found");
+
+                // Chỉ update các field không null
+                if (dto.DonationId.HasValue)
+                    bloodUnit.DonationId = dto.DonationId;
+
+                if (dto.BloodTypeId.HasValue)
+                    bloodUnit.BloodTypeId = dto.BloodTypeId;
+
+                if (dto.ComponentType.HasValue)
+                    bloodUnit.ComponentType = dto.ComponentType;
+
+                if (dto.ExpiryDate.HasValue)
+                    bloodUnit.ExpiryDate = dto.ExpiryDate;
+
+                if (!string.IsNullOrWhiteSpace(dto.Status))
+                    bloodUnit.Status = dto.Status;
+
+                if (dto.Quantity.HasValue)
+                    bloodUnit.Quantity = dto.Quantity.Value;
+
+                if (dto.RequestId.HasValue)
+                    bloodUnit.RequestId = dto.RequestId;
+
+                await _bloodUnitRepository.UpdateAsync(bloodUnit);
+                await _bloodUnitRepository.SaveChangesAsync();
+
+                _logger.LogInformation("Blood unit {Id} updated successfully", id);
+                return (true, "Blood unit updated successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating blood unit {Id}", id);
+                return (false, $"Error updating blood unit: {ex.Message}");
+            }
+        }
     }
 }
