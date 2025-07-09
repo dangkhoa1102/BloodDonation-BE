@@ -72,6 +72,9 @@ builder.Services.AddScoped<IBloodManagementService, BloodManagementService>();
 builder.Services.AddScoped<IBloodUnitRepository, BloodUnitRepository>();
 builder.Services.AddScoped<IBloodUnitService, BloodUnitService>();
 
+// đăng kí cho lịch hiến máu
+builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+
 //cấu hình cho đăng nhập Google
 builder.Services.AddScoped<IJwtService, JwtService>();
 
