@@ -22,26 +22,27 @@ namespace APIS.Middleware
                 // Skip validation for these paths
                 if (context.Request.Path.StartsWithSegments("/swagger") ||
                     context.Request.Path.StartsWithSegments("/api/Auth/login") ||
-                    context.Request.Path.StartsWithSegments("/api/Auth/register"))
+                    context.Request.Path.StartsWithSegments("/api/Auth/register") ||
+                    context.Request.Path.StartsWithSegments("/api/Auth/login-google") ||
+                    context.Request.Path.StartsWithSegments("/api/Auth/google-response"))
                 {
                     await _next(context);
                     return;
                 }
 
                 var token = context.Request.Headers["Authorization"].ToString();
-                
-                // Nếu token đã có "Bearer" thì giữ nguyên, nếu không thì thêm vào
-                if (!string.IsNullOrEmpty(token) && !token.StartsWith("Bearer "))
-                {
-                    token = $"Bearer {token}";
-                    // Update lại header với token mới
-                    context.Request.Headers["Authorization"] = token;
-                }
 
                 if (string.IsNullOrEmpty(token))
                 {
                     context.Response.StatusCode = 401;
                     await context.Response.WriteAsJsonAsync(new { message = "Token is missing" });
+                    return;
+                }
+
+                if (!token.StartsWith("Bearer "))
+                {
+                    context.Response.StatusCode = 401;
+                    await context.Response.WriteAsJsonAsync(new { message = "Invalid token format" });
                     return;
                 }
 

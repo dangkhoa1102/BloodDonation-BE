@@ -23,6 +23,7 @@ namespace Models.DTOs
         public string Email { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
         public DateOnly? DateOfBirth { get; set; }
+        public string UserIdCard { get; set; } = string.Empty;
 
         // Thông tin y tế
         public string BloodType { get; set; } = string.Empty;

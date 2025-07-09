@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+
 using Microsoft.AspNetCore.Mvc;
 using Models.DTOs;
 using Models.Enums;
@@ -8,7 +10,8 @@ namespace APIS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -21,6 +24,7 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-All-User")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,Staff")]
         public async Task<IActionResult> GetAllUsers()
         {
             try
@@ -58,7 +62,7 @@ namespace APIS.Controllers
             }
         }
         [HttpGet("Get-User-By-Role/{role}")]
-        [Authorize(Roles = "Admin,Staff")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,Staff")]
         public async Task<IActionResult> GetUsersByRole([FromRoute] string role)
         {
             try
@@ -110,7 +114,8 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Search-User-By-Name")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,Staff")]
+
         public async Task<IActionResult> SearchUsers([FromQuery] string searchTerm)
         {
             try
@@ -152,7 +157,8 @@ namespace APIS.Controllers
             }
         }
         [HttpPut("Update-User/{id}")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
         public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UserUpdateDTO updateDto)
         {
             try
@@ -171,7 +177,8 @@ namespace APIS.Controllers
             }
         }
         [HttpGet("Get-User-Detail/{id}")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
         public async Task<IActionResult> GetUserDetail(Guid id)
         {
             try
@@ -203,7 +210,7 @@ namespace APIS.Controllers
             }
         }
         [HttpGet("current")]
-        [Authorize] // Requires authentication
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> GetCurrentUser()
         {
             try
@@ -225,6 +232,93 @@ namespace APIS.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving current user");
+                return StatusCode(500, new { message = "An error occurred while retrieving user information" });
+            }
+        }
+
+        [HttpGet("search-by-fullname/{fullName}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
+        public async Task<IActionResult> GetUsersByFullName(string fullName)
+        {
+            try
+            {
+                if (!User.IsInRole("Admin") && !User.IsInRole("Staff"))
+                {
+                    return Unauthorized(new { message = "Unauthorized access" });
+                }
+
+                if (string.IsNullOrWhiteSpace(fullName))
+                {
+                    return BadRequest(new { message = "Full name cannot be empty" });
+                }
+
+                var users = await _userService.GetUsersByFullNameAsync(fullName);
+                if (!users.Any())
+                {
+                    return NoContent();
+                }
+
+                var response = new
+                {
+                    searchTerm = fullName,
+                    totalResults = users.Count(),
+                    users = users.Select(u => new
+                    {
+                        u.UserId,
+                        u.Username,
+                        u.Email,
+                        u.FullName,
+                        u.Phone,
+                        u.UserIdCard,
+                        DateOfBirth = u.DateOfBirth?.ToString("yyyy-MM-dd"),
+                        u.Role
+                    })
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error searching users by full name: {FullName}", fullName);
+                return StatusCode(500, new { message = "An error occurred while searching users" });
+            }
+        }
+        [HttpGet("get-by-idcard/{userIdCard}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
+        public async Task<IActionResult> GetByUserIdCard(string userIdCard)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(userIdCard))
+                {
+                    return BadRequest(new { message = "UserIdCard cannot be empty" });
+                }
+
+                var user = await _userService.GetByUserIdCardAsync(userIdCard);
+                if (user == null)
+                {
+                    return NotFound(new { message = "User not found" });
+                }
+
+                var response = new
+                {
+                    userId = user.UserId,
+                    username = user.Username,
+                    email = user.Email,
+                    fullName = user.FullName,
+                    phone = user.Phone,
+                    userIdCard = user.UserIdCard,
+                    dateOfBirth = user.DateOfBirth?.ToString("yyyy-MM-dd"),
+                    role = user.Role
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving user by UserIdCard: {UserIdCard}", userIdCard);
                 return StatusCode(500, new { message = "An error occurred while retrieving user information" });
             }
         }

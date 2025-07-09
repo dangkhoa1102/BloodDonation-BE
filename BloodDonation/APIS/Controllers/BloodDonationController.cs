@@ -4,6 +4,8 @@ using Models.DTOs;
 using Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 
 namespace APIS.Controllers
 {
@@ -46,6 +48,7 @@ namespace APIS.Controllers
         }
 
         [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<BloodDonationDto>> Create([FromBody] CreateBloodDonationDto dto)
         {
             var userIdClaim = User.FindFirst("UserId") ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
@@ -59,6 +62,7 @@ namespace APIS.Controllers
         }
 
         [HttpPost("sync")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<BloodDonationDto>> CreateWithSync(CreateBloodDonationDto dto)
         {
             try
@@ -79,6 +83,7 @@ namespace APIS.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> Update(Guid id, UpdateBloodDonationDto dto)
         {
             var result = await _service.UpdateAsync(id, dto);
@@ -88,6 +93,7 @@ namespace APIS.Controllers
         }
 
         [HttpPatch("{id}/status/{status}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> UpdateStatus(Guid id, string status)
         {
             var result = await _service.UpdateStatusAsync(id, status);
@@ -97,12 +103,33 @@ namespace APIS.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var result = await _service.DeleteAsync(id);
             if (!result)
                 return NotFound();
             return NoContent();
+        }
+
+        [HttpPost("approve-blood-donation")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> ApproveBloodDonation([FromBody] ApproveBloodDonationDTO dto)
+        {
+            var result = await _service.ApproveDonationAsync(dto.DonationId, dto.ApproveDate);
+            if (!result)
+                return NotFound(new { message = "Donation not found" });
+            return Ok(new { message = "Blood donation approved successfully." });
+        }
+
+        [HttpPost("reject-blood-donation")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> RejectBloodDonation([FromBody] RejectBloodDonationDTO dto)
+        {
+            var result = await _service.RejectDonationAsync(dto.DonationId, dto.RejectionReason, dto.RejectionDate);
+            if (!result)
+                return NotFound(new { message = "Donation not found" });
+            return Ok(new { message = "Blood donation rejected successfully." });
         }
     }
 }

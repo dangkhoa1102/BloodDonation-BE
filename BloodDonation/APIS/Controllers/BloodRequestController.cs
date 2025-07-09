@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.DTOs;
@@ -65,7 +66,8 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-All-Request")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff")]
+
         public async Task<IActionResult> GetAllRequests()
         {
             try
@@ -86,7 +88,8 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-Request-By-Id/{id}")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff")]
+
         public async Task<IActionResult> GetRequestById(Guid id)
         {
             try
@@ -107,7 +110,8 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-Request-By-status/{status}")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff")]
+
         public async Task<IActionResult> GetRequestsByStatus([FromRoute] BloodRequestStatus status)
         {
             try
@@ -133,7 +137,8 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-Request-By-Recipient-Name/{recipientName}")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff")]
+
         public async Task<IActionResult> GetRequestsByRecipientName([FromRoute] string recipientName)
         {
             try
@@ -173,7 +178,8 @@ namespace APIS.Controllers
             }
         }
         [HttpGet("Get-My-Requests")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Member")]
+
         public async Task<IActionResult> GetMyRequests()
         {
             try
@@ -224,7 +230,8 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-My-Requests-By-Status/{status}")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Member")]
+
         public async Task<IActionResult> GetMyRequestsByStatus([FromRoute] BloodRequestStatus status)
         {
             try
@@ -275,7 +282,8 @@ namespace APIS.Controllers
             }
         }
         [HttpPut("Update-Blood-Requests/{id}")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff")]
+
         public async Task<IActionResult> UpdateBloodRequest(Guid id, [FromBody] BloodRequestUpdateDTO updateDto)
         {
             try
@@ -300,7 +308,8 @@ namespace APIS.Controllers
             }
         }
         [HttpPost("reject-blood-request")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff")]
+
         public async Task<IActionResult> RejectBloodRequest([FromBody] BloodRequestRejectDTO rejectDto)
         {
             try
@@ -326,7 +335,8 @@ namespace APIS.Controllers
         }
 
         [HttpPost("approve-blood-request")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff")]
+
         public async Task<IActionResult> ApproveBloodRequest(Guid requestId)
         {
             try
@@ -348,7 +358,8 @@ namespace APIS.Controllers
             }
         }
         [HttpPost("register-emergency")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff")]
+
         public async Task<IActionResult> RegisterEmergencyRequest([FromBody] EmergencyBloodRequestDTO request)
         {
             try

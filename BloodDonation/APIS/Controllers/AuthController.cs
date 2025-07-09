@@ -4,6 +4,9 @@ using Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 
 namespace APIS.Controllers
 {
@@ -126,5 +129,70 @@ namespace APIS.Controllers
                 return StatusCode(500, new { message = "An error occurred during logout" });
             }
         }
+
+        // ====== GOOGLE LOGIN API ======
+        [HttpGet("login-google")]
+        public IActionResult LoginWithGoogle()
+        {
+            // Redirect về FE route trung gian, không phải /register
+            var redirectUrl = "http://localhost:5173/google-callback";
+            var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+        }
+
+
+        [HttpGet("google-response")]
+        public async Task<IActionResult> GoogleResponse()
+        {
+            var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            if (!result.Succeeded || result.Principal == null)
+            {
+                return Unauthorized(new { message = "Google authentication failed" });
+            }
+
+            var email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
+            var name = result.Principal.FindFirst(ClaimTypes.Name)?.Value;
+
+            if (string.IsNullOrEmpty(email))
+            {
+                return BadRequest(new { message = "Cannot retrieve email from Google account" });
+            }
+
+            var user = await _authService.GetUserByEmailAsync(email);
+
+            if (user == null)
+            {
+                // Chưa có tài khoản, FE sẽ xử lý đăng ký
+                return Ok(new
+                {
+                    needRegister = true,
+                    message = "Email chưa có tài khoản, vui lòng đăng ký.",
+                    email,
+                    name
+                });
+            }
+
+            var (success, message, token) = await _authService.LoginWithGoogleAsync(email, name);
+
+            if (!success)
+            {
+                return BadRequest(new { message });
+            }
+
+            // Đã có tài khoản, trả về token cho FE
+            return Ok(new
+            {
+                needRegister = false,
+                message = "Google login successful",
+                email,
+                name,
+                token
+            });
+        }
+
+
+
+
     }
 }

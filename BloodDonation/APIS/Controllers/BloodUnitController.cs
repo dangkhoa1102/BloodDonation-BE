@@ -1,12 +1,14 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Models.DTOs;
 using Services.Interfaces;
 
 namespace APIS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class BloodUnitController : ControllerBase
     {
         private readonly IBloodUnitService _bloodUnitService;
@@ -125,6 +127,25 @@ namespace APIS.Controllers
             {
                 _logger.LogError(ex, "Error retrieving expired blood units");
                 return StatusCode(500, new { message = "An error occurred while retrieving expired blood units" });
+            }
+        }
+        [HttpPatch("Update-Blood-Unit/{id}")]
+        [Authorize(Roles = "Admin,Staff")]
+        public async Task<IActionResult> UpdateBloodUnit(Guid id, [FromBody] UpdateBloodUnitDTO dto)
+        {
+            try
+            {
+                var (success, message) = await _bloodUnitService.UpdateBloodUnitAsync(id, dto);
+
+                if (!success)
+                    return BadRequest(new { message });
+
+                return Ok(new { message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating blood unit {Id}", id);
+                return StatusCode(500, new { message = "An error occurred while updating the blood unit" });
             }
         }
     }

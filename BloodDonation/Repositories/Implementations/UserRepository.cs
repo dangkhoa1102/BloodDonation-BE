@@ -17,8 +17,13 @@ namespace Repositories.Implementations
 
         public async Task<User> GetByEmailAsync(string email)
         {
-            return await _dbSet.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+            if (string.IsNullOrWhiteSpace(email))
+                return null;
+
+            var normalizedEmail = email.Trim().ToLower();
+            return await _dbSet.FirstOrDefaultAsync(u => u.Email.Trim().ToLower() == normalizedEmail);
         }
+
 
         public async Task<User> GetByUsernameAsync(string username)
         {
@@ -38,6 +43,19 @@ namespace Repositories.Implementations
         public async Task<IEnumerable<User>> GetUsersByRoleAsync(string role)
         {
             return await _dbSet.Where(u => u.Role == role).ToListAsync();
+        }
+
+        public async Task<IEnumerable<User>> GetUsersByFullNameAsync(string fullName)
+        {
+            return await _dbSet
+                .Where(u => u.FullName.ToLower().Contains(fullName.ToLower()))
+                .OrderBy(u => u.FullName)
+                .ToListAsync();
+        }
+        public async Task<User> GetByUserIdCardAsync(string userIdCard)
+        {
+            return await _dbSet
+                .FirstOrDefaultAsync(u => u.UserIdCard.Equals(userIdCard));
         }
     }
 }

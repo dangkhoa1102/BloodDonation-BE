@@ -17,8 +17,12 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using System.Globalization;
 using APIS.Helpers;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var googleSection = builder.Configuration.GetSection("Authentication:Google");
 
 builder.Services.AddDbContext<BloodDonationSupportContext>(options =>
 {
@@ -67,6 +71,71 @@ builder.Services.AddScoped<IBloodComponentRepository, BloodComponentRepository>(
 builder.Services.AddScoped<IBloodManagementService, BloodManagementService>();
 builder.Services.AddScoped<IBloodUnitRepository, BloodUnitRepository>();
 builder.Services.AddScoped<IBloodUnitService, BloodUnitService>();
+
+// đăng kí cho lịch hiến máu
+builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+
+//cấu hình cho đăng nhập Google
+builder.Services.AddScoped<IJwtService, JwtService>();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+})
+.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
+.AddGoogle(options =>
+{
+    options.ClientId = googleSection["ClientId"];
+    options.ClientSecret = googleSection["ClientSecret"];
+    options.Scope.Add("email");
+    options.Scope.Add("profile");
+    // options.CallbackPath = "/signin-google";
+})
+    .AddJwtBearer(options =>
+    {
+        options.SaveToken = true;
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ClockSkew = TimeSpan.Zero,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ??
+                throw new InvalidOperationException("JWT Key is not configured")))
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                {
+                    context.Response.Headers.Add("Token-Expired", "true");
+                }
+                return Task.CompletedTask;
+            },
+            OnChallenge = async context =>
+            {
+                context.HandleResponse();
+                context.Response.StatusCode = 401;
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsJsonAsync(new { message = "You are not authorized" });
+            },
+            OnForbidden = async context =>
+            {
+                context.Response.StatusCode = 403;
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsJsonAsync(new { message = "You do not have permission to access this resource" });
+            }
+        };
+    });
+
 // Add controllers with JSON options
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -86,57 +155,6 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("RequireAdminOrStaffRole", policy => policy.RequireRole("Admin", "Staff"));
     options.AddPolicy("RequireCustomerRole", policy => policy.RequireRole("Customer"));
 });
-
-// Configure JWT Authentication
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
-    options.SaveToken = true;
-    options.RequireHttpsMetadata = false;
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ClockSkew = TimeSpan.Zero,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ??
-            throw new InvalidOperationException("JWT Key is not configured")))
-    };
-
-    options.Events = new JwtBearerEvents
-    {
-        OnAuthenticationFailed = context =>
-        {
-            if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
-            {
-                context.Response.Headers.Add("Token-Expired", "true");
-            }
-            return Task.CompletedTask;
-        },
-        OnChallenge = async context =>
-        {
-            context.HandleResponse();
-            context.Response.StatusCode = 401;
-            context.Response.ContentType = "application/json";
-            await context.Response.WriteAsJsonAsync(new { message = "You are not authorized" });
-        },
-        OnForbidden = async context =>
-        {
-            context.Response.StatusCode = 403;
-            context.Response.ContentType = "application/json";
-            await context.Response.WriteAsJsonAsync(new { message = "You do not have permission to access this resource" });
-        }
-    };
-});
-
 
 
 // Configure Swagger with JWT support
@@ -250,6 +268,8 @@ app.UseCors(x => x
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseTokenValidation();
+
+
 
 app.MapControllers();
 
