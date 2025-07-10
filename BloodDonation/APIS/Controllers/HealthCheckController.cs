@@ -64,7 +64,15 @@ namespace APIS.Controllers
         {
             try
             {
-                await _service.ApproveHealthCheckAsync(healthCheckId);
+                // Lấy staffId từ claim
+                var staffIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(staffIdClaim) || !Guid.TryParse(staffIdClaim, out var staffId))
+                {
+                    return Unauthorized(new { message = "Không xác định được StaffId" });
+                }
+
+
+                await _service.ApproveHealthCheckAsync(healthCheckId, staffId);
                 return Ok(new { message = "Duyệt Phiếu Sức Khỏe thành công!" });
             }
             catch (Exception ex)

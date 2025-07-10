@@ -82,7 +82,7 @@ namespace Services
         public async Task<List<Guid>> GetAvailableDonorIdsAsync()
             => await _repo.GetAvailableDonorIdsAsync();
 
-        public async Task ApproveHealthCheckAsync(Guid healthCheckId)
+        public async Task ApproveHealthCheckAsync(Guid healthCheckId, Guid staffId)
         {
             var healthCheck = await _repo.GetByIdAsync(healthCheckId);
             if (healthCheck == null) throw new Exception("Không tìm thấy HealthCheck");
@@ -104,6 +104,26 @@ namespace Services
             // 1. Cập nhật trạng thái
             donation.Status = "Completed";
             _context.BloodDonations.Update(donation);
+
+            // --- Tạo Certificate mới ---
+            var now = DateTime.Now;
+            var certificate = new Certificate
+            {
+                CertificateId = Guid.NewGuid(),
+                DonorId = donor.DonorId,
+                DonationId = donation.DonationId,
+                StaffId = staffId,
+                CertificateType = "Blood Donation", // hoặc loại phù hợp
+                CertificateNumber = Guid.NewGuid().ToString().Substring(0, 8).ToUpper(), // hoặc logic sinh số certificate
+                IssueDate = DateOnly.FromDateTime(now),
+                CreatedDate = now,
+                LastModified = now
+            };
+            _context.Add(certificate);
+
+            // Gán CertificateId cho BloodDonation và DonationHistory
+            donation.CertificateId = certificate.CertificateId;
+
 
             // 2. Tạo DonationHistory mới
             var nextEligibleDate = donation.DonationDate!.Value.AddDays(84);

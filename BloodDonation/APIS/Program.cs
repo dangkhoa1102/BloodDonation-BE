@@ -72,6 +72,9 @@ builder.Services.AddScoped<IBloodManagementService, BloodManagementService>();
 builder.Services.AddScoped<IBloodUnitRepository, BloodUnitRepository>();
 builder.Services.AddScoped<IBloodUnitService, BloodUnitService>();
 
+//đăng kí DI cho Certificate
+builder.Services.AddScoped<ICertificateService, CertificateService>();
+
 // đăng kí cho lịch hiến máu
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 

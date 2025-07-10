@@ -131,7 +131,7 @@ namespace APIS.Controllers
             }
         }
         [HttpPatch("Update-Blood-Unit/{id}")]
-        [Authorize(Roles = "Admin,Staff")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,Staff")]
         public async Task<IActionResult> UpdateBloodUnit(Guid id, [FromBody] UpdateBloodUnitDTO dto)
         {
             try
