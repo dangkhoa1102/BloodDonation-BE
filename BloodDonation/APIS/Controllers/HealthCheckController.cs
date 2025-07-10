@@ -56,5 +56,21 @@ namespace APIS.Controllers
         [HttpGet("available-donor-ids")]
         public async Task<IActionResult> GetAvailableDonorIds()
             => Ok(await _service.GetAvailableDonorIdsAsync());
+
+        // API duyệt HealthCheck
+        [HttpPost("approve/{healthCheckId}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff,Admin")]
+        public async Task<IActionResult> Approve(Guid healthCheckId)
+        {
+            try
+            {
+                await _service.ApproveHealthCheckAsync(healthCheckId);
+                return Ok(new { message = "Duyệt Phiếu Sức Khỏe thành công!" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }
