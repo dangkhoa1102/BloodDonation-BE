@@ -102,6 +102,10 @@ namespace Services
             donation.Status = "Completed";
             _context.BloodDonations.Update(donation);
 
+            // 2. Cập nhật trạng thái HealthCheck
+            healthCheck.HealthCheckStatus = "Approved";
+            await _repo.UpdateAsync(healthCheck);
+
             // 2. Tạo BloodUnit mới
             var expiryDate = healthCheck.HealthCheckDate.AddDays(35); // Ví dụ: 35 ngày cho máu toàn phần
             var bloodUnit = new BloodUnit
