@@ -10,5 +10,8 @@ namespace Services.Interfaces
         Task<IEnumerable<BloodUnitResponseDTO>> GetBloodUnitsByComponentAsync(Guid componentId);
         Task<IEnumerable<BloodUnitResponseDTO>> GetBloodUnitsByStatusAsync(string status);
         Task<IEnumerable<BloodUnitResponseDTO>> GetExpiredBloodUnitsAsync();
+
+        
+
     }
 }
