@@ -87,6 +87,9 @@ namespace Services
             var healthCheck = await _repo.GetByIdAsync(healthCheckId);
             if (healthCheck == null) throw new Exception("Không tìm thấy HealthCheck");
 
+            // 2. Cập nhật trạng thái HealthCheck
+            healthCheck.HealthCheckStatus = "Approved";
+            await _repo.UpdateAsync(healthCheck);
             // Tìm Donor
             var donor = await _donorRepo.GetByIdAsync(healthCheck.DonorId);
             if (donor == null) throw new Exception("Không tìm thấy Donor");
@@ -102,8 +105,22 @@ namespace Services
             donation.Status = "Completed";
             _context.BloodDonations.Update(donation);
 
-            // 2. Tạo BloodUnit mới
-            var expiryDate = healthCheck.HealthCheckDate.AddDays(35); // Ví dụ: 35 ngày cho máu toàn phần
+            // 2. Tạo DonationHistory mới
+            var nextEligibleDate = donation.DonationDate!.Value.AddDays(84);
+            var donationHistory = new DonationHistory
+            {
+                HistoryId = Guid.NewGuid(),
+                DonorId = donation.DonorId,
+                DonationDate = donation.DonationDate,
+                Quantity = donation.Quantity ?? 0,
+                HealthStatus = "Hiến máu thành công",
+                NextEligibleDate = nextEligibleDate,
+                CertificateId = donation.CertificateId
+            };
+            _context.DonationHistories.Add(donationHistory);
+
+            // 3. Tạo BloodUnit mới
+            var expiryDate = healthCheck.HealthCheckDate.AddDays(84); // 84 ngày cho máu toàn phần
             var bloodUnit = new BloodUnit
             {
                 UnitId = Guid.NewGuid(),
@@ -112,11 +129,12 @@ namespace Services
                 ComponentType = null, // Chưa biết, staff sẽ cập nhật sau
                 Status = "available",
                 ExpiryDate = expiryDate,
-                Quantity = donation.Quantity ?? 0, 
+                Quantity = donation.Quantity ?? 0,
             };
             _context.BloodUnits.Add(bloodUnit);
 
             await _context.SaveChangesAsync();
         }
+
     }
 }

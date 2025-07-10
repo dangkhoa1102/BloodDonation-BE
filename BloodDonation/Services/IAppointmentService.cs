@@ -11,6 +11,7 @@ namespace Services
     {
         
         Task<bool> UpdateDonationDateAsync(UpdateDonationDateDTO dto);
-        Task<BloodDonationProcessDTO> GetLatestDonationProcessByDonorIdAsync(Guid donorId);
+        Task<BloodDonationProcessDTO> GetLatestDonationProcessByDonorIdAsync(Guid donorId);        
+
     }
 }
