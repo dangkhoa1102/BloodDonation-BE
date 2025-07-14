@@ -12,17 +12,20 @@ public class BloodRequestService : IBloodRequestService
     private readonly IBloodRequestRepository _requestRepository;
     private readonly IBloodRecipientRepository _recipientRepository;
     private readonly IUserRepository _userRepository;
+    private readonly IBloodTypeRepository _bloodTypeRepository;
     private readonly ILogger<BloodRequestService> _logger;
 
     public BloodRequestService(
         IBloodRequestRepository requestRepository,
         IBloodRecipientRepository recipientRepository,
         IUserRepository userRepository,
+        IBloodTypeRepository bloodTypeRepository,
         ILogger<BloodRequestService> logger)
     {
         _requestRepository = requestRepository;
         _recipientRepository = recipientRepository;
         _userRepository = userRepository;
+        _bloodTypeRepository = bloodTypeRepository;
         _logger = logger;
     }
 
@@ -325,9 +328,17 @@ public class BloodRequestService : IBloodRequestService
                 return (false, "Invalid staff member", null);
             }
 
-            // Chỉ tìm user dựa trên email
-            var existingUser = await _userRepository.GetByEmailAsync(request.Email);
+            // Check blood inventory first
+            var bloodTypeId = request.BloodTypeRequired;
+            var quantityNeeded = request.QuantityNeeded;
+            var availableBloodUnits = await _bloodTypeRepository.GetAvailableUnitsCountAsync(bloodTypeId);
 
+            var initialStatus = availableBloodUnits >= quantityNeeded 
+                ? BloodRequestStatus.Pending.ToString()  // Có đủ máu trong kho
+                : BloodRequestStatus.Opened.ToString();   // Không đủ máu, cần hiển thị lên UI
+
+            // Create or update user
+            var existingUser = await _userRepository.GetByEmailAsync(request.Email);
             if (existingUser == null)
             {
                 existingUser = new User
@@ -339,18 +350,16 @@ public class BloodRequestService : IBloodRequestService
                     FullName = request.PatientName,
                     UserIdCard = request.UserIdCard,
                     Phone = request.Phone,
-                    DateOfBirth = request.DateOfBirth, // Add this line to include DateOfBirth
+                    DateOfBirth = request.DateOfBirth,
                     Role = UserRoles.Member.ToString()
                 };
 
                 await _userRepository.AddAsync(existingUser);
                 await _userRepository.SaveChangesAsync();
-
                 _logger.LogInformation("Created new user with ID: {UserId}", existingUser.UserId);
             }
             else
             {
-                // Update existing user's information if needed
                 existingUser.FullName = request.PatientName;
                 existingUser.UserIdCard = request.UserIdCard;
                 existingUser.Phone = request.Phone;
@@ -358,12 +367,11 @@ public class BloodRequestService : IBloodRequestService
                 {
                     existingUser.DateOfBirth = request.DateOfBirth;
                 }
-                
                 await _userRepository.SaveChangesAsync();
                 _logger.LogInformation("Updated existing user information for ID: {UserId}", existingUser.UserId);
             }
 
-            // Rest of the code remains the same...
+            // Create or get recipient
             var recipient = await _recipientRepository.GetByUserIdAsync(existingUser.UserId);
             if (recipient == null)
             {
@@ -375,10 +383,10 @@ public class BloodRequestService : IBloodRequestService
                 };
                 await _recipientRepository.AddAsync(recipient);
                 await _recipientRepository.SaveChangesAsync();
-
                 _logger.LogInformation("Created new recipient with ID: {RecipientId}", recipient.RecipientId);
             }
 
+            // Create emergency blood request
             var bloodRequest = new BloodRequest
             {
                 RequestId = Guid.NewGuid(),
@@ -387,31 +395,106 @@ public class BloodRequestService : IBloodRequestService
                 QuantityNeeded = request.QuantityNeeded,
                 UrgencyLevel = "Emergency",
                 RequestDate = DateOnly.FromDateTime(DateTime.UtcNow),
-                Status = BloodRequestStatus.Pending.ToString(),
-                Description = request.Description
+                Status = initialStatus,
+                Description = $"Emergency request. Available units: {availableBloodUnits}. {request.Description}"
             };
 
             await _requestRepository.AddAsync(bloodRequest);
             await _requestRepository.SaveChangesAsync();
 
-            _logger.LogInformation("Created emergency blood request with ID: {RequestId}", bloodRequest.RequestId);
+            _logger.LogInformation(
+                "Created emergency blood request with ID: {RequestId}, Status: {Status}, Available Units: {AvailableUnits}",
+                bloodRequest.RequestId, initialStatus, availableBloodUnits);
+
+            // Create notification
+            var notificationMessage = initialStatus == BloodRequestStatus.Pending.ToString()
+                ? $"Emergency blood request has been created with sufficient blood in inventory. Request ID: {bloodRequest.RequestId}"
+                : $"Emergency blood request has been created and opened for donors. Request ID: {bloodRequest.RequestId}";
 
             var notification = new Notification
             {
                 NotificationId = Guid.NewGuid(),
                 UserId = existingUser.UserId,
                 NotificationType = "Emergency Blood Request",
-                Message = $"Emergency blood request has been created. Request ID: {bloodRequest.RequestId}",
+                Message = notificationMessage,
                 SendDate = DateOnly.FromDateTime(DateTime.Now),
                 IsRead = false
             };
 
-            return (true, "Emergency blood request created successfully", bloodRequest.RequestId);
+            return (true, $"Emergency blood request created successfully with status: {initialStatus}", bloodRequest.RequestId);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating emergency blood request");
             return (false, $"An error occurred: {ex.Message}", null);
+        }
+    }
+    private bool IsValidStatusTransition(BloodRequestStatus currentStatus, BloodRequestStatus newStatus)
+    {
+        return (currentStatus, newStatus) switch
+        {
+            (BloodRequestStatus.Draft, BloodRequestStatus.Pending) => true,
+            (BloodRequestStatus.Pending, BloodRequestStatus.Opened) => true,
+            (BloodRequestStatus.Pending, BloodRequestStatus.Approved) => true,
+            (BloodRequestStatus.Pending, BloodRequestStatus.Rejected) => true,
+            (BloodRequestStatus.Opened, BloodRequestStatus.Approved) => true,
+            (BloodRequestStatus.Opened, BloodRequestStatus.Rejected) => true,
+            (BloodRequestStatus.Approved, BloodRequestStatus.Done) => true,
+            (BloodRequestStatus.Approved, BloodRequestStatus.Closed) => true,
+            (BloodRequestStatus.Done, BloodRequestStatus.Closed) => true,
+            _ => false
+        };
+    }
+    public async Task<(bool success, string message)> UpdateRequestStatusAsync(
+    Guid requestId,
+    BloodRequestStatus newStatus,
+    Guid userId)
+    {
+        try
+        {
+            var request = await _requestRepository.GetByIdWithDetailsAsync(requestId);
+            if (request == null)
+            {
+                return (false, "Blood request not found");
+            }
+
+            // Parse current status
+            if (!Enum.TryParse<BloodRequestStatus>(request.Status, out var currentStatus))
+            {
+                return (false, "Invalid current status");
+            }
+
+            // Validate status transition
+            if (!IsValidStatusTransition(currentStatus, newStatus))
+            {
+                return (false, $"Invalid status transition from {currentStatus} to {newStatus}");
+            }
+
+            // Update status
+            request.Status = newStatus.ToString();
+
+            // Create notification
+            var notification = new Notification
+            {
+                NotificationId = Guid.NewGuid(),
+                UserId = request.Recipient?.UserId,
+                NotificationType = "Blood Request Status Update",
+                Message = $"Your blood request (ID: {requestId}) status has been updated to {newStatus}",
+                SendDate = DateOnly.FromDateTime(DateTime.Now),
+                IsRead = false
+            };
+
+            // Save changes
+            _requestRepository.Update(request);
+            await _requestRepository.SaveChangesAsync();
+
+            return (true, $"Blood request status updated to {newStatus} successfully");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating blood request {RequestId} status to {NewStatus}",
+                requestId, newStatus);
+            return (false, "An error occurred while updating the request status");
         }
     }
 }

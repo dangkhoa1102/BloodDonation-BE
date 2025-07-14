@@ -7,6 +7,7 @@ using Models.Enums;
 using Services;
 using System.Security.Claims;
 
+
 namespace APIS.Controllers
 {
     [Route("api/[controller]")]
@@ -412,6 +413,43 @@ namespace APIS.Controllers
             {
                 _logger.LogError(ex, "Error processing emergency blood request");
                 return StatusCode(500, new { message = "An error occurred while processing the emergency request" });
+            }
+        }
+        [HttpPut("update-emergency-status/{requestId}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> UpdateEmergencyStatus(
+        Guid requestId,
+        [FromBody] UpdateRequestStatusDTO updateDto)
+        {
+            try
+            {
+                var staffId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? throw new InvalidOperationException("Staff ID not found in token"));
+
+                var (success, message) = await _bloodRequestService.UpdateRequestStatusAsync(
+                    requestId,
+                    updateDto.NewStatus,
+                    staffId);
+
+                if (!success)
+                    return BadRequest(new { message });
+
+                return Ok(new
+                {
+                    message,
+                    updatedStatus = new
+                    {
+                        id = (int)updateDto.NewStatus,
+                        name = updateDto.NewStatus.ToString()
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating emergency request status");
+                return StatusCode(500, new { message = "An error occurred while updating the request status" });
             }
         }
     }
