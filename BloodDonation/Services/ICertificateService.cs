@@ -15,4 +15,5 @@ namespace Services
         Task<bool> UpdateAsync(Guid id, UpdateCertificateDto dto);
         Task<bool> DeleteAsync(Guid id);
     }
+
 }
