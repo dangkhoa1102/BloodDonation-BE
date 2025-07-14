@@ -54,6 +54,19 @@ namespace Services
                 HealthCheckDate = dto.HealthCheckDate,
                 HealthCheckStatus = dto.HealthCheckStatus
             };
+
+            //// Tìm BloodDonation theo DonorId và HealthCheckDate
+            var bloodDonation = await _context.BloodDonations
+        .FirstOrDefaultAsync(b => b.DonorId == donor.DonorId && b.DonationDate == dto.HealthCheckDate);
+
+            // Nếu tìm thấy và DTO có Quantity thì cập nhật
+            if (bloodDonation != null && dto.Quantity.HasValue)
+            {
+                bloodDonation.Quantity = dto.Quantity.Value;
+                _context.BloodDonations.Update(bloodDonation);
+                await _context.SaveChangesAsync();
+            }
+
             return await _repo.AddAsync(entity);
         }
 
