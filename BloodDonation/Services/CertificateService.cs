@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Models.DTOs;
 using Models;
 using Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Services
 {
@@ -13,46 +14,86 @@ namespace Services
     // Service Implementation
     public class CertificateService : ICertificateService
     {
-        private readonly IGenericRepository<Certificate> _repository;
+        private readonly BloodDonationSupportContext _context;
 
-        public CertificateService(IGenericRepository<Certificate> repository)
+        public CertificateService(BloodDonationSupportContext context)
         {
-            _repository = repository;
+            _context = context;
         }
 
         public async Task<IEnumerable<CertificateDto>> GetAllAsync()
         {
-            var entities = await _repository.GetAllAsync();
-            return entities.Select(x => new CertificateDto
-            {
-                CertificateId = x.CertificateId,
-                DonorId = x.DonorId,
-                DonationId = x.DonationId,
-                StaffId = x.StaffId,
-                CertificateNumber = x.CertificateNumber,
-                IssueDate = x.IssueDate,
-                CertificateType = x.CertificateType
-            });
+            return await _context.Certificates
+                .Include(c => c.Donor)
+                    .ThenInclude(d => d.User)
+                .Include(c => c.Donor)
+                    .ThenInclude(d => d.BloodType)
+                .Include(c => c.Donation)
+                .Select(c => new CertificateDto
+                {
+                    CertificateId = c.CertificateId,
+                    DonorId = c.DonorId,
+                    DonationId = c.DonationId,
+                    StaffId = c.StaffId,
+                    CertificateNumber = c.CertificateNumber,
+                    IssueDate = c.IssueDate,
+                    CertificateType = c.CertificateType,
+                    CreatedDate = c.CreatedDate,
+                    LastModified = c.LastModified,
+
+                    // Thông tin mở rộng
+                    FullName = c.Donor != null ? c.Donor.FullName : null,
+                    UserIdCard = c.Donor != null && c.Donor.User != null ? c.Donor.User.UserIdCard : null,
+                    DateOfBirth = c.Donor != null && c.Donor.User != null ? c.Donor.User.DateOfBirth : null,
+                    Address = c.Donor != null && c.Donor.User != null ? c.Donor.Address : null,
+                    Quantity = c.Donation != null ? c.Donation.Quantity : null,
+                    BloodType = c.Donor != null && c.Donor.BloodType != null
+                            ? c.Donor.BloodType.AboType + c.Donor.BloodType.RhFactor
+                            : null,
+                    BloodDonationDate = c.Donation != null ? c.Donation.DonationDate : null
+                })
+                .ToListAsync();
         }
 
         public async Task<CertificateDto?> GetByIdAsync(Guid id)
         {
-            var entity = await _repository.GetByIdAsync(id);
-            if (entity == null) return null;
+            var c = await _context.Certificates
+                .Include(c => c.Donor)
+                    .ThenInclude(d => d.User)
+                .Include(c => c.Donor)
+                    .ThenInclude(d => d.BloodType)
+                .Include(c => c.Donation)
+                .FirstOrDefaultAsync(c => c.CertificateId == id);
+
+            if (c == null) return null;
+
             return new CertificateDto
             {
-                CertificateId = entity.CertificateId,
-                DonorId = entity.DonorId,
-                DonationId = entity.DonationId,
-                StaffId = entity.StaffId,
-                CertificateNumber = entity.CertificateNumber,
-                IssueDate = entity.IssueDate,
-                CertificateType = entity.CertificateType
+                CertificateId = c.CertificateId,
+                DonorId = c.DonorId,
+                DonationId = c.DonationId,
+                StaffId = c.StaffId,
+                CertificateNumber = c.CertificateNumber,
+                IssueDate = c.IssueDate,
+                CertificateType = c.CertificateType,
+                CreatedDate = c.CreatedDate,
+                LastModified = c.LastModified,
+
+                FullName = c.Donor != null ? c.Donor.FullName : null,
+                UserIdCard = c.Donor != null && c.Donor.User != null ? c.Donor.User.UserIdCard : null,
+                DateOfBirth = c.Donor != null && c.Donor.User != null ? c.Donor.User.DateOfBirth : null,
+                Address = c.Donor != null && c.Donor.User != null ? c.Donor.Address : null,
+                Quantity = c.Donation != null ? c.Donation.Quantity : null,
+                BloodType = c.Donor != null && c.Donor.BloodType != null
+                            ? c.Donor.BloodType.AboType + c.Donor.BloodType.RhFactor
+                            : null,
+                BloodDonationDate = c.Donation != null ? c.Donation.DonationDate : null
             };
         }
 
         public async Task<CertificateDto> CreateAsync(CreateCertificateDto dto)
         {
+            var now = DateTime.Now;
             var entity = new Certificate
             {
                 CertificateId = Guid.NewGuid(),
@@ -62,11 +103,11 @@ namespace Services
                 CertificateNumber = dto.CertificateNumber,
                 IssueDate = dto.IssueDate,
                 CertificateType = dto.CertificateType,
-                CreatedDate = DateTime.UtcNow
+                CreatedDate = now,
+                LastModified = now
             };
-
-            await _repository.AddAsync(entity);
-            await _repository.SaveChangesAsync();
+            _context.Certificates.Add(entity);
+            await _context.SaveChangesAsync();
 
             return new CertificateDto
             {
@@ -76,31 +117,34 @@ namespace Services
                 StaffId = entity.StaffId,
                 CertificateNumber = entity.CertificateNumber,
                 IssueDate = entity.IssueDate,
-                CertificateType = entity.CertificateType
+                CertificateType = entity.CertificateType,
+                CreatedDate = entity.CreatedDate,
+                LastModified = entity.LastModified
             };
         }
 
         public async Task<bool> UpdateAsync(Guid id, UpdateCertificateDto dto)
         {
-            var existing = await _repository.GetByIdAsync(id);
-            if (existing == null) return false;
+            var entity = await _context.Certificates.FindAsync(id);
+            if (entity == null) return false;
 
-            existing.CertificateNumber = dto.CertificateNumber;
-            existing.IssueDate = dto.IssueDate;
-            existing.CertificateType = dto.CertificateType;
-            existing.LastModified = DateTime.UtcNow;
+            entity.CertificateNumber = dto.CertificateNumber;
+            entity.IssueDate = dto.IssueDate;
+            entity.CertificateType = dto.CertificateType;
+            entity.LastModified = DateTime.Now;
 
-            _repository.Update(existing);
-            return await _repository.SaveChangesAsync();
+            await _context.SaveChangesAsync();
+            return true;
         }
 
         public async Task<bool> DeleteAsync(Guid id)
         {
-            var existing = await _repository.GetByIdAsync(id);
-            if (existing == null) return false;
-
-            _repository.Remove(existing);
-            return await _repository.SaveChangesAsync();
+            var entity = await _context.Certificates.FindAsync(id);
+            if (entity == null) return false;
+            _context.Certificates.Remove(entity);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
+
 }

@@ -15,4 +15,7 @@ public interface IHealthCheckService
     Task UpdateAsync(Guid id, HealthCheckDTO dto);
     Task DeleteAsync(Guid id);
     Task<List<Guid>> GetAvailableDonorIdsAsync();
+
+    Task ApproveHealthCheckAsync(Guid healthCheckId, Guid staffId);
+
 }

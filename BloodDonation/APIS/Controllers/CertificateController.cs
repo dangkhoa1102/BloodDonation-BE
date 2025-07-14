@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models.DTOs;
 using Services;
@@ -10,28 +12,27 @@ namespace APIS.Controllers
     public class CertificateController : ControllerBase
     {
         private readonly ICertificateService _service;
-
         public CertificateController(ICertificateService service)
         {
             _service = service;
         }
 
         [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> GetAll()
-        {
-            var items = await _service.GetAllAsync();
-            return Ok(items);
-        }
+            => Ok(await _service.GetAllAsync());
 
         [HttpGet("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var item = await _service.GetByIdAsync(id);
-            if (item == null) return NotFound();
-            return Ok(item);
+            var result = await _service.GetByIdAsync(id);
+            if (result == null) return NotFound();
+            return Ok(result);
         }
 
         [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff,Admin")]
         public async Task<IActionResult> Create([FromBody] CreateCertificateDto dto)
         {
             var created = await _service.CreateAsync(dto);
@@ -39,17 +40,21 @@ namespace APIS.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff,Admin")]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCertificateDto dto)
         {
             var success = await _service.UpdateAsync(id, dto);
-            return success ? NoContent() : NotFound();
+            if (!success) return NotFound();
+            return Ok();
         }
 
         [HttpDelete("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff,Admin")]
         public async Task<IActionResult> Delete(Guid id)
         {
             var success = await _service.DeleteAsync(id);
-            return success ? NoContent() : NotFound();
+            if (!success) return NotFound();
+            return Ok();
         }
     }
 
