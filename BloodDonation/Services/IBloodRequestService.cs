@@ -22,5 +22,8 @@ namespace Services
             Guid requestId,
             BloodRequestStatus newStatus,
             Guid staffId);
+       Task<(bool success, string message)> UpdateReceivedQuantityAsync(
+       BloodRequestUpdateQuantityDTO updateDto,
+       Guid staffId);
     }
 }
