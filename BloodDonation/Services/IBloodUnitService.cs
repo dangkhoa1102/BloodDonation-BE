@@ -1,4 +1,5 @@
 ﻿using Models.DTOs;
+using Models.Enums;
 
 namespace Services.Interfaces
 {
@@ -13,5 +14,8 @@ namespace Services.Interfaces
         Task<(bool success, string message)> UpdateBloodUnitAsync(Guid id, UpdateBloodUnitDTO dto);
         Task<Dictionary<string, int>> GetQuantityByBloodTypeAsync();
         Task<int> GetTotalBloodQuantityAsync();
+        Task UpdateExpiredUnitsAsync();
+        Task<(bool success, string message)> MarkUnitAsUsedAsync(Guid unitId, Guid? requestId = null);
+        Task<(bool success, string message)> UpdateBloodUnitStatusAsync(Guid id, BloodUnitStatus newStatus);
     }
 }
