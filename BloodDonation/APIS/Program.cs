@@ -71,6 +71,7 @@ builder.Services.AddScoped<IBloodComponentRepository, BloodComponentRepository>(
 builder.Services.AddScoped<IBloodManagementService, BloodManagementService>();
 builder.Services.AddScoped<IBloodUnitRepository, BloodUnitRepository>();
 builder.Services.AddScoped<IBloodUnitService, BloodUnitService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 //đăng kí DI cho Certificate
 builder.Services.AddScoped<ICertificateService, CertificateService>();
