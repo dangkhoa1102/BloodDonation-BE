@@ -162,5 +162,46 @@ namespace Services.Implementations
                 return (false, $"Error updating blood unit: {ex.Message}");
             }
         }
+        public async Task<Dictionary<string, int>> GetQuantityByBloodTypeAsync()
+        {
+            try
+            {
+                var bloodUnits = await _bloodUnitRepository.GetAllWithDetailsAsync();
+
+                var quantities = bloodUnits
+                    .Where(bu => bu.BloodType != null && bu.Status == "available")
+                    .GroupBy(bu => $"{bu.BloodType.AboType}{bu.BloodType.RhFactor}")
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.Sum(bu => bu.Quantity)
+                    );
+
+                return quantities;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error calculating blood quantities by blood type");
+                throw;
+            }
+        }
+
+        public async Task<int> GetTotalBloodQuantityAsync()
+        {
+            try
+            {
+                var bloodUnits = await _bloodUnitRepository.GetAllWithDetailsAsync();
+
+                var totalQuantity = bloodUnits
+                    .Where(bu => bu.Status == "available")
+                    .Sum(bu => bu.Quantity);
+
+                return totalQuantity;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error calculating total blood quantity");
+                throw;
+            }
+        }
     }
 }

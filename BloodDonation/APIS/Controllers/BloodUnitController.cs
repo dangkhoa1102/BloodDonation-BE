@@ -149,5 +149,33 @@ namespace APIS.Controllers
                 return StatusCode(500, new { message = "An error occurred while updating the blood unit" });
             }
         }
+        [HttpGet("quantities-by-type")]
+        public async Task<IActionResult> GetQuantitiesByBloodType()
+        {
+            try
+            {
+                var quantities = await _bloodUnitService.GetQuantityByBloodTypeAsync();
+                return Ok(quantities);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving blood quantities by type");
+                return StatusCode(500, "An error occurred while retrieving blood quantities");
+            }
+        }
+        [HttpGet("total-quantity")]
+        public async Task<IActionResult> GetTotalQuantity()
+        {
+            try
+            {
+                var totalQuantity = await _bloodUnitService.GetTotalBloodQuantityAsync();
+                return Ok(totalQuantity);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving total blood quantity");
+                return StatusCode(500, "An error occurred while retrieving total blood quantity");
+            }
+        }
     }
 }

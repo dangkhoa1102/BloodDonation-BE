@@ -11,5 +11,7 @@ namespace Services.Interfaces
         Task<IEnumerable<BloodUnitResponseDTO>> GetBloodUnitsByStatusAsync(string status);
         Task<IEnumerable<BloodUnitResponseDTO>> GetExpiredBloodUnitsAsync();
         Task<(bool success, string message)> UpdateBloodUnitAsync(Guid id, UpdateBloodUnitDTO dto);
+        Task<Dictionary<string, int>> GetQuantityByBloodTypeAsync();
+        Task<int> GetTotalBloodQuantityAsync();
     }
 }
