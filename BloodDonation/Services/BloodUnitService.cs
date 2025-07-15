@@ -213,7 +213,7 @@ namespace Services.Implementations
 
                 var expiredUnits = units.Where(u =>
                     u.ExpiryDate <= currentDate &&
-                    u.Status == BloodUnitStatus.Available.ToString());
+                    u.Status.Equals(BloodUnitStatus.Available.ToString(), StringComparison.OrdinalIgnoreCase));
 
                 foreach (var unit in expiredUnits)
                 {
@@ -239,8 +239,9 @@ namespace Services.Implementations
                 if (unit == null)
                     return (false, "Blood unit not found");
 
-                if (unit.Status != BloodUnitStatus.Available.ToString() &&
-                    unit.Status != BloodUnitStatus.Reserved.ToString())
+                // Case-insensitive comparison for status
+                if (!unit.Status.Equals(BloodUnitStatus.Available.ToString(), StringComparison.OrdinalIgnoreCase) &&
+                    !unit.Status.Equals(BloodUnitStatus.Reserved.ToString(), StringComparison.OrdinalIgnoreCase))
                 {
                     return (false, $"Cannot mark unit as used. Current status: {unit.Status}");
                 }
@@ -266,11 +267,16 @@ namespace Services.Implementations
 
         private bool ValidateStatusTransition(string currentStatus, string newStatus)
         {
-            if (!Enum.TryParse<BloodUnitStatus>(currentStatus, out var current) ||
-                !Enum.TryParse<BloodUnitStatus>(newStatus, out var next))
+            // Convert cả hai status về cùng format để so sánh (title case)
+            if (!Enum.TryParse<BloodUnitStatus>(currentStatus, true, out var current) ||
+                !Enum.TryParse<BloodUnitStatus>(newStatus, true, out var next))
             {
                 return false;
             }
+
+            // Chuyển đổi cả hai giá trị về chuỗi chuẩn từ enum để đảm bảo định dạng nhất quán
+            currentStatus = current.ToString();
+            newStatus = next.ToString();
 
             return (current, next) switch
             {
