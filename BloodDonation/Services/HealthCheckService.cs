@@ -123,9 +123,13 @@ namespace Services
             if (donor == null) throw new Exception("Không tìm thấy Donor");
 
             // Tìm BloodDonation đúng ngày HealthCheck
+            // chỉ kiểm tra ngày, không ktra giờ phút giây
             var donation = await _context.BloodDonations
-                .Where(d => d.DonorId == donor.DonorId && d.DonationDate == healthCheck.HealthCheckDate)
-                .FirstOrDefaultAsync();
+    .Where(d => d.DonorId == donor.DonorId
+        && d.DonationDate.HasValue
+        && d.DonationDate.Value.Date == healthCheck.HealthCheckDate.Date)
+    .OrderByDescending(d => d.DonationDate)
+    .FirstOrDefaultAsync();
 
             if (donation == null) throw new Exception("Không tìm thấy BloodDonation phù hợp");
 
