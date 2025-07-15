@@ -10,13 +10,16 @@ namespace Services.Implementations
     public class BloodUnitService : IBloodUnitService
     {
         private readonly IBloodUnitRepository _bloodUnitRepository;
+        private readonly IBloodRequestRepository _bloodRequestRepository;
         private readonly ILogger<BloodUnitService> _logger;
 
         public BloodUnitService(
             IBloodUnitRepository bloodUnitRepository,
+            IBloodRequestRepository bloodRequestRepository,
             ILogger<BloodUnitService> logger)
         {
             _bloodUnitRepository = bloodUnitRepository;
+            _bloodRequestRepository = bloodRequestRepository;
             _logger = logger;
         }
 
@@ -121,6 +124,7 @@ namespace Services.Implementations
                 throw;
             }
         }
+
         public async Task<(bool success, string message)> UpdateBloodUnitAsync(Guid id, UpdateBloodUnitDTO dto)
         {
             try
@@ -129,7 +133,8 @@ namespace Services.Implementations
                 if (bloodUnit == null)
                     return (false, "Blood unit not found");
 
-                // Chỉ update các field không null
+                var oldRequestId = bloodUnit.RequestId;
+
                 if (dto.DonationId.HasValue)
                     bloodUnit.DonationId = dto.DonationId;
 
@@ -149,7 +154,22 @@ namespace Services.Implementations
                     bloodUnit.Quantity = dto.Quantity.Value;
 
                 if (dto.RequestId.HasValue)
-                    bloodUnit.RequestId = dto.RequestId;
+                {
+                    if (bloodUnit.RequestId != dto.RequestId)
+                    {
+                        bloodUnit.RequestId = dto.RequestId;
+
+                        if (dto.RequestId.HasValue)
+                        {
+                            await UpdateBloodRequestQuantityAsync(dto.RequestId.Value, bloodUnit.Quantity);
+                        }
+
+                        if (oldRequestId.HasValue)
+                        {
+                            await UpdateBloodRequestQuantityAsync(oldRequestId.Value, -bloodUnit.Quantity);
+                        }
+                    }
+                }
 
                 await _bloodUnitRepository.UpdateAsync(bloodUnit);
                 await _bloodUnitRepository.SaveChangesAsync();
@@ -163,6 +183,38 @@ namespace Services.Implementations
                 return (false, $"Error updating blood unit: {ex.Message}");
             }
         }
+
+        private async Task UpdateBloodRequestQuantityAsync(Guid requestId, int quantity)
+        {
+            var request = await _bloodRequestRepository.GetByIdWithDetailsAsync(requestId);
+            if (request == null)
+                return;
+
+            var remainingQuantity = request.QuantityNeeded - quantity;
+            request.QuantityNeeded = remainingQuantity < 0 ? 0 : remainingQuantity;
+
+            if (request.QuantityNeeded <= 0)
+            {
+                request.Status = BloodRequestStatus.Done.ToString();
+                _logger.LogInformation("Blood request {RequestId} marked as Done - all required blood received", requestId);
+            }
+
+            _bloodRequestRepository.Update(request);
+            await _bloodRequestRepository.SaveChangesAsync();
+
+            var notification = new Notification
+            {
+                NotificationId = Guid.NewGuid(),
+                UserId = request.Recipient?.UserId,
+                NotificationType = "Blood Request Update",
+                Message = request.QuantityNeeded <= 0
+                    ? $"Your blood request (ID: {request.RequestId}) has been completed. All required blood has been received."
+                    : $"Your blood request (ID: {request.RequestId}) has received {quantity}ml of blood. Remaining needed: {request.QuantityNeeded}ml",
+                SendDate = DateOnly.FromDateTime(DateTime.Now),
+                IsRead = false
+            };
+        }
+
         public async Task<Dictionary<string, int>> GetQuantityByBloodTypeAsync()
         {
             try
@@ -204,6 +256,7 @@ namespace Services.Implementations
                 throw;
             }
         }
+
         public async Task UpdateExpiredUnitsAsync()
         {
             try
@@ -239,7 +292,6 @@ namespace Services.Implementations
                 if (unit == null)
                     return (false, "Blood unit not found");
 
-                // Case-insensitive comparison for status
                 if (!unit.Status.Equals(BloodUnitStatus.Available.ToString(), StringComparison.OrdinalIgnoreCase) &&
                     !unit.Status.Equals(BloodUnitStatus.Reserved.ToString(), StringComparison.OrdinalIgnoreCase))
                 {
@@ -267,14 +319,12 @@ namespace Services.Implementations
 
         private bool ValidateStatusTransition(string currentStatus, string newStatus)
         {
-            // Convert cả hai status về cùng format để so sánh (title case)
             if (!Enum.TryParse<BloodUnitStatus>(currentStatus, true, out var current) ||
                 !Enum.TryParse<BloodUnitStatus>(newStatus, true, out var next))
             {
                 return false;
             }
 
-            // Chuyển đổi cả hai giá trị về chuỗi chuẩn từ enum để đảm bảo định dạng nhất quán
             currentStatus = current.ToString();
             newStatus = next.ToString();
 
