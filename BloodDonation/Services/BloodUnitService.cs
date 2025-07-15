@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Models;
 using Models.DTOs;
+using Models.Enums;
 using Repositories.Interfaces;
 using Services.Interfaces;
 
@@ -201,6 +202,112 @@ namespace Services.Implementations
             {
                 _logger.LogError(ex, "Error calculating total blood quantity");
                 throw;
+            }
+        }
+        public async Task UpdateExpiredUnitsAsync()
+        {
+            try
+            {
+                var units = await _bloodUnitRepository.GetAllWithDetailsAsync();
+                var currentDate = DateOnly.FromDateTime(DateTime.Now);
+
+                var expiredUnits = units.Where(u =>
+                    u.ExpiryDate <= currentDate &&
+                    u.Status == BloodUnitStatus.Available.ToString());
+
+                foreach (var unit in expiredUnits)
+                {
+                    unit.Status = BloodUnitStatus.Expired.ToString();
+                    await _bloodUnitRepository.UpdateAsync(unit);
+                    _logger.LogInformation("Blood unit {UnitId} status updated to Expired", unit.UnitId);
+                }
+
+                await _bloodUnitRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating expired blood units");
+                throw;
+            }
+        }
+
+        public async Task<(bool success, string message)> MarkUnitAsUsedAsync(Guid unitId, Guid? requestId = null)
+        {
+            try
+            {
+                var unit = await _bloodUnitRepository.GetByIdAsync(unitId);
+                if (unit == null)
+                    return (false, "Blood unit not found");
+
+                if (unit.Status != BloodUnitStatus.Available.ToString() &&
+                    unit.Status != BloodUnitStatus.Reserved.ToString())
+                {
+                    return (false, $"Cannot mark unit as used. Current status: {unit.Status}");
+                }
+
+                unit.Status = BloodUnitStatus.Used.ToString();
+                if (requestId.HasValue)
+                {
+                    unit.RequestId = requestId;
+                }
+
+                await _bloodUnitRepository.UpdateAsync(unit);
+                await _bloodUnitRepository.SaveChangesAsync();
+
+                _logger.LogInformation("Blood unit {UnitId} marked as Used for request {RequestId}", unitId, requestId);
+                return (true, "Blood unit marked as used successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error marking blood unit {UnitId} as used", unitId);
+                return (false, $"Error marking blood unit as used: {ex.Message}");
+            }
+        }
+
+        private bool ValidateStatusTransition(string currentStatus, string newStatus)
+        {
+            if (!Enum.TryParse<BloodUnitStatus>(currentStatus, out var current) ||
+                !Enum.TryParse<BloodUnitStatus>(newStatus, out var next))
+            {
+                return false;
+            }
+
+            return (current, next) switch
+            {
+                (BloodUnitStatus.Available, BloodUnitStatus.Used) => true,
+                (BloodUnitStatus.Available, BloodUnitStatus.Expired) => true,
+                (BloodUnitStatus.Available, BloodUnitStatus.Reserved) => true,
+                (BloodUnitStatus.Available, BloodUnitStatus.Discarded) => true,
+                (BloodUnitStatus.Reserved, BloodUnitStatus.Used) => true,
+                (BloodUnitStatus.Reserved, BloodUnitStatus.Available) => true,
+                (BloodUnitStatus.Processing, BloodUnitStatus.Available) => true,
+                _ => false
+            };
+        }
+
+        public async Task<(bool success, string message)> UpdateBloodUnitStatusAsync(Guid id, BloodUnitStatus newStatus)
+        {
+            try
+            {
+                var bloodUnit = await _bloodUnitRepository.GetByIdAsync(id);
+                if (bloodUnit == null)
+                    return (false, "Blood unit not found");
+
+                if (!ValidateStatusTransition(bloodUnit.Status, newStatus.ToString()))
+                    return (false, $"Invalid status transition from {bloodUnit.Status} to {newStatus}");
+
+                bloodUnit.Status = newStatus.ToString();
+
+                await _bloodUnitRepository.UpdateAsync(bloodUnit);
+                await _bloodUnitRepository.SaveChangesAsync();
+
+                _logger.LogInformation("Blood unit {Id} status updated to {Status}", id, newStatus);
+                return (true, "Blood unit status updated successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating blood unit {Id} status", id);
+                return (false, $"Error updating blood unit status: {ex.Message}");
             }
         }
     }
