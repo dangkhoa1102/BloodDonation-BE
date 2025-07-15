@@ -22,7 +22,7 @@ namespace APIS.Controllers
         {
             _service = service;
             _logger = logger; // Khởi tạo logger
-        }
+        }     
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BloodDonationDto>>> GetAll()
@@ -131,5 +131,16 @@ namespace APIS.Controllers
                 return NotFound(new { message = "Donation not found" });
             return Ok(new { message = "Blood donation rejected successfully." });
         }
+
+        [HttpPost("cancel-blood-donation")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> CancelBloodDonation([FromBody] CancelBloodDonationDTO dto)
+        {
+            var result = await _service.CancelDonationAsync(dto.DonationId, dto.CancelReason, dto.CancelDate);
+            if (!result)
+                return NotFound(new { message = "Donation not found" });
+            return Ok(new { message = "Blood donation canceled successfully." });
+        }
+
     }
 }

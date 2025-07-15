@@ -294,6 +294,17 @@ namespace Services
             return true;
         }
 
+        public async Task<bool> CancelDonationAsync(Guid donationId, string reason, DateOnly? cancelDate)
+        {
+            var donation = await _donationRepository.GetByIdAsync(donationId);
+            if (donation == null) return false;
+            donation.Status = "Canceled";
+            donation.Notes = $"Canceled: {reason} on {cancelDate?.ToString() ?? DateTime.Now.ToShortDateString()}";
+            await _donationRepository.SaveChangesAsync();
+            return true;
+        }
+
+
 
         private BloodDonationDto MapToDto(BloodDonation donation)
         {
