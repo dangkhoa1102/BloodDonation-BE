@@ -19,5 +19,6 @@ namespace Models.DTOs
         public string Allergies { get; set; } = string.Empty;
         public DateOnly HealthCheckDate { get; set; }
         public string HealthCheckStatus { get; set; } = string.Empty;
+        public int? Quantity { get; set; }
     }
 }
