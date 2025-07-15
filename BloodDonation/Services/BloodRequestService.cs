@@ -497,4 +497,74 @@ public class BloodRequestService : IBloodRequestService
             return (false, "An error occurred while updating the request status");
         }
     }
+    public async Task<(bool success, string message)> UpdateReceivedQuantityAsync(
+    BloodRequestUpdateQuantityDTO updateDto,
+    Guid staffId)
+    {
+        try
+        {
+            // Kiểm tra staff
+            var staff = await _userRepository.GetByIdAsync(staffId);
+            if (staff == null || staff.Role != "Staff")
+            {
+                return (false, "Invalid staff member");
+            }
+
+            var request = await _requestRepository.GetByIdWithDetailsAsync(updateDto.RequestId);
+            if (request == null)
+            {
+                return (false, "Blood request not found");
+            }
+
+            // Tính toán số lượng còn lại cần nhận
+            var remainingQuantity = request.QuantityNeeded - updateDto.ReceivedQuantity;
+
+            if (remainingQuantity < 0)
+            {
+                return (false, "Received quantity cannot exceed needed quantity");
+            }
+
+            // Cập nhật số lượng còn lại
+            request.QuantityNeeded = remainingQuantity;
+
+            // Nếu đã nhận đủ số lượng (remainingQuantity = 0)
+            if (remainingQuantity == 0)
+            {
+                request.Status = BloodRequestStatus.Done.ToString();
+            }
+
+            // Tạo notification cho recipient
+            var notificationMessage = remainingQuantity == 0
+                ? $"Your blood request (ID: {request.RequestId}) has been completed. All required blood has been received."
+                : $"Your blood request (ID: {request.RequestId}) has received {updateDto.ReceivedQuantity}ml of blood. Remaining needed: {remainingQuantity}ml";
+
+            var notification = new Notification
+            {
+                NotificationId = Guid.NewGuid(),
+                UserId = request.Recipient?.UserId,
+                NotificationType = "Blood Request Update",
+                Message = notificationMessage,
+                SendDate = DateOnly.FromDateTime(DateTime.Now),
+                IsRead = false
+            };
+
+            // Log hoạt động
+            _logger.LogInformation(
+                "Blood request {RequestId} updated by staff {StaffId}. Received: {ReceivedQuantity}ml, Remaining: {RemainingQuantity}ml",
+                request.RequestId, staffId, updateDto.ReceivedQuantity, remainingQuantity);
+
+            // Lưu thay đổi
+            _requestRepository.Update(request);
+            await _requestRepository.SaveChangesAsync();
+
+            return (true, remainingQuantity == 0
+                ? "Blood request completed successfully"
+                : $"Blood request updated successfully. Remaining quantity needed: {remainingQuantity}ml");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating blood request received quantity {RequestId}", updateDto.RequestId);
+            return (false, "An error occurred while updating the blood request quantity");
+        }
+    }
 }
