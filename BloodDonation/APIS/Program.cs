@@ -19,6 +19,7 @@ using System.Globalization;
 using APIS.Helpers;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Services.BackgroundServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,18 +30,10 @@ builder.Services.AddDbContext<BloodDonationSupportContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-
-
-
-
 builder.Services.AddScoped<IHealthCheckRepository, HealthCheckRepository>();
 builder.Services.AddScoped<IHealthCheckService, HealthCheckService>();
 
-
-// With:
 builder.Services.AddScoped<IBloodDonationRepository, BloodDonationRepository>();
-
-// Same for the service registration:
 builder.Services.AddScoped<IBloodDonationService, BloodDonationService>();
 
 builder.Services.AddScoped<IDonorRepository, DonorRepository>();
@@ -72,6 +65,7 @@ builder.Services.AddScoped<IBloodManagementService, BloodManagementService>();
 builder.Services.AddScoped<IBloodUnitRepository, BloodUnitRepository>();
 builder.Services.AddScoped<IBloodUnitService, BloodUnitService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddHostedService<BloodUnitStatusUpdateService>();
 
 //đăng kí DI cho Certificate
 builder.Services.AddScoped<ICertificateService, CertificateService>();
@@ -160,7 +154,6 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("RequireCustomerRole", policy => policy.RequireRole("Customer"));
 });
 
-
 // Configure Swagger with JWT support
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -194,8 +187,6 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-
-
 // Add CORS policy
 builder.Services.AddCors(options =>
 {
@@ -204,7 +195,6 @@ builder.Services.AddCors(options =>
                           .AllowAnyMethod()
                           .AllowAnyHeader());
 });
-
 
 var app = builder.Build();
 
@@ -257,7 +247,6 @@ app.Use(async (context, next) =>
         });
     }
 });
-
 
 // Configure middleware pipeline with correct order
 app.UseHttpsRedirection();

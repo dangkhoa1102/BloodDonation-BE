@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.DTOs;
+using Models.Enums;
 using Services.Interfaces;
 
 namespace APIS.Controllers
@@ -147,6 +148,87 @@ namespace APIS.Controllers
             {
                 _logger.LogError(ex, "Error updating blood unit {Id}", id);
                 return StatusCode(500, new { message = "An error occurred while updating the blood unit" });
+            }
+        }
+        [HttpGet("quantities-by-type")]
+        public async Task<IActionResult> GetQuantitiesByBloodType()
+        {
+            try
+            {
+                var quantities = await _bloodUnitService.GetQuantityByBloodTypeAsync();
+                return Ok(quantities);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving blood quantities by type");
+                return StatusCode(500, "An error occurred while retrieving blood quantities");
+            }
+        }
+        [HttpGet("total-quantity")]
+        public async Task<IActionResult> GetTotalQuantity()
+        {
+            try
+            {
+                var totalQuantity = await _bloodUnitService.GetTotalBloodQuantityAsync();
+                return Ok(totalQuantity);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving total blood quantity");
+                return StatusCode(500, "An error occurred while retrieving total blood quantity");
+            }
+        }
+        [HttpPost("Blood-Unit-auto-update-expired")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,Staff")]
+        public async Task<IActionResult> UpdateExpiredUnits()
+        {
+            try
+            {
+                await _bloodUnitService.UpdateExpiredUnitsAsync();
+                return Ok(new { message = "Expired blood units have been updated successfully" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating expired blood units");
+                return StatusCode(500, new { message = "An error occurred while updating expired blood units" });
+            }
+        }
+
+        [HttpPut("Blood-Unit-mark-as-used/{unitId}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,Staff")]
+        public async Task<IActionResult> MarkAsUsed(Guid unitId, [FromQuery] Guid? requestId = null)
+        {
+            try
+            {
+                var (success, message) = await _bloodUnitService.MarkUnitAsUsedAsync(unitId, requestId);
+                if (!success)
+                    return BadRequest(new { message });
+
+                return Ok(new { message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error marking blood unit {UnitId} as used", unitId);
+                return StatusCode(500, new { message = "An error occurred while marking blood unit as used" });
+            }
+        }
+
+        [HttpPut("Blood-unit-update-status{unitId}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,Staff")]
+        public async Task<IActionResult> UpdateStatus(Guid unitId, [FromQuery] BloodUnitStatus newStatus)
+        {
+            try
+            {
+                var (success, message) = await _bloodUnitService.UpdateBloodUnitStatusAsync(unitId, newStatus);
+                if (!success)
+                    return BadRequest(new { message });
+
+                return Ok(new { message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating blood unit {UnitId} status", unitId);
+                return StatusCode(500, new { message = "An error occurred while updating blood unit status" });
             }
         }
     }

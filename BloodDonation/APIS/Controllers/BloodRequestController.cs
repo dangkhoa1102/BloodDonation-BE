@@ -17,6 +17,7 @@ namespace APIS.Controllers
         private readonly IBloodRequestService _bloodRequestService;
         private readonly ILogger<BloodRequestController> _logger;
 
+
         public BloodRequestController(
             IBloodRequestService bloodRequestService,
             ILogger<BloodRequestController> logger)
@@ -450,6 +451,31 @@ namespace APIS.Controllers
             {
                 _logger.LogError(ex, "Error updating emergency request status");
                 return StatusCode(500, new { message = "An error occurred while updating the request status" });
+            }
+        }
+        [HttpPut("update-received-quantity")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff")]
+        public async Task<IActionResult> UpdateReceivedQuantity([FromBody] BloodRequestUpdateQuantityDTO updateDto)
+        {
+            try
+            {
+                var staffIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(staffIdClaim) || !Guid.TryParse(staffIdClaim, out var staffId))
+                {
+                    return Unauthorized(new { message = "Invalid staff credentials" });
+                }
+
+                var result = await _bloodRequestService.UpdateReceivedQuantityAsync(updateDto, staffId);
+                if (!result.success)
+                {
+                    return BadRequest(new { message = result.message });
+                }
+
+                return Ok(new { message = result.message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating the received quantity" });
             }
         }
     }
