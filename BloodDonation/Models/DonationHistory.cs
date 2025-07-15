@@ -11,13 +11,13 @@ public partial class DonationHistory
 
     public Guid? DonorId { get; set; }
 
-    public DateOnly? DonationDate { get; set; }
+    public DateTime? DonationDate { get; set; }
 
     public int? Quantity { get; set; }
 
     public string HealthStatus { get; set; }
 
-    public DateOnly? NextEligibleDate { get; set; }
+    public DateTime? NextEligibleDate { get; set; }
 
     public Guid? CertificateId { get; set; }
 

@@ -11,7 +11,7 @@ namespace Models.DTOs
         public Guid DonationId { get; set; }
         public Guid DonorId { get; set; }
         public Guid? RequestId { get; set; }
-        public DateOnly? DonationDate { get; set; }
+        public DateTime? DonationDate { get; set; }
         public int? Quantity { get; set; }
         public string Status { get; set; } = string.Empty;
         public string Notes { get; set; } = string.Empty;
@@ -40,7 +40,7 @@ namespace Models.DTOs
     {
         public Guid? DonorId { get; set; }
         public Guid? RequestId { get; set; }
-        public DateOnly? DonationDate { get; set; }
+        public DateTime? DonationDate { get; set; }
         public int? Quantity { get; set; }
         public string Status { get; set; } = string.Empty;
         public string Notes { get; set; } = string.Empty;
@@ -55,7 +55,7 @@ namespace Models.DTOs
 
     public class UpdateBloodDonationDto
     {
-        public DateOnly? DonationDate { get; set; }
+        public DateTime? DonationDate { get; set; }
         public int? Quantity { get; set; }
         public string Status { get; set; } = string.Empty;
         public string Notes { get; set; } = string.Empty;

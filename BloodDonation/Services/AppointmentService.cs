@@ -50,7 +50,7 @@ namespace Services
             var donation = await _context.BloodDonations.FindAsync(dto.DonationId);
             if (donation == null) return false;
 
-            donation.DonationDate = dto.DonationDate;
+            donation.DonationDate = dto.DonationDate.ToDateTime(TimeOnly.MinValue);
             await _context.SaveChangesAsync();
             return true;
         }

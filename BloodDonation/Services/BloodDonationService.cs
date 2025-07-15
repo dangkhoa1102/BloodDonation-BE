@@ -100,7 +100,7 @@ namespace Services
                 DonorId = donor.DonorId,
                 DonationDate = dto.DonationDate,
                 Quantity = dto.Quantity,
-                Status = dto.Status,
+                Status = "Approved",
                 Notes = dto.Notes
             };
 
@@ -112,7 +112,7 @@ namespace Services
             {
                 DonationId = donation.DonationId,
                 DonorId = donor.DonorId,
-                DonationDate = donation.DonationDate,
+                DonationDate = dto.DonationDate,
                 Quantity = donation.Quantity,
                 Status = donation.Status ?? string.Empty,
                 Notes = donation.Notes ?? string.Empty,
@@ -190,11 +190,11 @@ namespace Services
             // Cập nhật LastDonationDate cho Donor
             if (dto.DonationDate.HasValue)
             {
-                donor.LastDonationDate = dto.DonationDate;
+                var donationDateOnly = DateOnly.FromDateTime(dto.DonationDate.Value);
+                donor.LastDonationDate = donationDateOnly;
 
                 // Tính toán NextEligibleDate (ví dụ: 3 tháng sau lần hiến máu)
-                donor.NextEligibleDate = DateOnly.FromDateTime(
-                    dto.DonationDate.Value.ToDateTime(TimeOnly.MinValue).AddMonths(3));
+                donor.NextEligibleDate = donationDateOnly.AddMonths(3);
             }
 
             _donorRepository.Update(donor);

@@ -83,9 +83,9 @@ namespace Services.Implementations
                 var query = _context.BloodDonations.AsQueryable();
 
                 if (startDate.HasValue)
-                    query = query.Where(d => d.DonationDate >= startDate.Value);
+                    query = query.Where(d => d.DonationDate.HasValue && d.DonationDate.Value.Date >= startDate.Value.ToDateTime(TimeOnly.MinValue).Date);
                 if (endDate.HasValue)
-                    query = query.Where(d => d.DonationDate <= endDate.Value);
+                    query = query.Where(d => d.DonationDate.HasValue && d.DonationDate.Value.Date <= endDate.Value.ToDateTime(TimeOnly.MinValue).Date);
 
                 var donations = await query
                     .Include(d => d.Donor)
@@ -105,15 +105,17 @@ namespace Services.Implementations
                         .GroupBy(d => $"{d.Donor.BloodType.AboType}{d.Donor.BloodType.RhFactor}")
                         .ToDictionary(g => g.Key, g => g.Count()),
                     DailyStats = donations
-                        .GroupBy(d => d.DonationDate)
-                        .Select(g => new DailyDonationStatsDTO
-                        {
-                            Date = g.Key ?? DateOnly.FromDateTime(DateTime.Now),
-                            DonationCount = g.Count(),
-                            TotalQuantity = g.Sum(d => d.Quantity ?? 0)
-                        })
-                        .OrderBy(s => s.Date)
-                        .ToList()
+                    .Where(d => d.DonationDate.HasValue)
+                    .GroupBy(d => DateOnly.FromDateTime(d.DonationDate.Value))
+    .Select(g => new DailyDonationStatsDTO
+    {
+        Date = g.Key,
+        DonationCount = g.Count(),
+        TotalQuantity = g.Sum(d => d.Quantity ?? 0)
+    })
+    .OrderBy(s => s.Date)
+    .ToList()
+
                 };
 
                 return stats;
@@ -249,7 +251,9 @@ namespace Services.Implementations
                     {
                         ActivityType = "Donation",
                         Description = $"Blood donation by {d.Donor.User.FullName}",
-                        Date = d.DonationDate ?? currentDate,
+                        Date = d.DonationDate.HasValue 
+            ? DateOnly.FromDateTime(d.DonationDate.Value) 
+            : currentDate,
                         ReferenceId = d.DonationId
                     })
                     .ToListAsync();
