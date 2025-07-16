@@ -15,12 +15,17 @@ namespace Models.DTOs
             public Guid? BloodTypeId { get; set; }
             public double? Weight { get; set; }
             public double? Height { get; set; }
-            public string MedicalHistory { get; set; }
+            public string MedicalHistory { get; set; } = string.Empty;
             public bool? IsAvailable { get; set; }
             public DateOnly? LastDonationDate { get; set; }
             public DateOnly? NextEligibleDate { get; set; }
             public Guid? LocationId { get; set; }
             public Guid? ClosestFacilityId { get; set; }
+            public string FullName { get; set; } = string.Empty;
+            public string Email { get; set; } = string.Empty;
+            public string PhoneNumber { get; set; } = string.Empty;
+            public string Address { get; set; } = string.Empty;
+            public string CurrentMedications { get; set; } = string.Empty;
         }
         public class CreateDonorDto
         {
@@ -35,6 +40,11 @@ namespace Models.DTOs
             public DateOnly? NextEligibleDate { get; set; }
             public Guid? LocationId { get; set; }
             public Guid? ClosestFacilityId { get; set; }
+            public string FullName { get; set; } = string.Empty;
+            public string Email { get; set; } = string.Empty;
+            public string PhoneNumber { get; set; } = string.Empty;
+            public string Address { get; set; } = string.Empty;
+            public string CurrentMedications { get; set; } = string.Empty;
         }
 
         public class UpdateDonorDto

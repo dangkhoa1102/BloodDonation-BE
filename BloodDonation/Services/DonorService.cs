@@ -35,7 +35,12 @@ namespace Services
                 LastDonationDate = d.LastDonationDate,
                 NextEligibleDate = d.NextEligibleDate,
                 LocationId = d.LocationId,
-                ClosestFacilityId = d.ClosestFacilityId
+                ClosestFacilityId = d.ClosestFacilityId,
+                FullName = d.FullName,
+                Email = d.Email,
+                PhoneNumber = d.PhoneNumber,
+                Address = d.Address,
+                CurrentMedications = d.CurrentMedications
             });
         }
 
@@ -53,7 +58,12 @@ namespace Services
                 LastDonationDate = d.LastDonationDate,
                 NextEligibleDate = d.NextEligibleDate,
                 LocationId = d.LocationId,
-                ClosestFacilityId = d.ClosestFacilityId
+                ClosestFacilityId = d.ClosestFacilityId,
+                FullName = d.FullName,
+                Email = d.Email,
+                PhoneNumber = d.PhoneNumber,
+                Address = d.Address,
+                CurrentMedications = d.CurrentMedications
             };
         }
 
