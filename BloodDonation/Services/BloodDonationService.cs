@@ -21,6 +21,7 @@ namespace Services
         private readonly IGenericRepository<Location> _locationRepository;
         private readonly IGenericRepository<BloodType> _bloodTypeRepository;
         private readonly ILogger<BloodDonationService> _logger;
+        private readonly BloodDonationSupportContext _context;
 
         public BloodDonationService(
             IBloodDonationRepository donationRepository,
@@ -28,7 +29,8 @@ namespace Services
             IGenericRepository<User> userRepository,
             IGenericRepository<Location> locationRepository,
             IGenericRepository<BloodType> bloodTypeRepository,
-            ILogger<BloodDonationService> logger)
+            ILogger<BloodDonationService> logger,
+            BloodDonationSupportContext context)
         {
             _donationRepository = donationRepository;
             _donorRepository = donorRepository;
@@ -36,6 +38,7 @@ namespace Services
             _locationRepository = locationRepository;
             _bloodTypeRepository = bloodTypeRepository;
             _logger = logger;
+            _context = context;
         }
 
         public async Task<IEnumerable<BloodDonationDto>> GetAllAsync()
@@ -82,12 +85,10 @@ namespace Services
                     UserId = userId,
                     FullName = user.FullName,
                     PhoneNumber = user.Phone,
-                    // Email không cần vì đã có trong User
                     BloodTypeId = bloodTypeId,
                     Address = dto.Address ?? string.Empty,
                     Email = user.Email,
                     CurrentMedications = dto.CurrentMedications
-                    // Nếu có Address, bạn có thể lưu vào Location hoặc trường riêng
                 };
                 await _donorRepository.AddAsync(donor);
                 await _donorRepository.SaveChangesAsync();
@@ -106,6 +107,19 @@ namespace Services
 
             await _donationRepository.AddAsync(donation);
             await _donationRepository.SaveChangesAsync();
+
+            // Cập nhật HealthCheck "Approved" gần nhất thành "Used"
+            var approvedHealthCheck = await _context.HealthChecks
+                .Where(h => h.DonorId == donor.DonorId && h.HealthCheckStatus == "Approved")
+                .OrderByDescending(h => h.HealthCheckDate)
+                .FirstOrDefaultAsync();
+
+            if (approvedHealthCheck != null)
+            {
+                approvedHealthCheck.HealthCheckStatus = "Used";
+                _context.HealthChecks.Update(approvedHealthCheck);
+                await _context.SaveChangesAsync();
+            }
 
             // Build DTO trả về
             return new BloodDonationDto
