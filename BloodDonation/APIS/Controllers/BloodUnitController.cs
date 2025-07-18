@@ -179,7 +179,7 @@ namespace APIS.Controllers
             }
         }
         [HttpPost("Blood-Unit-auto-update-expired")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,Staff")]
+        [Authorize]
         public async Task<IActionResult> UpdateExpiredUnits()
         {
             try
@@ -195,7 +195,7 @@ namespace APIS.Controllers
         }
 
         [HttpPut("Blood-Unit-mark-as-used/{unitId}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,Staff")]
+        [Authorize]
         public async Task<IActionResult> MarkAsUsed(Guid unitId, [FromQuery] Guid? requestId = null)
         {
             try
@@ -214,7 +214,7 @@ namespace APIS.Controllers
         }
 
         [HttpPut("Blood-unit-update-status{unitId}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,Staff")]
+        [Authorize]
         public async Task<IActionResult> UpdateStatus(Guid unitId, [FromQuery] BloodUnitStatus newStatus)
         {
             try

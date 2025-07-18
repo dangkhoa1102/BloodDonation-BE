@@ -68,7 +68,7 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-All-Request")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff")]
+        [Authorize]
 
         public async Task<IActionResult> GetAllRequests()
         {
@@ -90,7 +90,7 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-Request-By-Id/{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff")]
+        [Authorize]
 
         public async Task<IActionResult> GetRequestById(Guid id)
         {
@@ -112,7 +112,7 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-Request-By-status/{status}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff")]
+        [Authorize]
 
         public async Task<IActionResult> GetRequestsByStatus([FromRoute] BloodRequestStatus status)
         {
@@ -139,7 +139,7 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-Request-By-Recipient-Name/{recipientName}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff")]
+        [Authorize]
 
         public async Task<IActionResult> GetRequestsByRecipientName([FromRoute] string recipientName)
         {
@@ -180,7 +180,7 @@ namespace APIS.Controllers
             }
         }
         [HttpGet("Get-My-Requests")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Member")]
+        [Authorize]
 
         public async Task<IActionResult> GetMyRequests()
         {
@@ -232,7 +232,7 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-My-Requests-By-Status/{status}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Member")]
+        [Authorize]
 
         public async Task<IActionResult> GetMyRequestsByStatus([FromRoute] BloodRequestStatus status)
         {
@@ -284,7 +284,7 @@ namespace APIS.Controllers
             }
         }
         [HttpPut("Update-Blood-Requests/{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff")]
+        [Authorize]
 
         public async Task<IActionResult> UpdateBloodRequest(Guid id, [FromBody] BloodRequestUpdateDTO updateDto)
         {
@@ -310,7 +310,7 @@ namespace APIS.Controllers
             }
         }
         [HttpPost("reject-blood-request")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff")]
+        [Authorize]
 
         public async Task<IActionResult> RejectBloodRequest([FromBody] BloodRequestRejectDTO rejectDto)
         {
@@ -337,7 +337,7 @@ namespace APIS.Controllers
         }
 
         [HttpPost("approve-blood-request")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff")]
+        [Authorize]
 
         public async Task<IActionResult> ApproveBloodRequest(Guid requestId)
         {
@@ -360,7 +360,7 @@ namespace APIS.Controllers
             }
         }
         [HttpPost("register-emergency")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff")]
+        [Authorize]
 
         public async Task<IActionResult> RegisterEmergencyRequest([FromBody] EmergencyBloodRequestDTO request)
         {
@@ -417,9 +417,7 @@ namespace APIS.Controllers
             }
         }
         [HttpPut("update-emergency-status/{requestId}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize]
         public async Task<IActionResult> UpdateEmergencyStatus(
         Guid requestId,
         [FromBody] UpdateRequestStatusDTO updateDto)
@@ -454,7 +452,7 @@ namespace APIS.Controllers
             }
         }
         [HttpPut("update-received-quantity")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff")]
+        [Authorize]
         public async Task<IActionResult> UpdateReceivedQuantity([FromBody] BloodRequestUpdateQuantityDTO updateDto)
         {
             try
