@@ -106,6 +106,8 @@ public class BloodRequestService : IBloodRequestService
         try
         {
             var statusString = status.ToString();
+            _logger.LogInformation($"Getting requests with status: {statusString}");
+
             var requests = await _requestRepository.GetByStatusAsync(statusString);
             return requests.OrderByDescending(r => r.RequestDate);
         }

@@ -7,7 +7,6 @@ using Models.Enums;
 using Services;
 using System.Security.Claims;
 
-
 namespace APIS.Controllers
 {
     [Route("api/[controller]")]
@@ -16,7 +15,6 @@ namespace APIS.Controllers
     {
         private readonly IBloodRequestService _bloodRequestService;
         private readonly ILogger<BloodRequestController> _logger;
-
 
         public BloodRequestController(
             IBloodRequestService bloodRequestService,
@@ -31,7 +29,7 @@ namespace APIS.Controllers
         {
             try
             {
-                _logger.LogInformation("User claims: {Claims}", 
+                _logger.LogInformation("User claims: {Claims}",
                     string.Join(", ", User.Claims.Select(c => $"{c.Type}: {c.Value}")));
 
                 var role = User.FindFirst(ClaimTypes.Role)?.Value;
@@ -68,7 +66,7 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-All-Request")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
         public async Task<IActionResult> GetAllRequests()
         {
@@ -90,7 +88,7 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-Request-By-Id/{id}")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
         public async Task<IActionResult> GetRequestById(Guid id)
         {
@@ -112,7 +110,7 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-Request-By-status/{status}")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
         public async Task<IActionResult> GetRequestsByStatus([FromRoute] BloodRequestStatus status)
         {
@@ -139,7 +137,7 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-Request-By-Recipient-Name/{recipientName}")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
         public async Task<IActionResult> GetRequestsByRecipientName([FromRoute] string recipientName)
         {
@@ -180,7 +178,7 @@ namespace APIS.Controllers
             }
         }
         [HttpGet("Get-My-Requests")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
         public async Task<IActionResult> GetMyRequests()
         {
@@ -232,7 +230,7 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-My-Requests-By-Status/{status}")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
         public async Task<IActionResult> GetMyRequestsByStatus([FromRoute] BloodRequestStatus status)
         {
@@ -284,7 +282,7 @@ namespace APIS.Controllers
             }
         }
         [HttpPut("Update-Blood-Requests/{id}")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
         public async Task<IActionResult> UpdateBloodRequest(Guid id, [FromBody] BloodRequestUpdateDTO updateDto)
         {
@@ -310,7 +308,7 @@ namespace APIS.Controllers
             }
         }
         [HttpPost("reject-blood-request")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
         public async Task<IActionResult> RejectBloodRequest([FromBody] BloodRequestRejectDTO rejectDto)
         {
@@ -318,11 +316,11 @@ namespace APIS.Controllers
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
-              
+
                 var staffId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                     ?? throw new InvalidOperationException("Staff ID not found in token"));
 
-                var (success, message) = await _bloodRequestService.RejectBloodRequestAsync(rejectDto.RequestId,rejectDto, staffId);
+                var (success, message) = await _bloodRequestService.RejectBloodRequestAsync(rejectDto.RequestId, rejectDto, staffId);
 
                 if (!success)
                     return BadRequest(new { message });
@@ -337,7 +335,7 @@ namespace APIS.Controllers
         }
 
         [HttpPost("approve-blood-request")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
         public async Task<IActionResult> ApproveBloodRequest(Guid requestId)
         {
@@ -360,7 +358,7 @@ namespace APIS.Controllers
             }
         }
         [HttpPost("register-emergency")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
         public async Task<IActionResult> RegisterEmergencyRequest([FromBody] EmergencyBloodRequestDTO request)
         {
@@ -414,66 +412,6 @@ namespace APIS.Controllers
             {
                 _logger.LogError(ex, "Error processing emergency blood request");
                 return StatusCode(500, new { message = "An error occurred while processing the emergency request" });
-            }
-        }
-        [HttpPut("update-emergency-status/{requestId}")]
-        [Authorize]
-        public async Task<IActionResult> UpdateEmergencyStatus(
-        Guid requestId,
-        [FromBody] UpdateRequestStatusDTO updateDto)
-        {
-            try
-            {
-                var staffId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? throw new InvalidOperationException("Staff ID not found in token"));
-
-                var (success, message) = await _bloodRequestService.UpdateRequestStatusAsync(
-                    requestId,
-                    updateDto.NewStatus,
-                    staffId);
-
-                if (!success)
-                    return BadRequest(new { message });
-
-                return Ok(new
-                {
-                    message,
-                    updatedStatus = new
-                    {
-                        id = (int)updateDto.NewStatus,
-                        name = updateDto.NewStatus.ToString()
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error updating emergency request status");
-                return StatusCode(500, new { message = "An error occurred while updating the request status" });
-            }
-        }
-        [HttpPut("update-received-quantity")]
-        [Authorize]
-        public async Task<IActionResult> UpdateReceivedQuantity([FromBody] BloodRequestUpdateQuantityDTO updateDto)
-        {
-            try
-            {
-                var staffIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(staffIdClaim) || !Guid.TryParse(staffIdClaim, out var staffId))
-                {
-                    return Unauthorized(new { message = "Invalid staff credentials" });
-                }
-
-                var result = await _bloodRequestService.UpdateReceivedQuantityAsync(updateDto, staffId);
-                if (!result.success)
-                {
-                    return BadRequest(new { message = result.message });
-                }
-
-                return Ok(new { message = result.message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "An error occurred while updating the received quantity" });
             }
         }
     }
