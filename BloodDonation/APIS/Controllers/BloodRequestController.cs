@@ -7,7 +7,6 @@ using Models.Enums;
 using Services;
 using System.Security.Claims;
 
-
 namespace APIS.Controllers
 {
     [Route("api/[controller]")]
@@ -16,7 +15,6 @@ namespace APIS.Controllers
     {
         private readonly IBloodRequestService _bloodRequestService;
         private readonly ILogger<BloodRequestController> _logger;
-
 
         public BloodRequestController(
             IBloodRequestService bloodRequestService,
@@ -32,7 +30,7 @@ namespace APIS.Controllers
         {
             try
             {
-                _logger.LogInformation("User claims: {Claims}", 
+                _logger.LogInformation("User claims: {Claims}",
                     string.Join(", ", User.Claims.Select(c => $"{c.Type}: {c.Value}")));
 
                 var role = User.FindFirst(ClaimTypes.Role)?.Value;
@@ -319,11 +317,11 @@ namespace APIS.Controllers
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
-              
+
                 var staffId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                     ?? throw new InvalidOperationException("Staff ID not found in token"));
 
-                var (success, message) = await _bloodRequestService.RejectBloodRequestAsync(rejectDto.RequestId,rejectDto, staffId);
+                var (success, message) = await _bloodRequestService.RejectBloodRequestAsync(rejectDto.RequestId, rejectDto, staffId);
 
                 if (!success)
                     return BadRequest(new { message });
