@@ -51,8 +51,10 @@ namespace Services.Implementations
                     BloodTypeQuantities = bloodUnits
                         .GroupBy(b => $"{b.BloodType.AboType}{b.BloodType.RhFactor}")
                         .ToDictionary(g => g.Key, g => g.Sum(b => b.Quantity)),
-                    TotalUnits = bloodUnits.Count,
-                    AvailableUnits = bloodUnits.Count(b => b.Status == "available"),
+                    TotalUnits = bloodUnits.Sum(b => b.Quantity),
+                    AvailableUnits = bloodUnits
+                        .Where(b => b.Status == "available")
+                        .Sum(b => b.Quantity),
                     ExpiringSoonUnits = bloodUnits.Count(b => b.ExpiryDate <= expiryThreshold),
                     ExpiringUnits = bloodUnits
                         .Where(b => b.ExpiryDate <= expiryThreshold)

@@ -333,12 +333,14 @@ public class BloodRequestService : IBloodRequestService
             // Check blood inventory first
             var bloodTypeId = request.BloodTypeRequired;
             var quantityNeeded = request.QuantityNeeded;
-            var availableBloodUnits = await _bloodTypeRepository.GetAvailableUnitsCountAsync(bloodTypeId);
-
-            var initialStatus = availableBloodUnits >= quantityNeeded 
-                ? BloodRequestStatus.Pending.ToString()  // Có đủ máu trong kho
-                : BloodRequestStatus.Opened.ToString();   // Không đủ máu, cần hiển thị lên UI
-
+            var availableQuantity = await _bloodTypeRepository.GetAvailableUnitsQuantityAsync(bloodTypeId);
+            // Xác định trạng thái dựa trên số lượng máu khả dụng (ml)
+            var initialStatus = availableQuantity >= quantityNeeded
+                ? BloodRequestStatus.Pending.ToString()  // Có đủ ml máu trong kho
+                : BloodRequestStatus.Opened.ToString();   // Không đủ ml máu, cần hiển thị lên UI
+            _logger.LogInformation(
+            "Blood availability check - Required: {Required}ml, Available: {Available}ml, Status: {Status}",
+            quantityNeeded, availableQuantity, initialStatus);
             // Create or update user
             var existingUser = await _userRepository.GetByEmailAsync(request.Email);
             if (existingUser == null)
@@ -398,7 +400,7 @@ public class BloodRequestService : IBloodRequestService
                 UrgencyLevel = "Emergency",
                 RequestDate = DateOnly.FromDateTime(DateTime.UtcNow),
                 Status = initialStatus,
-                Description = $"Emergency request. Available units: {availableBloodUnits}. {request.Description}"
+                Description = $"Emergency request. Available quantity: {availableQuantity}ml. {request.Description}"
             };
 
             await _requestRepository.AddAsync(bloodRequest);
@@ -406,7 +408,7 @@ public class BloodRequestService : IBloodRequestService
 
             _logger.LogInformation(
                 "Created emergency blood request with ID: {RequestId}, Status: {Status}, Available Units: {AvailableUnits}",
-                bloodRequest.RequestId, initialStatus, availableBloodUnits);
+                bloodRequest.RequestId, initialStatus, availableQuantity);
 
             // Create notification
             var notificationMessage = initialStatus == BloodRequestStatus.Pending.ToString()
