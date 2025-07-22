@@ -30,18 +30,21 @@ namespace Repositories.Implementations
         public async Task<IEnumerable<BloodRequest>> GetByStatusAsync(string status)
         {
             return await _dbSet
-                .Include(r => r.Recipient)
                 .Include(r => r.BloodTypeRequiredNavigation)
-                .Where(r => r.Status == status)
+                .Include(r => r.Recipient)
+                    .ThenInclude(r => r.User)
+                .Include(r => r.BloodDonations)
+                .Where(r => r.Status.ToLower() == status.ToLower())
                 .ToListAsync();
         }
 
         public async Task<BloodRequest> GetByIdWithDetailsAsync(Guid requestId)
         {
             return await _dbSet
-                .Include(r => r.Recipient)
-                    .ThenInclude(recipient => recipient.User)
                 .Include(r => r.BloodTypeRequiredNavigation)
+                .Include(r => r.Recipient)
+                    .ThenInclude(r => r.User)
+                .Include(r => r.BloodDonations)
                 .FirstOrDefaultAsync(r => r.RequestId == requestId);
         }
         public async Task<IEnumerable<BloodRequest>> GetByIdsAsync(List<Guid> ids)

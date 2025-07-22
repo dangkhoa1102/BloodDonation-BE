@@ -25,6 +25,9 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-All-BloodUnit")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
+
         public async Task<IActionResult> GetAllBloodUnits()
         {
             try
@@ -43,6 +46,8 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-BloodUnit-By-id/{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
         public async Task<IActionResult> GetBloodUnitById(Guid id)
         {
             try
@@ -61,6 +66,8 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-BloodUnit-by-blood-type/{bloodTypeId}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
         public async Task<IActionResult> GetByBloodType(Guid bloodTypeId)
         {
             try
@@ -79,6 +86,8 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-BloodUnit-by-component/{componentId}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
         public async Task<IActionResult> GetByComponent(Guid componentId)
         {
             try
@@ -97,6 +106,8 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-BloodUnit-by-status/{status}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
         public async Task<IActionResult> GetByStatus(string status)
         {
             try
@@ -115,6 +126,8 @@ namespace APIS.Controllers
         }
 
         [HttpGet("Get-BloodUnit-expired")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
         public async Task<IActionResult> GetExpiredUnits()
         {
             try
@@ -132,7 +145,7 @@ namespace APIS.Controllers
             }
         }
         [HttpPatch("Update-Blood-Unit/{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,Staff")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> UpdateBloodUnit(Guid id, [FromBody] UpdateBloodUnitDTO dto)
         {
             try
@@ -151,6 +164,8 @@ namespace APIS.Controllers
             }
         }
         [HttpGet("quantities-by-type")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
         public async Task<IActionResult> GetQuantitiesByBloodType()
         {
             try
@@ -165,6 +180,8 @@ namespace APIS.Controllers
             }
         }
         [HttpGet("total-quantity")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
         public async Task<IActionResult> GetTotalQuantity()
         {
             try
@@ -179,7 +196,7 @@ namespace APIS.Controllers
             }
         }
         [HttpPost("Blood-Unit-auto-update-expired")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> UpdateExpiredUnits()
         {
             try
@@ -195,7 +212,7 @@ namespace APIS.Controllers
         }
 
         [HttpPut("Blood-Unit-mark-as-used/{unitId}")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> MarkAsUsed(Guid unitId, [FromQuery] Guid? requestId = null)
         {
             try
@@ -214,7 +231,7 @@ namespace APIS.Controllers
         }
 
         [HttpPut("Blood-unit-update-status{unitId}")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> UpdateStatus(Guid unitId, [FromQuery] BloodUnitStatus newStatus)
         {
             try
