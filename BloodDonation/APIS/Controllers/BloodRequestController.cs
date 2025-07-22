@@ -25,6 +25,7 @@ namespace APIS.Controllers
         }
 
         [HttpPost("register")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> RegisterBloodRequest([FromBody] BloodRequestRegistrationDTO request)
         {
             try
@@ -412,6 +413,66 @@ namespace APIS.Controllers
             {
                 _logger.LogError(ex, "Error processing emergency blood request");
                 return StatusCode(500, new { message = "An error occurred while processing the emergency request" });
+            }
+        }
+        [HttpPut("update-emergency-status/{requestId}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> UpdateEmergencyStatus(
+        Guid requestId,
+        [FromBody] UpdateRequestStatusDTO updateDto)
+        {
+            try
+            {
+                var staffId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? throw new InvalidOperationException("Staff ID not found in token"));
+
+                var (success, message) = await _bloodRequestService.UpdateRequestStatusAsync(
+                    requestId,
+                    updateDto.NewStatus,
+                    staffId);
+
+                if (!success)
+                    return BadRequest(new { message });
+
+                return Ok(new
+                {
+                    message,
+                    updatedStatus = new
+                    {
+                        id = (int)updateDto.NewStatus,
+                        name = updateDto.NewStatus.ToString()
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating emergency request status");
+                return StatusCode(500, new { message = "An error occurred while updating the request status" });
+            }
+        }
+        [HttpPut("update-received-quantity")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> UpdateReceivedQuantity([FromBody] BloodRequestUpdateQuantityDTO updateDto)
+        {
+            try
+            {
+                var staffIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(staffIdClaim) || !Guid.TryParse(staffIdClaim, out var staffId))
+                {
+                    return Unauthorized(new { message = "Invalid staff credentials" });
+                }
+
+                var result = await _bloodRequestService.UpdateReceivedQuantityAsync(updateDto, staffId);
+                if (!result.success)
+                {
+                    return BadRequest(new { message = result.message });
+                }
+
+                return Ok(new { message = result.message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating the received quantity" });
             }
         }
     }
