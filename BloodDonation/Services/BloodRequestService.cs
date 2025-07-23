@@ -570,5 +570,40 @@ public class BloodRequestService : IBloodRequestService
             _logger.LogError(ex, "Error updating blood request received quantity {RequestId}", updateDto.RequestId);
             return (false, "An error occurred while updating the blood request quantity");
         }
+
+    }
+    public async Task<UserDetailDTO> GetRequestUserDetailsAsync(Guid requestId)
+    {
+        try
+        {
+            // Lấy request với thông tin chi tiết (bao gồm Recipient và User)
+            var request = await _requestRepository.GetByIdWithDetailsAsync(requestId);
+            if (request == null || request.Recipient == null || request.Recipient.User == null)
+            {
+                return null;
+            }
+
+            // Map thông tin sang DTO
+            var userDetails = new UserDetailDTO
+            {
+                UserId = request.Recipient.User.UserId,
+                FullName = request.Recipient.User.FullName,
+                Email = request.Recipient.User.Email,
+                Phone = request.Recipient.User.Phone,
+                UserIdCard = request.Recipient.User.UserIdCard,
+                DateOfBirth = request.Recipient.User.DateOfBirth,
+                Status = request.Status,
+                Description = request.Description,
+                QuantityNeeded = request.QuantityNeeded,
+                RequestDate = request.RequestDate
+            };
+
+            return userDetails;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting user details for blood request {RequestId}", requestId);
+            throw;
+        }
     }
 }

@@ -475,5 +475,29 @@ namespace APIS.Controllers
                 return StatusCode(500, new { message = "An error occurred while updating the received quantity" });
             }
         }
+        [HttpGet("get-request-user/{requestId}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> GetRequestUserDetails(Guid requestId)
+        {
+            try
+            {
+                var userDetails = await _bloodRequestService.GetRequestUserDetailsAsync(requestId);
+                if (userDetails == null)
+                {
+                    return NotFound(new { message = "Blood request or associated user not found" });
+                }
+
+                return Ok(new
+                {
+                    success = true,
+                    data = userDetails
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving user details for blood request {RequestId}", requestId);
+                return StatusCode(500, new { message = "An error occurred while retrieving user details" });
+            }
+        }
     }
 }
