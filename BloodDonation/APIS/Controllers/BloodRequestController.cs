@@ -308,56 +308,56 @@ namespace APIS.Controllers
                 return StatusCode(500, new { message = "An error occurred while updating the blood request" });
             }
         }
-        [HttpPost("reject-blood-request")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        //[HttpPost("reject-blood-request")]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
-        public async Task<IActionResult> RejectBloodRequest([FromBody] BloodRequestRejectDTO rejectDto)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
+        //public async Task<IActionResult> RejectBloodRequest([FromBody] BloodRequestRejectDTO rejectDto)
+        //{
+        //    try
+        //    {
+        //        if (!ModelState.IsValid)
+        //            return BadRequest(ModelState);
 
-                var staffId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? throw new InvalidOperationException("Staff ID not found in token"));
+        //        var staffId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+        //            ?? throw new InvalidOperationException("Staff ID not found in token"));
 
-                var (success, message) = await _bloodRequestService.RejectBloodRequestAsync(rejectDto.RequestId, rejectDto, staffId);
+        //        var (success, message) = await _bloodRequestService.RejectBloodRequestAsync(rejectDto.RequestId, rejectDto, staffId);
 
-                if (!success)
-                    return BadRequest(new { message });
+        //        if (!success)
+        //            return BadRequest(new { message });
 
-                return Ok(new { message });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error rejecting blood request {RequestId}", rejectDto.RequestId);
-                return StatusCode(500, new { message = "An error occurred while rejecting the blood request" });
-            }
-        }
+        //        return Ok(new { message });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error rejecting blood request {RequestId}", rejectDto.RequestId);
+        //        return StatusCode(500, new { message = "An error occurred while rejecting the blood request" });
+        //    }
+        //}
 
-        [HttpPost("approve-blood-request")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        //[HttpPost("approve-blood-request")]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
-        public async Task<IActionResult> ApproveBloodRequest(Guid requestId)
-        {
-            try
-            {
-                var staffId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? throw new InvalidOperationException("Staff ID not found in token"));
+        //public async Task<IActionResult> ApproveBloodRequest(Guid requestId)
+        //{
+        //    try
+        //    {
+        //        var staffId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+        //            ?? throw new InvalidOperationException("Staff ID not found in token"));
 
-                var (success, message) = await _bloodRequestService.ApproveBloodRequestAsync(requestId, staffId);
+        //        var (success, message) = await _bloodRequestService.ApproveBloodRequestAsync(requestId, staffId);
 
-                if (!success)
-                    return BadRequest(new { message });
+        //        if (!success)
+        //            return BadRequest(new { message });
 
-                return Ok(new { message });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error approving blood request {RequestId}", requestId);
-                return StatusCode(500, new { message = "An error occurred while approving the blood request" });
-            }
-        }
+        //        return Ok(new { message });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error approving blood request {RequestId}", requestId);
+        //        return StatusCode(500, new { message = "An error occurred while approving the blood request" });
+        //    }
+        //}
         [HttpPost("register-emergency")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
