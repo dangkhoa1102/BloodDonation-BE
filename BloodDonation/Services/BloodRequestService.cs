@@ -208,115 +208,115 @@ public class BloodRequestService : IBloodRequestService
             return (false, "An error occurred while updating the blood request");
         }
     }
-    public async Task<(bool success, string message)> RejectBloodRequestAsync(
-    Guid requestId,
-    BloodRequestRejectDTO rejectDto,
-    Guid staffId)
-    {
-        try
-        {
-            var request = await _requestRepository.GetByIdWithDetailsAsync(requestId);
+    //public async Task<(bool success, string message)> RejectBloodRequestAsync(
+    //Guid requestId,
+    //BloodRequestRejectDTO rejectDto,
+    //Guid staffId)
+    //{
+    //    try
+    //    {
+    //        var request = await _requestRepository.GetByIdWithDetailsAsync(requestId);
 
-            if (request == null)
-            {
-                return (false, "Blood request not found");
-            }
+    //        if (request == null)
+    //        {
+    //            return (false, "Blood request not found");
+    //        }
 
-            // Chỉ cho phép từ chối đơn có trạng thái Pending
-            if (request.Status != BloodRequestStatus.Pending.ToString())
-            {
-                return (false, $"Can only reject requests with 'Pending' status. Current status: {request.Status}");
-            }
+    //        // Chỉ cho phép từ chối đơn có trạng thái Pending
+    //        if (request.Status != BloodRequestStatus.Pending.ToString())
+    //        {
+    //            return (false, $"Can only reject requests with 'Pending' status. Current status: {request.Status}");
+    //        }
 
-            // Cập nhật trạng thái và thông tin từ chối
-            request.Status = BloodRequestStatus.Rejected.ToString();
-            request.Description = $"Reason: {rejectDto.RejectionReason}";
+    //        // Cập nhật trạng thái và thông tin từ chối
+    //        request.Status = BloodRequestStatus.Rejected.ToString();
+    //        request.Description = $"Reason: {rejectDto.RejectionReason}";
 
-            // Tạo notification cho recipient
-            var notification = new Notification
-            {
-                NotificationId = Guid.NewGuid(),
-                UserId = request.Recipient?.UserId,
-                NotificationType = "Request Rejection",
-                Message = $"Your blood request (ID: {request.RequestId}) has been rejected.\n{rejectDto.RejectionReason}",
-                SendDate = DateOnly.FromDateTime(DateTime.Now),
-                IsRead = false
-            };
+    //        // Tạo notification cho recipient
+    //        var notification = new Notification
+    //        {
+    //            NotificationId = Guid.NewGuid(),
+    //            UserId = request.Recipient?.UserId,
+    //            NotificationType = "Request Rejection",
+    //            Message = $"Your blood request (ID: {request.RequestId}) has been rejected.\n{rejectDto.RejectionReason}",
+    //            SendDate = DateOnly.FromDateTime(DateTime.Now),
+    //            IsRead = false
+    //        };
 
-            // Log hoạt động
-            _logger.LogInformation(
-                "Blood request {RequestId} rejected by staff {StaffId}. Reason: {Reason}",
-                requestId, staffId, rejectDto.RejectionReason);
+    //        // Log hoạt động
+    //        _logger.LogInformation(
+    //            "Blood request {RequestId} rejected by staff {StaffId}. Reason: {Reason}",
+    //            requestId, staffId, rejectDto.RejectionReason);
 
-            // Lưu thay đổi
-            _requestRepository.Update(request);
-            await _requestRepository.SaveChangesAsync();
+    //        // Lưu thay đổi
+    //        _requestRepository.Update(request);
+    //        await _requestRepository.SaveChangesAsync();
 
-            return (true, "Blood request rejected successfully");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error rejecting blood request {RequestId}", requestId);
-            return (false, "An error occurred while rejecting the blood request");
-        }
-    }
-    public async Task<(bool success, string message)> ApproveBloodRequestAsync(
-    Guid requestId,
-    Guid staffId)
-    {
-        try
-        {
-            // Kiểm tra staff
-            var staff = await _userRepository.GetByIdAsync(staffId);
-            if (staff == null || staff.Role != "Staff")
-            {
-                return (false, "Invalid staff member");
-            }
+    //        return (true, "Blood request rejected successfully");
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        _logger.LogError(ex, "Error rejecting blood request {RequestId}", requestId);
+    //        return (false, "An error occurred while rejecting the blood request");
+    //    }
+    //}
+    //public async Task<(bool success, string message)> ApproveBloodRequestAsync(
+    //Guid requestId,
+    //Guid staffId)
+    //{
+    //    try
+    //    {
+    //        // Kiểm tra staff
+    //        var staff = await _userRepository.GetByIdAsync(staffId);
+    //        if (staff == null || staff.Role != "Staff")
+    //        {
+    //            return (false, "Invalid staff member");
+    //        }
 
-            var request = await _requestRepository.GetByIdWithDetailsAsync(requestId);
-            if (request == null)
-            {
-                return (false, "Blood request not found");
-            }
+    //        var request = await _requestRepository.GetByIdWithDetailsAsync(requestId);
+    //        if (request == null)
+    //        {
+    //            return (false, "Blood request not found");
+    //        }
 
-            // Chỉ cho phép approve đơn có trạng thái Pending
-            if (request.Status != BloodRequestStatus.Pending.ToString())
-            {
-                return (false, $"Can only approve requests with 'Pending' status. Current status: {request.Status}");
-            }
+    //        // Chỉ cho phép approve đơn có trạng thái Pending
+    //        if (request.Status != BloodRequestStatus.Pending.ToString())
+    //        {
+    //            return (false, $"Can only approve requests with 'Pending' status. Current status: {request.Status}");
+    //        }
 
-            // Cập nhật trạng thái 
-            request.Status = BloodRequestStatus.Approved.ToString();
+    //        // Cập nhật trạng thái 
+    //        request.Status = BloodRequestStatus.Approved.ToString();
 
-            // Tạo notification cho recipient
-            var notification = new Notification
-            {
-                NotificationId = Guid.NewGuid(),
-                UserId = request.Recipient?.UserId,
-                NotificationType = "Request Approved",
-                Message = $"Your blood request (ID: {request.RequestId}) has been approved.",
-                SendDate = DateOnly.FromDateTime(DateTime.Now),
-                IsRead = false
-            };
+    //        // Tạo notification cho recipient
+    //        var notification = new Notification
+    //        {
+    //            NotificationId = Guid.NewGuid(),
+    //            UserId = request.Recipient?.UserId,
+    //            NotificationType = "Request Approved",
+    //            Message = $"Your blood request (ID: {request.RequestId}) has been approved.",
+    //            SendDate = DateOnly.FromDateTime(DateTime.Now),
+    //            IsRead = false
+    //        };
 
-            // Log hoạt động
-            _logger.LogInformation(
-                "Blood request {RequestId} approved by staff {StaffId}",
-                requestId, staffId);
+    //        // Log hoạt động
+    //        _logger.LogInformation(
+    //            "Blood request {RequestId} approved by staff {StaffId}",
+    //            requestId, staffId);
 
-            // Lưu thay đổi
-            _requestRepository.Update(request);
-            await _requestRepository.SaveChangesAsync();
+    //        // Lưu thay đổi
+    //        _requestRepository.Update(request);
+    //        await _requestRepository.SaveChangesAsync();
 
-            return (true, "Blood request approved successfully");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error approving blood request {RequestId}", requestId);
-            return (false, "An error occurred while approving the blood request");
-        }
+    //        return (true, "Blood request approved successfully");
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        _logger.LogError(ex, "Error approving blood request {RequestId}", requestId);
+    //        return (false, "An error occurred while approving the blood request");
+    //    }
 
-    }
+    //}
     public async Task<(bool success, string message, Guid? requestId)> RegisterEmergencyBloodRequestAsync(
     EmergencyBloodRequestDTO request, Guid staffId)
     {
@@ -433,22 +433,24 @@ public class BloodRequestService : IBloodRequestService
             return (false, $"An error occurred: {ex.Message}", null);
         }
     }
-    private bool IsValidStatusTransition(BloodRequestStatus currentStatus, BloodRequestStatus newStatus)
-    {
-        return (currentStatus, newStatus) switch
-        {
-            (BloodRequestStatus.Draft, BloodRequestStatus.Pending) => true,
-            (BloodRequestStatus.Pending, BloodRequestStatus.Opened) => true,
-            (BloodRequestStatus.Pending, BloodRequestStatus.Approved) => true,
-            (BloodRequestStatus.Pending, BloodRequestStatus.Rejected) => true,
-            (BloodRequestStatus.Opened, BloodRequestStatus.Approved) => true,
-            (BloodRequestStatus.Opened, BloodRequestStatus.Rejected) => true,
-            (BloodRequestStatus.Approved, BloodRequestStatus.Done) => true,
-            (BloodRequestStatus.Approved, BloodRequestStatus.Closed) => true,
-            (BloodRequestStatus.Done, BloodRequestStatus.Closed) => true,
-            _ => false
-        };
-    }
+    //private bool IsValidStatusTransition(BloodRequestStatus currentStatus, BloodRequestStatus newStatus)
+    //{
+    //    return (currentStatus, newStatus) switch
+    //    {
+    //        (BloodRequestStatus.Draft, BloodRequestStatus.Pending) => true,
+    //        (BloodRequestStatus.Pending, BloodRequestStatus.Opened) => true,
+    //        (BloodRequestStatus.Pending, BloodRequestStatus.Approved) => true,
+    //        (BloodRequestStatus.Pending, BloodRequestStatus.Rejected) => true,
+    //        (BloodRequestStatus.Opened, BloodRequestStatus.Approved) => true,
+    //        (BloodRequestStatus.Opened, BloodRequestStatus.Rejected) => true,
+    //        (BloodRequestStatus.Opened, BloodRequestStatus.Pending) => true,
+    //        (BloodRequestStatus.Approved, BloodRequestStatus.Done) => true,
+    //        (BloodRequestStatus.Approved, BloodRequestStatus.Closed) => true,
+    //        (BloodRequestStatus.Done, BloodRequestStatus.Closed) => true,
+            
+    //        _ => false
+    //    };
+    //}
     public async Task<(bool success, string message)> UpdateRequestStatusAsync(
     Guid requestId,
     BloodRequestStatus newStatus,
@@ -456,22 +458,31 @@ public class BloodRequestService : IBloodRequestService
     {
         try
         {
+            // Kiểm tra request tồn tại
             var request = await _requestRepository.GetByIdWithDetailsAsync(requestId);
             if (request == null)
             {
                 return (false, "Blood request not found");
             }
 
-            // Parse current status
+            // Kiểm tra user
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+            {
+                return (false, "User not found");
+            }
+
+            // Parse current status 
             if (!Enum.TryParse<BloodRequestStatus>(request.Status, out var currentStatus))
             {
                 return (false, "Invalid current status");
             }
 
-            // Validate status transition
-            if (!IsValidStatusTransition(currentStatus, newStatus))
+            // Validate status transition dựa trên role
+            var isValidTransition = IsValidStatusTransition(currentStatus, newStatus, user.Role);
+            if (!isValidTransition)
             {
-                return (false, $"Invalid status transition from {currentStatus} to {newStatus}");
+                return (false, $"Invalid status transition from {currentStatus} to {newStatus} for role {user.Role}");
             }
 
             // Update status
@@ -483,7 +494,7 @@ public class BloodRequestService : IBloodRequestService
                 NotificationId = Guid.NewGuid(),
                 UserId = request.Recipient?.UserId,
                 NotificationType = "Blood Request Status Update",
-                Message = $"Your blood request (ID: {requestId}) status has been updated to {newStatus}",
+                Message = $"Your blood request (ID: {requestId}) status has been updated to {newStatus} by {user.Role}",
                 SendDate = DateOnly.FromDateTime(DateTime.Now),
                 IsRead = false
             };
@@ -500,6 +511,66 @@ public class BloodRequestService : IBloodRequestService
                 requestId, newStatus);
             return (false, "An error occurred while updating the request status");
         }
+    }
+
+    private bool IsValidStatusTransition(BloodRequestStatus currentStatus, BloodRequestStatus newStatus, string userRole)
+    {
+        // Staff có thể thực hiện mọi chuyển đổi trạng thái
+        if (userRole == "Staff" || userRole == "Admin")
+        {
+            return (currentStatus, newStatus) switch
+            {
+                (BloodRequestStatus.Draft, BloodRequestStatus.Pending) => true,
+                (BloodRequestStatus.Pending, BloodRequestStatus.Opened) => true,
+                (BloodRequestStatus.Pending, BloodRequestStatus.Approved) => true,
+                (BloodRequestStatus.Pending, BloodRequestStatus.Rejected) => true,
+                (BloodRequestStatus.Pending, BloodRequestStatus.Done) => true,
+                (BloodRequestStatus.Pending, BloodRequestStatus.Closed) => true,
+                (BloodRequestStatus.Opened, BloodRequestStatus.Approved) => true,
+                (BloodRequestStatus.Opened, BloodRequestStatus.Rejected) => true,
+                (BloodRequestStatus.Opened, BloodRequestStatus.Pending) => true,
+                (BloodRequestStatus.Opened, BloodRequestStatus.Done) => true,
+                (BloodRequestStatus.Opened, BloodRequestStatus.Closed) => true,
+                (BloodRequestStatus.Approved, BloodRequestStatus.Done) => true,
+                (BloodRequestStatus.Approved, BloodRequestStatus.Closed) => true,
+                (BloodRequestStatus.Done, BloodRequestStatus.Closed) => true,
+                _ => false
+            };
+        }
+        
+        // Member chỉ có thể thực hiện một số chuyển đổi giới hạn
+        if (userRole == "Member")
+        {
+            return (currentStatus, newStatus) switch
+            {
+                // Member có thể chuyển từ Draft sang Pending
+                (BloodRequestStatus.Draft, BloodRequestStatus.Pending) => true,
+                
+                // Member có thể chuyển từ Pending sang Opened hoặc ngược lại
+                (BloodRequestStatus.Pending, BloodRequestStatus.Opened) => true,
+                (BloodRequestStatus.Opened, BloodRequestStatus.Pending) => true,
+                
+                // Member có thể đóng request ở trạng thái Done
+                (BloodRequestStatus.Done, BloodRequestStatus.Closed) => true,
+                
+                _ => false
+            };
+        }
+
+        // Donor có thể thực hiện một số chuyển đổi khác
+        if (userRole == "Donor") 
+        {
+            return (currentStatus, newStatus) switch
+            {
+                // Donor có thể chuyển từ Opened sang Pending
+                (BloodRequestStatus.Opened, BloodRequestStatus.Pending) => true,
+                
+                _ => false
+            };
+        }
+
+        // Mặc định không cho phép chuyển đổi
+        return false;
     }
     public async Task<(bool success, string message)> UpdateReceivedQuantityAsync(
     BloodRequestUpdateQuantityDTO updateDto,
