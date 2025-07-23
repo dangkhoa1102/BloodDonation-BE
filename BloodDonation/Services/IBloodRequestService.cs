@@ -25,5 +25,6 @@ namespace Services
        Task<(bool success, string message)> UpdateReceivedQuantityAsync(
        BloodRequestUpdateQuantityDTO updateDto,
        Guid staffId);
+        Task<UserDetailDTO> GetRequestUserDetailsAsync(Guid requestId);
     }
 }
