@@ -27,7 +27,7 @@ public partial class HealthCheck
 
     public string Allergies { get; set; }
 
-    public DateOnly HealthCheckDate { get; set; }
+    public DateTime HealthCheckDate { get; set; }
 
     public string HealthCheckStatus { get; set; }
 

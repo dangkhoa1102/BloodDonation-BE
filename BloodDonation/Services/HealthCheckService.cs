@@ -38,6 +38,24 @@ namespace Services
             var donor = await _donorRepo.GetByUserIdCardAsync(dto.UserIdCard);
             if (donor == null)
                 throw new ArgumentException("Không tìm thấy donor với userIdCard này");
+            
+            var approvedHealthCheck = await _context.HealthChecks
+        .Where(h => h.DonorId == donor.DonorId && h.HealthCheckStatus == "Approved")
+        .OrderByDescending(h => h.HealthCheckDate)
+        .FirstOrDefaultAsync();
+
+            if (approvedHealthCheck != null)
+            {
+                // Kiểm tra xem đã có BloodDonation sử dụng HealthCheck này chưa
+                var used = await _context.BloodDonations
+                    .AnyAsync(d => d.DonorId == donor.DonorId && d.DonationDate == approvedHealthCheck.HealthCheckDate);
+
+                if (!used)
+                {
+                    // Nếu chưa dùng, không cho tạo mới
+                    throw new InvalidOperationException("Donor đã có HealthCheck Approved chưa sử dụng cho lần hiến máu nào.");
+                }
+            }
 
             var entity = new HealthCheck
             {
@@ -54,6 +72,19 @@ namespace Services
                 HealthCheckDate = dto.HealthCheckDate,
                 HealthCheckStatus = dto.HealthCheckStatus
             };
+
+            //// Tìm BloodDonation theo DonorId và HealthCheckDate
+            var bloodDonation = await _context.BloodDonations
+        .FirstOrDefaultAsync(b => b.DonorId == donor.DonorId && b.DonationDate == dto.HealthCheckDate);
+
+            // Nếu tìm thấy và DTO có Quantity thì cập nhật
+            if (bloodDonation != null && dto.Quantity.HasValue)
+            {
+                bloodDonation.Quantity = dto.Quantity.Value;
+                _context.BloodDonations.Update(bloodDonation);
+                await _context.SaveChangesAsync();
+            }
+
             return await _repo.AddAsync(entity);
         }
 
@@ -87,21 +118,42 @@ namespace Services
             var healthCheck = await _repo.GetByIdAsync(healthCheckId);
             if (healthCheck == null) throw new Exception("Không tìm thấy HealthCheck");
 
-            // 2. Cập nhật trạng thái HealthCheck
-            healthCheck.HealthCheckStatus = "Approved";
-            await _repo.UpdateAsync(healthCheck);
             // Tìm Donor
             var donor = await _donorRepo.GetByIdAsync(healthCheck.DonorId);
             if (donor == null) throw new Exception("Không tìm thấy Donor");
 
             // Tìm BloodDonation đúng ngày HealthCheck
+            // chỉ kiểm tra ngày, không ktra giờ phút giây
             var donation = await _context.BloodDonations
-                .Where(d => d.DonorId == donor.DonorId && d.DonationDate == healthCheck.HealthCheckDate)
-                .FirstOrDefaultAsync();
+    .Where(d => d.DonorId == donor.DonorId
+        && d.DonationDate.HasValue
+        && d.DonationDate.Value.Date == healthCheck.HealthCheckDate.Date)
+    .OrderByDescending(d => d.DonationDate)
+    .FirstOrDefaultAsync();
 
             if (donation == null) throw new Exception("Không tìm thấy BloodDonation phù hợp");
 
-            // 1. Cập nhật trạng thái
+            // Cập nhật trạng thái các HealthCheck "Approved" cũ thành "Used" nếu đã có BloodDonation
+            var oldApprovedChecks = await _context.HealthChecks
+                .Where(h => h.DonorId == donor.DonorId && h.HealthCheckStatus == "Approved" && h.HealthCheckId != healthCheckId)
+                .ToListAsync();
+
+            foreach (var oldCheck in oldApprovedChecks)
+            {
+                var used = await _context.BloodDonations.AnyAsync(d =>
+                    d.DonorId == donor.DonorId && d.DonationDate == oldCheck.HealthCheckDate);
+                if (used)
+                {
+                    oldCheck.HealthCheckStatus = "Used";
+                    _context.HealthChecks.Update(oldCheck);
+                }
+            }
+
+            // 1. Cập nhật trạng thái HealthCheck hiện tại
+            healthCheck.HealthCheckStatus = "Approved";
+            await _repo.UpdateAsync(healthCheck);
+
+            // 2. Cập nhật trạng thái BloodDonation
             donation.Status = "Completed";
             _context.BloodDonations.Update(donation);
 
@@ -148,7 +200,7 @@ namespace Services
                 BloodTypeId = donor.BloodTypeId,
                 ComponentType = null, // Chưa biết, staff sẽ cập nhật sau
                 Status = "available",
-                ExpiryDate = expiryDate,
+                ExpiryDate = DateOnly.FromDateTime(expiryDate),
                 Quantity = donation.Quantity ?? 0,
             };
             _context.BloodUnits.Add(bloodUnit);

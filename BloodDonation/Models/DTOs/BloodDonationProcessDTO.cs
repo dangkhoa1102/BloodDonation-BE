@@ -10,7 +10,7 @@ namespace Models.DTOs
     {
         public Guid DonationId { get; set; }
         public string Status { get; set; } = string.Empty;
-        public DateOnly? HealthCheckDate { get; set; }
+        public DateTime? HealthCheckDate { get; set; }
         public string HealthCheckStatus { get; set; } = string.Empty;
         public Guid? CertificateId { get; set; }
         public string Notes { get; set; } = string.Empty;

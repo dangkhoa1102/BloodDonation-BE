@@ -12,7 +12,7 @@ public partial class BloodDonation
 
     public Guid? RequestId { get; set; }
 
-    public DateOnly? DonationDate { get; set; }
+    public DateTime? DonationDate { get; set; }
 
     public int? Quantity { get; set; }
 

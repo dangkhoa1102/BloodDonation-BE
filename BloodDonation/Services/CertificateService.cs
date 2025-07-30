@@ -50,7 +50,7 @@ namespace Services
                     BloodType = c.Donor != null && c.Donor.BloodType != null
                             ? c.Donor.BloodType.AboType + c.Donor.BloodType.RhFactor
                             : null,
-                    BloodDonationDate = c.Donation != null ? c.Donation.DonationDate : null
+                    BloodDonationDate = c.Donation != null && c.Donation.DonationDate.HasValue ? DateOnly.FromDateTime(c.Donation.DonationDate.Value) : (DateOnly?)null
                 })
                 .ToListAsync();
         }
@@ -87,7 +87,10 @@ namespace Services
                 BloodType = c.Donor != null && c.Donor.BloodType != null
                             ? c.Donor.BloodType.AboType + c.Donor.BloodType.RhFactor
                             : null,
-                BloodDonationDate = c.Donation != null ? c.Donation.DonationDate : null
+                BloodDonationDate = c.Donation != null && c.Donation.DonationDate.HasValue
+    ? DateOnly.FromDateTime(c.Donation.DonationDate.Value)
+    : (DateOnly?)null
+
             };
         }
 

@@ -13,7 +13,7 @@ namespace Models.DTOs
         public Guid DonorId { get; set; }
 
         [Required]
-        public DateOnly DonationDate { get; set; }
+        public DateTime? DonationDate { get; set; }
 
         [Required]
         [Range(100, 1000, ErrorMessage = "Quantity must be between 100 and 1000 ml.")]
@@ -24,14 +24,14 @@ namespace Models.DTOs
         public string HealthStatus { get; set; } = string.Empty;
 
         [Required]
-        public DateOnly NextEligibleDate { get; set; }
+        public DateTime? NextEligibleDate { get; set; }
         public Guid? CertificateId { get; set; }
     }
 
     public class DonationHistoryUpdateDto
     {
         [Required]
-        public DateOnly DonationDate { get; set; }
+        public DateTime? DonationDate { get; set; }
 
         [Required]
         [Range(100, 1000, ErrorMessage = "Quantity must be between 100 and 1000 ml.")]
@@ -42,7 +42,7 @@ namespace Models.DTOs
         public string HealthStatus { get; set; } = string.Empty;
 
         [Required]
-        public DateOnly NextEligibleDate { get; set; }
+        public DateTime? NextEligibleDate { get; set; }
         public Guid? CertificateId { get; set; }
     }
 
@@ -51,10 +51,10 @@ namespace Models.DTOs
     {
         public Guid HistoryId { get; set; }
         public Guid DonorId { get; set; }
-        public DateOnly DonationDate { get; set; }
+        public DateTime? DonationDate { get; set; }
         public int Quantity { get; set; }
         public string HealthStatus { get; set; } = string.Empty;
-        public DateOnly NextEligibleDate { get; set; }
+        public DateTime? NextEligibleDate { get; set; }
         public Guid? CertificateId { get; set; }
 
         // Thông tin mở rộng về người hiến máu (nếu cần)

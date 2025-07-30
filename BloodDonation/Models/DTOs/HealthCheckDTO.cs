@@ -17,7 +17,8 @@ namespace Models.DTOs
         public string MedicalHistory { get; set; } = string.Empty;
         public string CurrentMedications { get; set; } = string.Empty;
         public string Allergies { get; set; } = string.Empty;
-        public DateOnly HealthCheckDate { get; set; }
+        public DateTime HealthCheckDate { get; set; }
         public string HealthCheckStatus { get; set; } = string.Empty;
+        public int? Quantity { get; set; }
     }
 }

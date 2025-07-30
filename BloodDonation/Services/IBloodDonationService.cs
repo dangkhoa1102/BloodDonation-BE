@@ -20,6 +20,8 @@ namespace Services
 
         Task<bool> ApproveDonationAsync(Guid donationId, DateOnly? approveDate);
         Task<bool> RejectDonationAsync(Guid donationId, string reason, DateOnly? rejectionDate);
+        Task<bool> CancelDonationAsync(Guid donationId, string reason, DateOnly? cancelDate);
+
 
     }
 
