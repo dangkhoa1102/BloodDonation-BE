@@ -25,9 +25,20 @@ var builder = WebApplication.CreateBuilder(args);
 
 var googleSection = builder.Configuration.GetSection("Authentication:Google");
 
+//builder.Services.AddDbContext<BloodDonationSupportContext>(options =>
+//{
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+//});
 builder.Services.AddDbContext<BloodDonationSupportContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlServerOptionsAction: sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null);
+        });
 });
 
 builder.Services.AddScoped<IHealthCheckRepository, HealthCheckRepository>();
@@ -197,6 +208,25 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
+
+    // Redirect to Azure URL
+    app.Use(async (context, next) =>
+    {
+        var productionUrl = "https://blooddonation-bcdbbtfsc3achkc0.southeastasia-01.azurewebsites.net";
+
+        if (context.Request.Host.Host.Contains("localhost"))
+        {
+            context.Response.Redirect($"{productionUrl}{context.Request.Path}");
+            return;
+        }
+
+        await next();
+    });
+}
 
 app.Use(async (context, next) =>
 {
@@ -206,14 +236,15 @@ app.Use(async (context, next) =>
 app.UseCors("AllowAllOrigins");
 
 // Configure the HTTP request pipeline
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Blood Donation API V1");
+    c.DefaultModelsExpandDepth(-1);
+});
+
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Blood Donation API V1");
-        c.DefaultModelsExpandDepth(-1);
-    });
     app.UseDeveloperExceptionPage();
 }
 
