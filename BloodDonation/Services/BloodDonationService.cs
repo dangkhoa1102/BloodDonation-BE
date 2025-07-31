@@ -99,6 +99,7 @@ namespace Services
             {
                 DonationId = Guid.NewGuid(),
                 DonorId = donor.DonorId,
+                RequestId = dto.RequestId,
                 DonationDate = dto.DonationDate,
                 Quantity = dto.Quantity,
                 Status = "Approved",
@@ -144,7 +145,6 @@ namespace Services
 
         public async Task<BloodDonationDto> CreateWithSynchronizedInfoAsync(CreateBloodDonationDto dto)
         {
-            // Bằng
             if (!dto.DonorId.HasValue)
             {
                 _logger.LogError("DonorId is required");
@@ -164,50 +164,32 @@ namespace Services
                 throw new ArgumentException("User không tồn tại cho donor này");
             }
 
-            // Lấy thông tin địa chỉ trực tiếp từ Donor
-            string address = donor.Address ?? string.Empty;
+            // Lấy thông tin nhóm máu từ Donor
+            string bloodType = donor.BloodType != null
+                ? $"{donor.BloodType.AboType}{donor.BloodType.RhFactor}"
+                : string.Empty;
 
-
-            // Lấy thông tin nhóm máu
-            string bloodType = "";
-            if (donor.BloodType != null)
-            {
-                bloodType = $"{donor.BloodType.AboType}{donor.BloodType.RhFactor}";
-            }
-
+            // Tạo mới BloodDonation, ưu tiên lấy từ DTO, nếu không có thì lấy từ Donor/User
             var donation = new BloodDonation
             {
                 DonationId = Guid.NewGuid(),
                 DonorId = dto.DonorId.Value,
                 RequestId = dto.RequestId,
-                DonationDate = dto.DonationDate,
-                Quantity = dto.Quantity,
-                Status = dto.Status,
-                Notes = dto.Notes,
-
-                //// Thông tin cá nhân đồng bộ từ User
-                //FullName = user.FullName,
-                //PhoneNumber = user.Phone,
-                //Email = user.Email,
-                //Address = address,
-
-                //// Thông tin y tế đồng bộ từ Donor
-                //BloodType = bloodType,
-                //LastDonationDate = donor.LastDonationDate,
-                ////MedicalHistory = donor.MedicalHistory,
-                //CurrentMedications = dto.CurrentMedications
+                DonationDate = dto.DonationDate ?? (donor.LastDonationDate.HasValue ? donor.LastDonationDate.Value.ToDateTime(TimeOnly.MinValue) : null),
+                Quantity = dto.Quantity ?? 0, // Nếu Donor có trường mặc định thì lấy, còn không để 0
+                Status = !string.IsNullOrWhiteSpace(dto.Status) ? dto.Status : "Pending",
+                Notes = !string.IsNullOrWhiteSpace(dto.Notes) ? dto.Notes : "",
+                // Các trường khác nếu cần
             };
 
             await _donationRepository.AddAsync(donation);
             await _donationRepository.SaveChangesAsync();
 
             // Cập nhật LastDonationDate cho Donor
-            if (dto.DonationDate.HasValue)
+            if (donation.DonationDate.HasValue)
             {
-                var donationDateOnly = DateOnly.FromDateTime(dto.DonationDate.Value);
+                var donationDateOnly = DateOnly.FromDateTime(donation.DonationDate.Value);
                 donor.LastDonationDate = donationDateOnly;
-
-                // Tính toán NextEligibleDate (ví dụ: 3 tháng sau lần hiến máu)
                 donor.NextEligibleDate = donationDateOnly.AddMonths(3);
             }
 
@@ -224,23 +206,20 @@ namespace Services
                 Status = donation.Status ?? string.Empty,
                 Notes = donation.Notes ?? string.Empty,
                 CertificateId = donation.CertificateId,
-
-                // Lấy thông tin từ Donor và User
+                // Thông tin cá nhân từ User/Donor
                 FullName = user.FullName ?? string.Empty,
                 PhoneNumber = user.Phone ?? string.Empty,
                 Email = user.Email ?? string.Empty,
                 Address = donor.Address ?? string.Empty,
-
-                BloodType = donor.BloodType != null
-            ? $"{donor.BloodType.AboType}{donor.BloodType.RhFactor}"
-            : string.Empty,
+                BloodType = bloodType,
                 LastDonationDate = donor.LastDonationDate,
-                CurrentMedications = dto.CurrentMedications ?? string.Empty,
+                CurrentMedications = dto.CurrentMedications ?? donor.CurrentMedications ?? string.Empty,
                 DonorName = user.FullName ?? string.Empty,
                 RequestDescription = donation.Request?.Description ?? string.Empty,
-                DateOfBirth = donor.User?.DateOfBirth
+                DateOfBirth = user.DateOfBirth
             };
         }
+
 
         public async Task<bool> UpdateAsync(Guid id, UpdateBloodDonationDto dto)
         {
