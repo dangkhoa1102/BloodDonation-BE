@@ -14,19 +14,22 @@ public class BloodRequestService : IBloodRequestService
     private readonly IUserRepository _userRepository;
     private readonly IBloodTypeRepository _bloodTypeRepository;
     private readonly ILogger<BloodRequestService> _logger;
+    private readonly IDonorRepository _donorRepository;
 
     public BloodRequestService(
         IBloodRequestRepository requestRepository,
         IBloodRecipientRepository recipientRepository,
         IUserRepository userRepository,
         IBloodTypeRepository bloodTypeRepository,
-        ILogger<BloodRequestService> logger)
+        ILogger<BloodRequestService> logger,
+        IDonorRepository donorRepository)
     {
         _requestRepository = requestRepository;
         _recipientRepository = recipientRepository;
         _userRepository = userRepository;
         _bloodTypeRepository = bloodTypeRepository;
         _logger = logger;
+        _donorRepository = donorRepository;
     }
 
     public async Task<(bool success, string message, Guid? requestId)> RegisterBloodRequestAsync(
@@ -233,13 +236,10 @@ public class BloodRequestService : IBloodRequestService
             var quantityNeeded = request.QuantityNeeded;
             var totalAvailableQuantity = 0;
 
-            // Get compatible blood types based on the required blood type
+            // Kiểm tra và tính toán lượng máu tương thích có sẵn
             var compatibleTypes = GetCompatibleBloodTypes(bloodTypeString);
-            
-            // Check available quantity for each compatible blood type
             foreach (var compatibleType in compatibleTypes)
             {
-                // Find blood type ID for the compatible type
                 var compatibleBloodType = (await _bloodTypeRepository.GetAllAsync())
                     .FirstOrDefault(bt => $"{bt.AboType}{bt.RhFactor}" == compatibleType);
                     
@@ -253,16 +253,11 @@ public class BloodRequestService : IBloodRequestService
                 }
             }
 
-            // Determine initial status based on total available compatible blood
             var initialStatus = totalAvailableQuantity >= quantityNeeded
-                ? BloodRequestStatus.Pending.ToString()  // Đủ ml máu tương thích
-                : BloodRequestStatus.Opened.ToString();   // Không đủ ml máu tương thích
+                ? BloodRequestStatus.Pending.ToString()
+                : BloodRequestStatus.Opened.ToString();
 
-            _logger.LogInformation(
-                "Blood availability check - Required: {Required}ml, Total Available Compatible: {Available}ml, Status: {Status}",
-                quantityNeeded, totalAvailableQuantity, initialStatus);
-
-            // Create or update user
+            // Tìm hoặc tạo user mới
             var existingUser = await _userRepository.GetByEmailAsync(request.Email);
             if (existingUser == null)
             {
@@ -296,7 +291,7 @@ public class BloodRequestService : IBloodRequestService
                 _logger.LogInformation("Updated existing user information for ID: {UserId}", existingUser.UserId);
             }
 
-            // Create or get recipient
+            // Tìm hoặc tạo recipient
             var recipient = await _recipientRepository.GetByUserIdAsync(existingUser.UserId);
             if (recipient == null)
             {
@@ -306,12 +301,42 @@ public class BloodRequestService : IBloodRequestService
                     UserId = existingUser.UserId,
                     ContactInfo = request.Phone
                 };
+
+                // Kiểm tra xem user đã có nhóm máu chưa
+                var existingDonor = await _donorRepository.GetByIdAsync(existingUser.UserId);
+                if (existingDonor == null || existingDonor.BloodTypeId == null)
+                {
+                    // Nếu chưa có thông tin donor hoặc chưa có nhóm máu, tạo mới donor với nhóm máu từ yêu cầu
+                    if (existingDonor == null)
+                    {
+                        existingDonor = new Donor
+                        {
+                            DonorId = Guid.NewGuid(),
+                            UserId = existingUser.UserId,
+                            BloodTypeId = request.BloodTypeRequired, // Gán nhóm máu từ yêu cầu
+                            FullName = request.PatientName,
+                            Email = request.Email,
+                            PhoneNumber = request.Phone
+                        };
+                        await _donorRepository.AddAsync(existingDonor);
+                    }
+                    else
+                    {
+                        existingDonor.BloodTypeId = request.BloodTypeRequired; // Cập nhật nhóm máu
+                        _donorRepository.Update(existingDonor);
+                    }
+                    await _donorRepository.SaveChangesAsync();
+                    _logger.LogInformation(
+                        "Updated blood type for user {UserId} to {BloodType}",
+                        existingUser.UserId, bloodTypeString);
+                }
+
                 await _recipientRepository.AddAsync(recipient);
                 await _recipientRepository.SaveChangesAsync();
                 _logger.LogInformation("Created new recipient with ID: {RecipientId}", recipient.RecipientId);
             }
 
-            // Create emergency blood request with compatibility information
+            // Tạo yêu cầu máu khẩn cấp
             var compatibleTypesStr = string.Join(", ", compatibleTypes);
             var bloodRequest = new BloodRequest
             {
@@ -329,11 +354,7 @@ public class BloodRequestService : IBloodRequestService
             await _requestRepository.AddAsync(bloodRequest);
             await _requestRepository.SaveChangesAsync();
 
-            _logger.LogInformation(
-                "Created emergency blood request with ID: {RequestId}, Status: {Status}, Total Compatible Units: {AvailableUnits}",
-                bloodRequest.RequestId, initialStatus, totalAvailableQuantity);
-
-            // Create notification
+            // Tạo thông báo
             var notification = new Notification
             {
                 NotificationId = Guid.NewGuid(),
