@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 
 using Microsoft.AspNetCore.Mvc;
@@ -320,6 +320,33 @@ namespace APIS.Controllers
             {
                 _logger.LogError(ex, "Error retrieving user by UserIdCard: {UserIdCard}", userIdCard);
                 return StatusCode(500, new { message = "An error occurred while retrieving user information" });
+            }
+        }
+        [HttpDelete("Delete-user/{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        public async Task<IActionResult> DeleteUser(Guid id)
+        {
+            try
+            {
+                // Kiểm tra xem người dùng có quyền Admin không
+                if (!User.IsInRole("Admin"))
+                {
+                    return Unauthorized(new { message = "Only administrators can delete users" });
+                }
+
+                // Gọi service để xóa user
+                var (success, message) = await _userService.DeleteUserAsync(id);
+
+                if (!success)
+                    return BadRequest(new { message });
+
+                _logger.LogInformation("User {UserId} deleted successfully", id);
+                return Ok(new { message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting user {UserId}", id);
+                return StatusCode(500, new { message = "An error occurred while deleting the user" });
             }
         }
     }
