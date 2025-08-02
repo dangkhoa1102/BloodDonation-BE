@@ -225,38 +225,6 @@ public class BloodRequestService : IBloodRequestService
                 return (false, "Invalid staff member", null);
             }
 
-            // Get the required blood type details
-            var requiredBloodType = await _bloodTypeRepository.GetByIdAsync(request.BloodTypeRequired);
-            if (requiredBloodType == null)
-            {
-                return (false, "Invalid blood type specified", null);
-            }
-
-            var bloodTypeString = $"{requiredBloodType.AboType}{requiredBloodType.RhFactor}";
-            var quantityNeeded = request.QuantityNeeded;
-            var totalAvailableQuantity = 0;
-
-            // Kiểm tra và tính toán lượng máu tương thích có sẵn
-            var compatibleTypes = GetCompatibleBloodTypes(bloodTypeString);
-            foreach (var compatibleType in compatibleTypes)
-            {
-                var compatibleBloodType = (await _bloodTypeRepository.GetAllAsync())
-                    .FirstOrDefault(bt => $"{bt.AboType}{bt.RhFactor}" == compatibleType);
-                    
-                if (compatibleBloodType != null)
-                {
-                    var availableQuantity = await _bloodTypeRepository.GetAvailableUnitsQuantityAsync(compatibleBloodType.BloodTypeId);
-                    totalAvailableQuantity += availableQuantity;
-                    _logger.LogInformation(
-                        "Compatible blood type {CompatibleType} has {Available}ml available",
-                        compatibleType, availableQuantity);
-                }
-            }
-
-            var initialStatus = totalAvailableQuantity >= quantityNeeded
-                ? BloodRequestStatus.Pending.ToString()
-                : BloodRequestStatus.Opened.ToString();
-
             // Tìm hoặc tạo user mới
             var existingUser = await _userRepository.GetByEmailAsync(request.Email);
             if (existingUser == null)
@@ -291,6 +259,79 @@ public class BloodRequestService : IBloodRequestService
                 _logger.LogInformation("Updated existing user information for ID: {UserId}", existingUser.UserId);
             }
 
+            // Kiểm tra xem user đã có donor profile với nhóm máu chưa
+            var existingDonor = await _donorRepository.GetByIdAsync(existingUser.UserId);
+            Guid bloodTypeId;
+
+            if (existingDonor != null && existingDonor.BloodTypeId.HasValue)
+            {
+                // Nếu donor đã có nhóm máu, sử dụng nhóm máu đó
+                bloodTypeId = existingDonor.BloodTypeId.Value;
+                _logger.LogInformation("Using existing blood type for user {UserId}: {BloodTypeId}", 
+                    existingUser.UserId, bloodTypeId);
+            }
+            else
+            {
+                // Nếu chưa có donor hoặc chưa có nhóm máu, sử dụng nhóm máu từ yêu cầu
+                bloodTypeId = request.BloodTypeRequired;
+                
+                if (existingDonor == null)
+                {
+                    // Tạo mới donor profile
+                    existingDonor = new Donor
+                    {
+                        DonorId = Guid.NewGuid(),
+                        UserId = existingUser.UserId,
+                        BloodTypeId = bloodTypeId,
+                        FullName = request.PatientName,
+                        Email = request.Email,
+                        PhoneNumber = request.Phone
+                    };
+                    await _donorRepository.AddAsync(existingDonor);
+                }
+                else
+                {
+                    // Cập nhật nhóm máu cho donor hiện có
+                    existingDonor.BloodTypeId = bloodTypeId;
+                    _donorRepository.Update(existingDonor);
+                }
+                await _donorRepository.SaveChangesAsync();
+                _logger.LogInformation("Updated blood type for user {UserId} to {BloodTypeId}", 
+                    existingUser.UserId, bloodTypeId);
+            }
+
+            // Lấy thông tin nhóm máu
+            var requiredBloodType = await _bloodTypeRepository.GetByIdAsync(bloodTypeId);
+            if (requiredBloodType == null)
+            {
+                return (false, "Invalid blood type specified", null);
+            }
+
+            var bloodTypeString = $"{requiredBloodType.AboType}{requiredBloodType.RhFactor}";
+            var quantityNeeded = request.QuantityNeeded;
+            var totalAvailableQuantity = 0;
+
+            // Kiểm tra và tính toán lượng máu tương thích có sẵn
+            var compatibleTypes = GetCompatibleBloodTypes(bloodTypeString);
+            foreach (var compatibleType in compatibleTypes)
+            {
+                var compatibleBloodType = (await _bloodTypeRepository.GetAllAsync())
+                    .FirstOrDefault(bt => $"{bt.AboType}{bt.RhFactor}" == compatibleType);
+                
+                if (compatibleBloodType != null)
+                {
+                    var availableQuantity = await _bloodTypeRepository.GetAvailableUnitsQuantityAsync(compatibleBloodType.BloodTypeId);
+                    totalAvailableQuantity += availableQuantity;
+                    _logger.LogInformation(
+                        "Compatible blood type {CompatibleType} has {Available}ml available",
+                        compatibleType, availableQuantity);
+                }
+            }
+
+            var initialStatus = totalAvailableQuantity >= quantityNeeded
+                ? BloodRequestStatus.Pending.ToString()
+                : BloodRequestStatus.Opened.ToString();
+
             // Tìm hoặc tạo recipient
             var recipient = await _recipientRepository.GetByUserIdAsync(existingUser.UserId);
             if (recipient == null)
@@ -301,39 +342,8 @@ public class BloodRequestService : IBloodRequestService
                     UserId = existingUser.UserId,
                     ContactInfo = request.Phone
                 };
-
-                // Kiểm tra xem user đã có nhóm máu chưa
-                var existingDonor = await _donorRepository.GetByIdAsync(existingUser.UserId);
-                if (existingDonor == null || existingDonor.BloodTypeId == null)
-                {
-                    // Nếu chưa có thông tin donor hoặc chưa có nhóm máu, tạo mới donor với nhóm máu từ yêu cầu
-                    if (existingDonor == null)
-                    {
-                        existingDonor = new Donor
-                        {
-                            DonorId = Guid.NewGuid(),
-                            UserId = existingUser.UserId,
-                            BloodTypeId = request.BloodTypeRequired, // Gán nhóm máu từ yêu cầu
-                            FullName = request.PatientName,
-                            Email = request.Email,
-                            PhoneNumber = request.Phone
-                        };
-                        await _donorRepository.AddAsync(existingDonor);
-                    }
-                    else
-                    {
-                        existingDonor.BloodTypeId = request.BloodTypeRequired; // Cập nhật nhóm máu
-                        _donorRepository.Update(existingDonor);
-                    }
-                    await _donorRepository.SaveChangesAsync();
-                    _logger.LogInformation(
-                        "Updated blood type for user {UserId} to {BloodType}",
-                        existingUser.UserId, bloodTypeString);
-                }
-
                 await _recipientRepository.AddAsync(recipient);
                 await _recipientRepository.SaveChangesAsync();
-                _logger.LogInformation("Created new recipient with ID: {RecipientId}", recipient.RecipientId);
             }
 
             // Tạo yêu cầu máu khẩn cấp
@@ -342,7 +352,7 @@ public class BloodRequestService : IBloodRequestService
             {
                 RequestId = Guid.NewGuid(),
                 RecipientId = recipient.RecipientId,
-                BloodTypeRequired = request.BloodTypeRequired,
+                BloodTypeRequired = bloodTypeId,  // Sử dụng bloodTypeId đã xác định
                 QuantityNeeded = request.QuantityNeeded,
                 UrgencyLevel = "Emergency",
                 RequestDate = DateOnly.FromDateTime(DateTime.UtcNow),
