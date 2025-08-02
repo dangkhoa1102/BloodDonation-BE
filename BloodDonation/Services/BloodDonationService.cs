@@ -284,21 +284,6 @@ namespace Services
             donation.Status = "Rejected";
             donation.Notes = $"Rejected: {reason} on {rejectionDate?.ToString() ?? DateTime.Now.ToShortDateString()}";
             await _donationRepository.SaveChangesAsync();
-            // Update HealthCheck status = Rejected if exists
-            if (donation.DonorId.HasValue)
-            {
-                var healthCheck = await _context.HealthChecks
-                    .Where(h => h.DonorId == donation.DonorId.Value)
-                    .OrderByDescending(h => h.HealthCheckDate)
-                    .FirstOrDefaultAsync();
-
-                if (healthCheck != null)
-                {
-                    healthCheck.HealthCheckStatus = "Rejected";
-                    _context.HealthChecks.Update(healthCheck);
-                    await _context.SaveChangesAsync();
-                }
-            }
             return true;
         }
 
