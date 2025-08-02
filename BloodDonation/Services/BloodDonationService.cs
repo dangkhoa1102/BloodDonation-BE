@@ -284,7 +284,7 @@ namespace Services
             donation.Status = "Rejected";
             donation.Notes = $"Rejected: {reason} on {rejectionDate?.ToString() ?? DateTime.Now.ToShortDateString()}";
             await _donationRepository.SaveChangesAsync();
-            // Update HealthCheck status = Used if exists
+            // Update HealthCheck status = Rejected if exists
             if (donation.DonorId.HasValue)
             {
                 var healthCheck = await _context.HealthChecks
@@ -294,7 +294,7 @@ namespace Services
 
                 if (healthCheck != null)
                 {
-                    healthCheck.HealthCheckStatus = "Used";
+                    healthCheck.HealthCheckStatus = "Rejected";
                     _context.HealthChecks.Update(healthCheck);
                     await _context.SaveChangesAsync();
                 }
