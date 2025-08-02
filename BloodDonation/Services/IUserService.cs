@@ -11,4 +11,5 @@ public interface IUserService
     Task<User> GetCurrentUserAsync(Guid userId);
     Task<IEnumerable<User>> GetUsersByFullNameAsync(string fullName);
     Task<User> GetByUserIdCardAsync(string userIdCard);
+    Task<(bool success, string message)> DeleteUserAsync(Guid userId);
 }

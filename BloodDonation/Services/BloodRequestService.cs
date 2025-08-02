@@ -14,19 +14,22 @@ public class BloodRequestService : IBloodRequestService
     private readonly IUserRepository _userRepository;
     private readonly IBloodTypeRepository _bloodTypeRepository;
     private readonly ILogger<BloodRequestService> _logger;
+    private readonly IDonorRepository _donorRepository;
 
     public BloodRequestService(
         IBloodRequestRepository requestRepository,
         IBloodRecipientRepository recipientRepository,
         IUserRepository userRepository,
         IBloodTypeRepository bloodTypeRepository,
-        ILogger<BloodRequestService> logger)
+        ILogger<BloodRequestService> logger,
+        IDonorRepository donorRepository)
     {
         _requestRepository = requestRepository;
         _recipientRepository = recipientRepository;
         _userRepository = userRepository;
         _bloodTypeRepository = bloodTypeRepository;
         _logger = logger;
+        _donorRepository = donorRepository;
     }
 
     public async Task<(bool success, string message, Guid? requestId)> RegisterBloodRequestAsync(
@@ -208,115 +211,7 @@ public class BloodRequestService : IBloodRequestService
             return (false, "An error occurred while updating the blood request");
         }
     }
-    //public async Task<(bool success, string message)> RejectBloodRequestAsync(
-    //Guid requestId,
-    //BloodRequestRejectDTO rejectDto,
-    //Guid staffId)
-    //{
-    //    try
-    //    {
-    //        var request = await _requestRepository.GetByIdWithDetailsAsync(requestId);
-
-    //        if (request == null)
-    //        {
-    //            return (false, "Blood request not found");
-    //        }
-
-    //        // Chỉ cho phép từ chối đơn có trạng thái Pending
-    //        if (request.Status != BloodRequestStatus.Pending.ToString())
-    //        {
-    //            return (false, $"Can only reject requests with 'Pending' status. Current status: {request.Status}");
-    //        }
-
-    //        // Cập nhật trạng thái và thông tin từ chối
-    //        request.Status = BloodRequestStatus.Rejected.ToString();
-    //        request.Description = $"Reason: {rejectDto.RejectionReason}";
-
-    //        // Tạo notification cho recipient
-    //        var notification = new Notification
-    //        {
-    //            NotificationId = Guid.NewGuid(),
-    //            UserId = request.Recipient?.UserId,
-    //            NotificationType = "Request Rejection",
-    //            Message = $"Your blood request (ID: {request.RequestId}) has been rejected.\n{rejectDto.RejectionReason}",
-    //            SendDate = DateOnly.FromDateTime(DateTime.Now),
-    //            IsRead = false
-    //        };
-
-    //        // Log hoạt động
-    //        _logger.LogInformation(
-    //            "Blood request {RequestId} rejected by staff {StaffId}. Reason: {Reason}",
-    //            requestId, staffId, rejectDto.RejectionReason);
-
-    //        // Lưu thay đổi
-    //        _requestRepository.Update(request);
-    //        await _requestRepository.SaveChangesAsync();
-
-    //        return (true, "Blood request rejected successfully");
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        _logger.LogError(ex, "Error rejecting blood request {RequestId}", requestId);
-    //        return (false, "An error occurred while rejecting the blood request");
-    //    }
-    //}
-    //public async Task<(bool success, string message)> ApproveBloodRequestAsync(
-    //Guid requestId,
-    //Guid staffId)
-    //{
-    //    try
-    //    {
-    //        // Kiểm tra staff
-    //        var staff = await _userRepository.GetByIdAsync(staffId);
-    //        if (staff == null || staff.Role != "Staff")
-    //        {
-    //            return (false, "Invalid staff member");
-    //        }
-
-    //        var request = await _requestRepository.GetByIdWithDetailsAsync(requestId);
-    //        if (request == null)
-    //        {
-    //            return (false, "Blood request not found");
-    //        }
-
-    //        // Chỉ cho phép approve đơn có trạng thái Pending
-    //        if (request.Status != BloodRequestStatus.Pending.ToString())
-    //        {
-    //            return (false, $"Can only approve requests with 'Pending' status. Current status: {request.Status}");
-    //        }
-
-    //        // Cập nhật trạng thái 
-    //        request.Status = BloodRequestStatus.Approved.ToString();
-
-    //        // Tạo notification cho recipient
-    //        var notification = new Notification
-    //        {
-    //            NotificationId = Guid.NewGuid(),
-    //            UserId = request.Recipient?.UserId,
-    //            NotificationType = "Request Approved",
-    //            Message = $"Your blood request (ID: {request.RequestId}) has been approved.",
-    //            SendDate = DateOnly.FromDateTime(DateTime.Now),
-    //            IsRead = false
-    //        };
-
-    //        // Log hoạt động
-    //        _logger.LogInformation(
-    //            "Blood request {RequestId} approved by staff {StaffId}",
-    //            requestId, staffId);
-
-    //        // Lưu thay đổi
-    //        _requestRepository.Update(request);
-    //        await _requestRepository.SaveChangesAsync();
-
-    //        return (true, "Blood request approved successfully");
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        _logger.LogError(ex, "Error approving blood request {RequestId}", requestId);
-    //        return (false, "An error occurred while approving the blood request");
-    //    }
-
-    //}
+    
     public async Task<(bool success, string message, Guid? requestId)> RegisterEmergencyBloodRequestAsync(
     EmergencyBloodRequestDTO request, Guid staffId)
     {
@@ -330,18 +225,39 @@ public class BloodRequestService : IBloodRequestService
                 return (false, "Invalid staff member", null);
             }
 
-            // Check blood inventory first
-            var bloodTypeId = request.BloodTypeRequired;
+            // Get the required blood type details
+            var requiredBloodType = await _bloodTypeRepository.GetByIdAsync(request.BloodTypeRequired);
+            if (requiredBloodType == null)
+            {
+                return (false, "Invalid blood type specified", null);
+            }
+
+            var bloodTypeString = $"{requiredBloodType.AboType}{requiredBloodType.RhFactor}";
             var quantityNeeded = request.QuantityNeeded;
-            var availableQuantity = await _bloodTypeRepository.GetAvailableUnitsQuantityAsync(bloodTypeId);
-            // Xác định trạng thái dựa trên số lượng máu khả dụng (ml)
-            var initialStatus = availableQuantity >= quantityNeeded
-                ? BloodRequestStatus.Pending.ToString()  // Có đủ ml máu trong kho
-                : BloodRequestStatus.Opened.ToString();   // Không đủ ml máu, cần hiển thị lên UI
-            _logger.LogInformation(
-            "Blood availability check - Required: {Required}ml, Available: {Available}ml, Status: {Status}",
-            quantityNeeded, availableQuantity, initialStatus);
-            // Create or update user
+            var totalAvailableQuantity = 0;
+
+            // Kiểm tra và tính toán lượng máu tương thích có sẵn
+            var compatibleTypes = GetCompatibleBloodTypes(bloodTypeString);
+            foreach (var compatibleType in compatibleTypes)
+            {
+                var compatibleBloodType = (await _bloodTypeRepository.GetAllAsync())
+                    .FirstOrDefault(bt => $"{bt.AboType}{bt.RhFactor}" == compatibleType);
+                    
+                if (compatibleBloodType != null)
+                {
+                    var availableQuantity = await _bloodTypeRepository.GetAvailableUnitsQuantityAsync(compatibleBloodType.BloodTypeId);
+                    totalAvailableQuantity += availableQuantity;
+                    _logger.LogInformation(
+                        "Compatible blood type {CompatibleType} has {Available}ml available",
+                        compatibleType, availableQuantity);
+                }
+            }
+
+            var initialStatus = totalAvailableQuantity >= quantityNeeded
+                ? BloodRequestStatus.Pending.ToString()
+                : BloodRequestStatus.Opened.ToString();
+
+            // Tìm hoặc tạo user mới
             var existingUser = await _userRepository.GetByEmailAsync(request.Email);
             if (existingUser == null)
             {
@@ -375,7 +291,7 @@ public class BloodRequestService : IBloodRequestService
                 _logger.LogInformation("Updated existing user information for ID: {UserId}", existingUser.UserId);
             }
 
-            // Create or get recipient
+            // Tìm hoặc tạo recipient
             var recipient = await _recipientRepository.GetByUserIdAsync(existingUser.UserId);
             if (recipient == null)
             {
@@ -385,12 +301,43 @@ public class BloodRequestService : IBloodRequestService
                     UserId = existingUser.UserId,
                     ContactInfo = request.Phone
                 };
+
+                // Kiểm tra xem user đã có nhóm máu chưa
+                var existingDonor = await _donorRepository.GetByIdAsync(existingUser.UserId);
+                if (existingDonor == null || existingDonor.BloodTypeId == null)
+                {
+                    // Nếu chưa có thông tin donor hoặc chưa có nhóm máu, tạo mới donor với nhóm máu từ yêu cầu
+                    if (existingDonor == null)
+                    {
+                        existingDonor = new Donor
+                        {
+                            DonorId = Guid.NewGuid(),
+                            UserId = existingUser.UserId,
+                            BloodTypeId = request.BloodTypeRequired, // Gán nhóm máu từ yêu cầu
+                            FullName = request.PatientName,
+                            Email = request.Email,
+                            PhoneNumber = request.Phone
+                        };
+                        await _donorRepository.AddAsync(existingDonor);
+                    }
+                    else
+                    {
+                        existingDonor.BloodTypeId = request.BloodTypeRequired; // Cập nhật nhóm máu
+                        _donorRepository.Update(existingDonor);
+                    }
+                    await _donorRepository.SaveChangesAsync();
+                    _logger.LogInformation(
+                        "Updated blood type for user {UserId} to {BloodType}",
+                        existingUser.UserId, bloodTypeString);
+                }
+
                 await _recipientRepository.AddAsync(recipient);
                 await _recipientRepository.SaveChangesAsync();
                 _logger.LogInformation("Created new recipient with ID: {RecipientId}", recipient.RecipientId);
             }
 
-            // Create emergency blood request
+            // Tạo yêu cầu máu khẩn cấp
+            var compatibleTypesStr = string.Join(", ", compatibleTypes);
             var bloodRequest = new BloodRequest
             {
                 RequestId = Guid.NewGuid(),
@@ -400,27 +347,22 @@ public class BloodRequestService : IBloodRequestService
                 UrgencyLevel = "Emergency",
                 RequestDate = DateOnly.FromDateTime(DateTime.UtcNow),
                 Status = initialStatus,
-                Description = $"Emergency request. Available quantity: {availableQuantity}ml. {request.Description}"
+                Description = $"Emergency request. Required blood type: {bloodTypeString}. Compatible types: {compatibleTypesStr}. " +
+                            $"Total available compatible blood: {totalAvailableQuantity}ml. {request.Description}"
             };
 
             await _requestRepository.AddAsync(bloodRequest);
             await _requestRepository.SaveChangesAsync();
 
-            _logger.LogInformation(
-                "Created emergency blood request with ID: {RequestId}, Status: {Status}, Available Units: {AvailableUnits}",
-                bloodRequest.RequestId, initialStatus, availableQuantity);
-
-            // Create notification
-            var notificationMessage = initialStatus == BloodRequestStatus.Pending.ToString()
-                ? $"Emergency blood request has been created with sufficient blood in inventory. Request ID: {bloodRequest.RequestId}"
-                : $"Emergency blood request has been created and opened for donors. Request ID: {bloodRequest.RequestId}";
-
+            // Tạo thông báo
             var notification = new Notification
             {
                 NotificationId = Guid.NewGuid(),
                 UserId = existingUser.UserId,
                 NotificationType = "Emergency Blood Request",
-                Message = notificationMessage,
+                Message = initialStatus == BloodRequestStatus.Pending.ToString()
+                    ? $"Emergency blood request has been created with sufficient compatible blood in inventory. Request ID: {bloodRequest.RequestId}"
+                    : $"Emergency blood request has been created and opened for donors. Compatible blood types needed: {compatibleTypesStr}. Request ID: {bloodRequest.RequestId}",
                 SendDate = DateOnly.FromDateTime(DateTime.Now),
                 IsRead = false
             };
@@ -676,5 +618,21 @@ public class BloodRequestService : IBloodRequestService
             _logger.LogError(ex, "Error getting user details for blood request {RequestId}", requestId);
             throw;
         }
+    }
+    private List<string> GetCompatibleBloodTypes(string bloodType)
+    {
+        // Return blood types that can donate to the specified blood type
+        return bloodType.ToUpper() switch
+        {
+            "A+" => new List<string> { "A+", "A-", "O+", "O-" },
+            "A-" => new List<string> { "A-", "O-" },
+            "B+" => new List<string> { "B+", "B-", "O+", "O-" },
+            "B-" => new List<string> { "B-", "O-" },
+            "AB+" => new List<string> { "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-" },
+            "AB-" => new List<string> { "A-", "B-", "AB-", "O-" },
+            "O+" => new List<string> { "O+", "O-" },
+            "O-" => new List<string> { "O-" },
+            _ => new List<string>()
+        };
     }
 }
