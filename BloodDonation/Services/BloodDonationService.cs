@@ -281,62 +281,9 @@ namespace Services
         {
             var donation = await _donationRepository.GetByIdAsync(donationId);
             if (donation == null) return false;
-
-            // Find Donor
-            var donor = await _donorRepository.GetByIdAsync(donation.DonorId ?? Guid.Empty);
-            if (donor == null) return false;
-
-            // Find HealthCheck on the same date as the donation
-            DateTime? donationDate = donation.DonationDate;
-            HealthCheck healthCheck = null;
-
-            if (donationDate != null)
-            {
-                var date = donationDate.Value.Date;
-                healthCheck = await _context.HealthChecks
-                    .Where(h => h.DonorId == donor.DonorId && h.HealthCheckDate.Date == date)
-                    .OrderByDescending(h => h.HealthCheckDate)
-                    .FirstOrDefaultAsync();
-            }
-
-            // Update old "Approved" health checks to "Used" if a donation exists for their date
-            Guid excludeHealthCheckId = healthCheck != null ? healthCheck.HealthCheckId : Guid.Empty;
-
-            var oldApprovedChecks = await _context.HealthChecks
-                .Where(h => h.DonorId == donor.DonorId
-                    && h.HealthCheckStatus == "Approved"
-                    && h.HealthCheckId != excludeHealthCheckId)
-                .ToListAsync();
-
-            foreach (var oldCheck in oldApprovedChecks)
-            {
-                var used = await _context.BloodDonations.AnyAsync(d =>
-                d.DonorId == donor.DonorId &&
-                d.DonationDate != null &&
-                d.DonationDate.Value.Date == oldCheck.HealthCheckDate.Date);
-                if (used)
-                {
-                    oldCheck.HealthCheckStatus = "Used";
-                    _context.HealthChecks.Update(oldCheck);
-                }
-            }
-
-            // Update current health check status to "Rejected" if found
-            if (healthCheck != null)
-            {
-                healthCheck.HealthCheckStatus = "Rejected";
-                _context.HealthChecks.Update(healthCheck);
-            }
-
-            // Update donation status and notes
             donation.Status = "Rejected";
             donation.Notes = $"Rejected: {reason} on {rejectionDate?.ToString() ?? DateTime.Now.ToShortDateString()}";
-            _donationRepository.Update(donation);
-
-            // Save all changes
-            await _context.SaveChangesAsync();
             await _donationRepository.SaveChangesAsync();
-
             return true;
         }
 
