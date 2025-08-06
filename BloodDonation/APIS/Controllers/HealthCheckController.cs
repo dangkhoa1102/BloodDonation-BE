@@ -80,5 +80,27 @@ namespace APIS.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpPost("reject/{healthCheckId}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Staff,Admin")]
+        public async Task<IActionResult> Reject(Guid healthCheckId)
+        {
+            try
+            {
+                // Lấy staffId từ claim
+                var staffIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(staffIdClaim) || !Guid.TryParse(staffIdClaim, out var staffId))
+                {
+                    return Unauthorized(new { message = "Không xác định được StaffId" });
+                }
+
+                await _service.RejectHealthCheckAsync(healthCheckId, staffId);
+                return Ok(new { message = "Từ chối Phiếu Sức Khỏe thành công!" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }

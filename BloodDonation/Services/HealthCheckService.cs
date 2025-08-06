@@ -208,5 +208,52 @@ namespace Services
             await _context.SaveChangesAsync();
         }
 
+        public async Task RejectHealthCheckAsync(Guid healthCheckId, Guid staffId)
+        {
+            var healthCheck = await _repo.GetByIdAsync(healthCheckId);
+            if (healthCheck == null) throw new Exception("Không tìm thấy HealthCheck");
+
+            // Tìm Donor
+            var donor = await _donorRepo.GetByIdAsync(healthCheck.DonorId);
+            if (donor == null) throw new Exception("Không tìm thấy Donor");
+
+            // Tìm BloodDonation đúng ngày HealthCheck
+            var donation = await _context.BloodDonations
+                .Where(d => d.DonorId == donor.DonorId
+                    && d.DonationDate.HasValue
+                    && d.DonationDate.Value.Date == healthCheck.HealthCheckDate.Date)
+                .OrderByDescending(d => d.DonationDate)
+                .FirstOrDefaultAsync();
+
+            // Cập nhật trạng thái các HealthCheck "Approved" cũ thành "Used" nếu đã có BloodDonation
+            var oldApprovedChecks = await _context.HealthChecks
+                .Where(h => h.DonorId == donor.DonorId && h.HealthCheckStatus == "Approved" && h.HealthCheckId != healthCheckId)
+                .ToListAsync();
+
+            foreach (var oldCheck in oldApprovedChecks)
+            {
+                var used = await _context.BloodDonations.AnyAsync(d =>
+                    d.DonorId == donor.DonorId && d.DonationDate == oldCheck.HealthCheckDate);
+                if (used)
+                {
+                    oldCheck.HealthCheckStatus = "Used";
+                    _context.HealthChecks.Update(oldCheck);
+                }
+            }
+
+            // 1. Cập nhật trạng thái HealthCheck hiện tại
+            healthCheck.HealthCheckStatus = "Rejected";
+            await _repo.UpdateAsync(healthCheck);
+
+            // 2. Nếu có BloodDonation, cập nhật trạng thái
+            if (donation != null)
+            {
+                donation.Status = "Rejected";
+                _context.BloodDonations.Update(donation);
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
     }
 }

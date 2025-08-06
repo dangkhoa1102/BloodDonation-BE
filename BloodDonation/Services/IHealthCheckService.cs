@@ -18,4 +18,7 @@ public interface IHealthCheckService
 
     Task ApproveHealthCheckAsync(Guid healthCheckId, Guid staffId);
 
+    Task RejectHealthCheckAsync(Guid healthCheckId, Guid staffId);
+
+
 }
